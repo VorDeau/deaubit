@@ -45,7 +45,7 @@ export async function DELETE(
       where: { id: existing.id },
     });
 
-    revalidateTag(`shortlink:${existing.slug}`, { expire: 0 });
+    revalidateTag(`shortlink:${existing.slug}`);
 
     return NextResponse.json({ ok: true });
 
@@ -72,8 +72,11 @@ export async function PATCH(
     });
 
     if (!existing) return NextResponse.json({ error: "Link not found" }, { status: 404 });
-    
-    if (existing.userId !== user.id) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+
+    const isAdmin = user.role === "ADMIN";
+    const isOwner = existing.userId === user.id;
+
+    if (!isOwner && !isAdmin) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
     const updateData: any = {};
 
@@ -100,7 +103,7 @@ export async function PATCH(
       data: updateData,
     });
 
-    revalidateTag(`shortlink:${existing.slug}`, { expire: 0 });
+    revalidateTag(`shortlink:${existing.slug}`);
 
     return NextResponse.json(updatedLink);
 

@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       },
     });
     
-    const shortUrl = `${process.env.NEXT_PUBLIC_APP_URL || "https://deau.bit"}/${link.slug}`;
+    const shortUrl = `${process.env.NEXT_PUBLIC_BASE_URL || "https://deau.bit"}/${link.slug}`;
 
     const response = NextResponse.json({ shortUrl }, { status: 201 });
     

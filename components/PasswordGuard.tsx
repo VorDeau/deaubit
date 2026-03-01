@@ -14,7 +14,7 @@ export default function PasswordGuard({ slug }: { slug: string }) {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault(); setLoading(true); setError("");
     try {
-      const res = await fetch(`/api/links/${slug}/verify`, { method: "POST", body: JSON.stringify({ password }) });
+      const res = await fetch(`/api/links/${slug}/verify`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Access Denied");
       setTargetUrl(data.targetUrl);

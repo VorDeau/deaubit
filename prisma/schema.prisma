@@ -25,6 +25,7 @@ model User {
   
   verifiedAt    DateTime?
   otpSecret     String?
+  otpExpiresAt  DateTime?
 
   resetToken       String?
   resetTokenExpiry DateTime?

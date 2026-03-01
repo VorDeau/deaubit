@@ -16,25 +16,25 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: "Forbidden: Admin access only" }, { status: 403 });
     }
 
-    const reports = await prisma.report.findMany({
-        orderBy: { createdAt: "desc" },
-        include: {
-            shortLink: {
-                select: { slug: true, targetUrl: true }
-            }
-        },
-        take: 50
-    });
-
-    const publicLinks = await prisma.shortLink.findMany({
-        where: { userId: null },
-        orderBy: { createdAt: "desc" },
-        take: 50
-    });
-
-    const totalUsers = await prisma.user.count();
-    const totalLinks = await prisma.shortLink.count();
-    const totalReports = await prisma.report.count({ where: { status: "PENDING" } });
+    const [reports, publicLinks, totalUsers, totalLinks, totalReports] = await prisma.$transaction([
+        prisma.report.findMany({
+            orderBy: { createdAt: "desc" },
+            include: {
+                shortLink: {
+                    select: { slug: true, targetUrl: true }
+                }
+            },
+            take: 50
+        }),
+        prisma.shortLink.findMany({
+            where: { userId: null },
+            orderBy: { createdAt: "desc" },
+            take: 50
+        }),
+        prisma.user.count(),
+        prisma.shortLink.count(),
+        prisma.report.count({ where: { status: "PENDING" } }),
+    ]);
 
     return NextResponse.json({
         reports,

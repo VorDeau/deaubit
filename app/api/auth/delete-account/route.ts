@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { SESSION_COOKIE_NAME, verifyUserJWT } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, verifyUserJWT, generateOTP } from "@/lib/auth";
 import { sendAccountDeletedEmail, sendAdminDeletionCodeEmail, sendAdminGoodbyeEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
@@ -26,10 +26,11 @@ export async function POST(req: NextRequest) {
     if (user.role === 'ADMIN') {
         
         if (!otp) {
-            const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+            const newOtp = generateOTP();
+            const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
             await prisma.user.update({
                 where: { id: user.id },
-                data: { otpSecret: newOtp }
+                data: { otpSecret: newOtp, otpExpiresAt }
             });
             
             await sendAdminDeletionCodeEmail(user.email, newOtp);
@@ -41,11 +42,7 @@ export async function POST(req: NextRequest) {
                 return NextResponse.json({ error: "Kode konfirmasi salah!" }, { status: 400 });
             }
 
-            console.log("[ADMIN] Performing Full Database Reset...");
-            await prisma.report.deleteMany({});
-            await prisma.click.deleteMany({});
-            await prisma.shortLink.deleteMany({});
-            await prisma.user.deleteMany({});
+            await prisma.user.delete({ where: { id: user.id } });
 
             try { await sendAdminGoodbyeEmail(user.email, user.name || "Admin"); } catch {}
         }

@@ -28,6 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     const otp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -44,7 +45,8 @@ export async function POST(req: NextRequest) {
         data: { 
             name: finalName, 
             password: hashedPassword, 
-            otpSecret: otp 
+            otpSecret: otp,
+            otpExpiresAt,
         },
       });
     } else {
@@ -53,7 +55,8 @@ export async function POST(req: NextRequest) {
             name: finalName, 
             email, 
             password: hashedPassword, 
-            otpSecret: otp 
+            otpSecret: otp,
+            otpExpiresAt,
         },
       });
     }

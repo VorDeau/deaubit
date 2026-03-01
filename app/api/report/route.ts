@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
     const reportedHost = urlObj.hostname;
 
     if (appHost && shortHost && !reportedHost.includes(appHost) && !reportedHost.includes(shortHost)) {
+        return NextResponse.json({ error: "URL tidak berasal dari domain yang valid." }, { status: 400 });
     }
 
     const slug = urlObj.pathname.replace(/^\//, "");

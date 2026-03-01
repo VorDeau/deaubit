@@ -3,6 +3,15 @@
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#x27;");
+}
+
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT),
@@ -230,9 +239,9 @@ export async function sendAbuseReportEmail(data: { linkUrl: string; reason: stri
     <p><strong>User Report</strong></p>
     <p>A link has been flagged for review.</p>
     <div style="background:#f9fafb; border:1px solid #e5e7eb; padding:15px; margin:20px 0; border-radius:6px; color:#374151;">
-       <p style="margin:5px 0"><strong>URL:</strong> <span style="background:#eee; padding:2px 6px; border-radius:4px; font-family:monospace;">${data.linkUrl}</span></p>
-       <p style="margin:5px 0"><strong>Reason:</strong> ${data.reason}</p>
-       <p style="margin:5px 0"><strong>Details:</strong> ${data.details || "-"}</p>
+       <p style="margin:5px 0"><strong>URL:</strong> <span style="background:#eee; padding:2px 6px; border-radius:4px; font-family:monospace;">${escapeHtml(data.linkUrl)}</span></p>
+       <p style="margin:5px 0"><strong>Reason:</strong> ${escapeHtml(data.reason)}</p>
+       <p style="margin:5px 0"><strong>Details:</strong> ${escapeHtml(data.details || "-")}</p>
     </div>
     <div style="text-align: center; margin-top: 24px;">
         <a href="${deleteLink}" class="btn" style="background-color: #dc2626 !important;">Review & Delete</a>

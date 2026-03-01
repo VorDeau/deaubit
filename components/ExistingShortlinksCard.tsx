@@ -220,7 +220,6 @@ export function ExistingShortlinksCard({
                     link={link} 
                     baseUrl={baseUrl} 
                     getDomainLabel={getDomainLabel} 
-                    onDelete={onDelete}
                     onEdit={onEdit}
                     onViewStats={onViewStats} 
                     onViewQr={onViewQr} 

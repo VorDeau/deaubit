@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { sendVerificationEmail, sendAdminVerificationEmail } from "@/lib/mail";
 import { checkRateLimit } from "@/lib/rateLimit";
+import { generateOTP } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
@@ -34,11 +35,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Akun sudah diverifikasi." }, { status: 400 });
     }
 
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const newOtp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     await prisma.user.update({
       where: { email },
-      data: { otpSecret: newOtp },
+      data: { otpSecret: newOtp, otpExpiresAt },
     });
 
     if (user.role === "ADMIN") {

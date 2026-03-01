@@ -12,6 +12,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Data tidak lengkap" }, { status: 400 });
     }
 
+    if (newPassword.length < 8) {
+      return NextResponse.json({ error: "Password minimal 8 karakter" }, { status: 400 });
+    }
+
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {

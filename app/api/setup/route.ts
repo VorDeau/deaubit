@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendAdminVerificationEmail } from "@/lib/mail";
+import { generateOTP } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +17,8 @@ export async function POST(req: NextRequest) {
     if (!email || !password) return NextResponse.json({ error: "Data incomplete." }, { status: 400 });
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
 
     await prisma.user.create({
       data: {
@@ -26,6 +28,7 @@ export async function POST(req: NextRequest) {
         role: "ADMIN",
         verifiedAt: null,
         otpSecret: otp,
+        otpExpiresAt,
       },
     });
 

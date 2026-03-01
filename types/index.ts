@@ -11,23 +11,13 @@ export interface LoginResponse extends ApiResponse {
 }
 
 export interface PublicLinkResponse extends ApiResponse {
-    slug: string;
-    targetUrl: string;
+    shortUrl: string;
 }
 
 export interface SessionResponse extends ApiResponse {
     authenticated: boolean;
-    username?: string;
+    name?: string;
     role?: string; 
-}
-
-export interface LoginFormData {
-    username: string;
-    password: string;
-}
-
-export interface PublicShortlinkFormData {
-    targetUrl: string;
 }
 
 export interface ShortlinkResult {
@@ -38,3 +28,4 @@ export interface ShortlinkResult {
 export interface SetupStatusResponse {
     initialized: boolean;
 }
+

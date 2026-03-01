@@ -13,6 +13,7 @@ export async function GET() {
 
     return NextResponse.json({ initialized: adminCount > 0 });
   } catch (error) {
-    return NextResponse.json({ initialized: true });
+    console.error("Setup status check error:", error);
+    return NextResponse.json({ error: "Database unavailable" }, { status: 503 });
   }
 }

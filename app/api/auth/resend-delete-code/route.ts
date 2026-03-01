@@ -2,7 +2,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { SESSION_COOKIE_NAME, verifyUserJWT } from "@/lib/auth";
+import { SESSION_COOKIE_NAME, verifyUserJWT, generateOTP } from "@/lib/auth";
 import { sendAdminDeletionCodeEmail } from "@/lib/mail";
 import { checkRateLimit } from "@/lib/rateLimit";
 
@@ -22,11 +22,12 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Too many requests." }, { status: 429 });
     }
 
-    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    const newOtp = generateOTP();
+    const otpExpiresAt = new Date(Date.now() + 15 * 60 * 1000);
     
     await prisma.user.update({
         where: { id: payload.id },
-        data: { otpSecret: newOtp }
+        data: { otpSecret: newOtp, otpExpiresAt }
     });
 
     await sendAdminDeletionCodeEmail(payload.email, newOtp);

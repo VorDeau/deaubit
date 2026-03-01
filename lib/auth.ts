@@ -37,10 +37,10 @@ export function verifyUserJWT(token: string): UserJwtPayload | null {
 }
 
 export function generateOTP(length: number = 6): string {
-  const digits = "0123456789";
+  const { randomInt } = require("crypto");
   let otp = "";
   for (let i = 0; i < length; i++) {
-    otp += digits[Math.floor(Math.random() * 10)];
+    otp += randomInt(0, 10).toString();
   }
   return otp;
 }

@@ -22,9 +22,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Kode verifikasi salah" }, { status: 401 });
     }
 
+    if (user.otpExpiresAt && new Date() > user.otpExpiresAt) {
+      return NextResponse.json({ error: "Kode verifikasi sudah kadaluarsa, silakan minta ulang" }, { status: 400 });
+    }
+
     await prisma.user.update({
       where: { email },
-      data: { verifiedAt: new Date(), otpSecret: null },
+      data: { verifiedAt: new Date(), otpSecret: null, otpExpiresAt: null },
     });
 
     try {

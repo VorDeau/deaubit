@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   compress: true,
   poweredByHeader: false,
-  serverExternalPackages: ["geoip-lite"],
+  serverExternalPackages: ["fast-geoip"],
 
   typescript: {
     ignoreBuildErrors: false,

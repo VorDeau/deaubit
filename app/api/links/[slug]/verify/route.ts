@@ -24,6 +24,10 @@ export async function POST(
       return NextResponse.json({ targetUrl: link.targetUrl });
     }
 
+    if (!password) {
+      return NextResponse.json({ error: "Password diperlukan" }, { status: 400 });
+    }
+
     const isValid = await bcrypt.compare(password, link.password);
     
     if (!isValid) {
