@@ -1,6 +1,7 @@
 //lib/auth.ts
 
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
+import { randomInt } from "crypto";
 import { SESSION_COOKIE_NAME, SESSION_MAX_AGE } from "@/constants";
 
 const rawSecret = process.env.JWT_SECRET;
@@ -37,7 +38,6 @@ export function verifyUserJWT(token: string): UserJwtPayload | null {
 }
 
 export function generateOTP(length: number = 6): string {
-  const { randomInt } = require("crypto");
   let otp = "";
   for (let i = 0; i < length; i++) {
     otp += randomInt(0, 10).toString();

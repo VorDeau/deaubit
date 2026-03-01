@@ -6,10 +6,11 @@ import { createHmac } from "crypto";
 const VERIFY_ENDPOINT = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TURNSTILE_COOKIE_NAME = "db-cv";
 const TURNSTILE_VALIDITY = 300;
-const SECRET = process.env.JWT_SECRET;
-if (!SECRET) {
+const rawSecret = process.env.JWT_SECRET;
+if (!rawSecret) {
   throw new Error("JWT_SECRET is not set");
 }
+const SECRET: string = rawSecret;
 
 function signData(data: string) {
     return createHmac("sha256", SECRET).update(data).digest("hex");
