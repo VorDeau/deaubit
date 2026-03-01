@@ -17,13 +17,6 @@ export default function PublicShortlinkForm() {
     
     const [turnstileToken, setTurnstileToken] = useState("");
 
-    const shortBaseUrl = 
-        (process.env.NEXT_PUBLIC_SHORT_HOST || process.env.NEXT_PUBLIC_APP_HOST || "")
-        .replace(/\/+$/, "") || 
-        (typeof window !== "undefined" ? window.location.origin.replace(/\/+$/, "") : "");
-    
-    const protocol = process.env.NEXT_PUBLIC_PROTOCOL || "https";
-
     async function handlePublicSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         
@@ -57,9 +50,12 @@ export default function PublicShortlinkForm() {
                 );
             }
 
-            const shortUrl = `${protocol}://${shortBaseUrl}/${data.slug}`;
+            if (typeof data.shortUrl !== "string") {
+                throw new Error("Failed to create link.");
+            }
 
-            setPublicResult({ slug: data.slug, shortUrl });
+            const slug = data.shortUrl.split("/").pop() ?? "";
+            setPublicResult({ slug, shortUrl: data.shortUrl });
             setPublicTarget("");
         } catch (err) {
             const msg =
