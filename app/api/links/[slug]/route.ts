@@ -45,7 +45,7 @@ export async function DELETE(
       where: { id: existing.id },
     });
 
-    revalidateTag(`shortlink:${existing.slug}`);
+    revalidateTag(`shortlink:${existing.slug}`, { expire: 0 });
 
     return NextResponse.json({ ok: true });
 
@@ -103,7 +103,7 @@ export async function PATCH(
       data: updateData,
     });
 
-    revalidateTag(`shortlink:${existing.slug}`);
+    revalidateTag(`shortlink:${existing.slug}`, { expire: 0 });
 
     return NextResponse.json(updatedLink);
 
