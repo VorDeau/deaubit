@@ -7,38 +7,13 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
     - uses: actions/checkout@v3
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20'
-
-    - name: Connect to Tailscale
-      uses: tailscale/github-action@v3
-      with:
-        authkey: ${{ secrets.TAILSCALE_AUTHKEY }}
-        version: latest
-
-    - name: Create .env file
-      run: |
-        touch .env
-        echo "CRON_SECRET=${{ secrets.CRON_SECRET }}" >> .env
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env
-        echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-        echo "NEXT_PUBLIC_APP_HOST=${{ secrets.NEXT_PUBLIC_APP_HOST }}" >> .env
-        echo "NEXT_PUBLIC_PROTOCOL=${{ secrets.NEXT_PUBLIC_PROTOCOL }}" >> .env
-        echo "NEXT_PUBLIC_SHORT_HOST=${{ secrets.NEXT_PUBLIC_SHORT_HOST }}" >> .env
-        echo "NEXT_PUBLIC_TURNSTILE_SITE_KEY=${{ secrets.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}" >> .env
-        echo "SMTP_FROM=${{ secrets.SMTP_FROM }}" >> .env
-        echo "SMTP_HOST=${{ secrets.SMTP_HOST }}" >> .env
-        echo "SMTP_PASS=${{ secrets.SMTP_PASS }}" >> .env
-        echo "SMTP_PORT=${{ secrets.SMTP_PORT }}" >> .env
-        echo "SMTP_USER=${{ secrets.SMTP_USER }}" >> .env
-        echo "TURNSTILE_SECRET_KEY=${{ secrets.TURNSTILE_SECRET_KEY }}" >> .env
+    - name: Inject .env
+      run: cp /home/noble/envs/deaubit/.env .env
 
     - name: Install Dependencies
       run: npm ci
@@ -51,11 +26,11 @@ jobs:
     - name: Build
       run: |
         npm run build
-        
+
         mkdir -p .next/standalone/public
         mkdir -p .next/standalone/.next/static
 
-        cp .env .next/standalone/ || true
+        cp .env .next/standalone/
 
         if [ -d "public" ]; then
           cp -r public/* .next/standalone/public/
@@ -63,21 +38,16 @@ jobs:
 
         cp -r .next/static/* .next/standalone/.next/static/
 
-    - name: Copy files
-      uses: appleboy/scp-action@master
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        source: ".next/standalone/*"
-        target: "/var/www/deaubit"
-        strip_components: 2
-    
+    - name: Deploy to Kripton
+      run: |
+        rsync -av --delete \
+          -e "ssh -i /home/noble/.ssh/radon_deploy -o StrictHostKeyChecking=no" \
+          .next/standalone/ \
+          noble@100.64.0.3:/var/www/deaubit/
+
     - name: Restart PM2
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USERNAME }}
-        key: ${{ secrets.VPS_SSH_KEY }}
-        script: |
-          pm2 reload deaubit || pm2 start /var/www/deaubit/server.js --name deaubit
+      run: |
+        ssh -i /home/noble/.ssh/radon_deploy \
+          -o StrictHostKeyChecking=no \
+          noble@100.64.0.3 \
+          "pm2 reload deaubit || pm2 start /var/www/deaubit/ecosystem.config.js"
