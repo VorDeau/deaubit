@@ -38,12 +38,6 @@ jobs:
 
         cp -r .next/static/* .next/standalone/.next/static/
 
-    - name: Debug PATH
-      run: |
-        echo "PATH: $PATH"
-        ls -la /usr/bin/rsync
-        /usr/bin/rsync --version
-
     - name: Deploy to Kripton
       run: |
         /usr/bin/rsync -av --delete \
@@ -56,4 +50,20 @@ jobs:
         ssh -i /home/noble/.ssh/radon_deploy \
           -o StrictHostKeyChecking=no \
           noble@100.64.0.3 \
-          "pm2 reload deaubit || pm2 start /var/www/deaubit/ecosystem.config.js"
+          "cat > /var/www/deaubit/ecosystem.config.js << 'EOF'
+        module.exports = {
+          apps: [
+            {
+              name: 'deaubit',
+              script: '/var/www/deaubit/server.js',
+              cwd: '/var/www/deaubit',
+              env: {
+                NODE_ENV: 'production',
+                PORT: 3000,
+                HOSTNAME: '0.0.0.0'
+              }
+            }
+          ]
+        }
+        EOF
+        pm2 reload deaubit || pm2 start /var/www/deaubit/ecosystem.config.js"
