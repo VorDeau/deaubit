@@ -40,7 +40,7 @@ jobs:
 
     - name: Deploy to Kripton
       run: |
-        rsync -av --delete \
+        /usr/bin/rsync -av --delete \
           -e "ssh -i /home/noble/.ssh/radon_deploy -o StrictHostKeyChecking=no" \
           .next/standalone/ \
           noble@100.64.0.3:/var/www/deaubit/
