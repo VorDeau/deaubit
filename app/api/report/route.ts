@@ -29,12 +29,44 @@ export async function POST(req: NextRequest) {
     }
 
     const urlObj = new URL(validUrl);
-    const appHost = process.env.NEXT_PUBLIC_APP_HOST?.split(":")[0];
-    const shortHost = process.env.NEXT_PUBLIC_SHORT_HOST?.split(":")[0];
-    const reportedHost = urlObj.hostname;
+    const slug = urlObj.pathname.replace(/^\//, "");
 
-    if (appHost && shortHost && !reportedHost.includes(appHost) && !reportedHost.includes(shortHost)) {
-        return NextResponse.json({ error: "URL does not belong to a valid domain." }, { status: 400 });
+    if (!slug) {
+        return NextResponse.json({ error: "Could not identify shortlink from URL." }, { status: 400 });
     }
 
-    const slug = urlObj.pathname.replace(/^\
+    const shortLink = await prisma.shortLink.findUnique({
+        where: { slug }
+    });
+
+    if (!shortLink) {
+        return NextResponse.json({ error: "Link not found in our database." }, { status: 404 });
+    }
+
+    await prisma.report.create({
+        data: {
+            shortLinkId: shortLink.id,
+            reason: sanitizeInput(reason),
+            details: details ? sanitizeInput(details) : "",
+            contact: contact ? sanitizeInput(contact) : "",
+        }
+    });
+
+    try {
+        await sendAbuseReportEmail({
+            linkUrl: validUrl,
+            reason,
+            details: details || "-",
+            reporter: ip
+        });
+    } catch (emailErr) {
+        console.error("[Report] Failed to send email alert:", emailErr);
+    }
+
+    return NextResponse.json({ success: true, message: "Report submitted. Thank you." });
+
+  } catch (error) {
+    console.error("[Report] Error:", error);
+    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+  }
+}

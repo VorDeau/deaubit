@@ -5,10 +5,17 @@ import { prisma } from "@/lib/prisma";
 import { generateRandomSlug } from "@/lib/slug";
 import { sanitizeAndValidateUrl } from "@/lib/validation";
 import { verifyTurnstileWithCookie } from "@/lib/turnstile";
+import { checkRateLimit } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
     const { targetUrl, cfTurnstile } = await req.json();
+
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    const limit = await checkRateLimit(ip, "public_link_creation");
+    if (!limit.ok) {
+        return NextResponse.json({ error: "Too many links created. Please wait an hour." }, { status: 429 });
+    }
 
     const turnstileCheck = await verifyTurnstileWithCookie(req, cfTurnstile);
     if (!turnstileCheck.success) {

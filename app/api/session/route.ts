@@ -23,7 +23,6 @@ export async function GET(req: NextRequest) {
     return res;
   }
 
-  
   if (payload.jti) {
     const valid = await validateSession(payload.jti);
     if (!valid) {
@@ -31,11 +30,9 @@ export async function GET(req: NextRequest) {
       res.cookies.delete(SESSION_COOKIE_NAME);
       return res;
     }
-    
     await deleteSession(payload.jti);
   }
 
-  
   const { token: newToken, jti: newJti } = signUserJWT({
     id: payload.id,
     email: payload.email,
@@ -56,7 +53,6 @@ export async function GET(req: NextRequest) {
   });
 
   const isProduction = process.env.NODE_ENV === "production";
-
   res.cookies.set(SESSION_COOKIE_NAME, newToken, {
     httpOnly: true,
     secure: isProduction,

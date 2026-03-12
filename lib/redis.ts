@@ -28,8 +28,18 @@ if (process.env.REDIS_URL) {
 
     redis.on("connect", () => {
       if (process.env.NODE_ENV !== "production") {
-        console.log("[Redis] Connected to", process.env.REDIS_URL);
+        console.log("[Redis] Connected to Redis server.");
       }
     });
 
-    
+    if (process.env.NODE_ENV !== "production") {
+      globalForRedis.redis = redis;
+    }
+  }
+} else {
+  if (process.env.NODE_ENV !== "production") {
+    console.warn("⚠️ REDIS_URL is not set. Redis features will be disabled.");
+  }
+}
+
+export { redis };

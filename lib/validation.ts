@@ -19,4 +19,18 @@ export function sanitizeAndValidateUrl(url: string): string | null {
     
     let cleaned = url.trim();
 
-    if (!/^https?:\/\
+    if (!/^https?:\/\//i.test(cleaned)) {
+        cleaned = "https://" + cleaned;
+    }
+
+    try {
+        const parsed = new URL(cleaned);
+        if (!["http:", "https:"].includes(parsed.protocol)) return null;
+        if (parsed.hostname.length < 3) return null;
+        if (!parsed.hostname.includes(".")) return null;
+        
+        return parsed.toString();
+    } catch {
+        return null;
+    }
+}
