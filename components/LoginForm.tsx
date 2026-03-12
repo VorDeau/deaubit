@@ -2,11 +2,11 @@
 
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Loader2, Mail, Eye, EyeOff, Terminal } from "lucide-react";
-import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import type { LoginResponse } from "@/types";
+import ChallengeModal from "./ChallengeModal";
 
 interface LoginFormProps {
     nextPath?: string;
@@ -20,8 +20,9 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
     const [unverified, setUnverified] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cooldown, setCooldown] = useState<number | null>(null);
-    const [turnstileToken, setTurnstileToken] = useState("");
-    const turnstileRef = useRef<TurnstileInstance>(null);
+    
+    const [showChallenge, setShowChallenge] = useState(false);
+    const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
 
     useEffect(() => {
         if (cooldown === null) return;
@@ -30,10 +31,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
         return () => clearInterval(id);
     }, [cooldown]);
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (cooldown !== null && cooldown > 0) return;
-        
+    async function performLogin(token?: string) {
         setLoading(true); setError(null); setUnverified(false);
 
         try {
@@ -43,7 +41,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                 body: JSON.stringify({ 
                     email, 
                     password,
-                    cfTurnstile: turnstileToken
+                    cfTurnstile: token
                 }),
             });
             const data: LoginResponse = await res.json().catch(() => ({}));
@@ -62,8 +60,9 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
             
             if (!res.ok) {
                 if (res.status === 400 && data.error?.includes("Security")) {
-                    turnstileRef.current?.reset();
-                    setTurnstileToken("");
+                    setPendingAction(() => (t: string) => performLogin(t));
+                    setShowChallenge(true);
+                    return;
                 }
                 throw new Error(typeof data.error === "string" ? data.error : "Login failed");
             }
@@ -76,8 +75,28 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
         }
     }
 
+    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        if (cooldown !== null && cooldown > 0) return;
+        await performLogin();
+    }
+
+    const handleChallengeSuccess = (token: string) => {
+        setShowChallenge(false);
+        if (pendingAction) {
+            pendingAction(token);
+            setPendingAction(null);
+        }
+    };
+
     return (
         <section className="h-full w-full flex items-center justify-center">
+            {showChallenge && (
+                <ChallengeModal 
+                    onSuccess={handleChallengeSuccess}
+                    onClose={() => setShowChallenge(false)}
+                />
+            )}
             <div className="db-card w-full max-w-md p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
                 
                 <div className="flex items-center gap-4 mb-8 border-b-4 border-(--db-border) pb-4">
@@ -141,19 +160,10 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </div>
                     </div>
 
-                    <div className={`overflow-hidden transition-all duration-300 ${turnstileToken ? 'h-0 opacity-0 my-0' : 'h-auto opacity-100 my-4'}`}>
-                        <Turnstile 
-                            ref={turnstileRef}
-                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
-                            onSuccess={(token) => setTurnstileToken(token)}
-                            options={{ size: 'flexible', theme: 'auto' }}
-                        />
-                    </div>
-
                     <div className="pt-2">
                         <button
                             type="submit"
-                            disabled={loading || (cooldown !== null && cooldown > 0) || !turnstileToken}
+                            disabled={loading || (cooldown !== null && cooldown > 0)}
                             className="w-full bg-(--db-primary) text-(--db-primary-fg) border-2 border-(--db-border) py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (

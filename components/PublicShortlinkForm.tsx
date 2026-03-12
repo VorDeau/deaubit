@@ -7,7 +7,7 @@ import { Loader2, Link2 } from "lucide-react";
 import type { ShortlinkResult, PublicLinkResponse } from "@/types";
 import ShortlinkResultModal from "./ShortlinkResultModal";
 import Link from "next/link";
-import { Turnstile } from "@marsidev/react-turnstile";
+import ChallengeModal from "./ChallengeModal";
 
 export default function PublicShortlinkForm() {
     const [publicTarget, setPublicTarget] = useState("");
@@ -15,16 +15,10 @@ export default function PublicShortlinkForm() {
     const [publicError, setPublicError] = useState<string | null>(null);
     const [publicResult, setPublicResult] = useState<ShortlinkResult | null>(null);
     
-    const [turnstileToken, setTurnstileToken] = useState("");
+    const [showChallenge, setShowChallenge] = useState(false);
+    const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
 
-    async function handlePublicSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        
-        if (!turnstileToken) {
-            setPublicError("Please complete the security check.");
-            return;
-        }
-
+    async function performShorten(token?: string) {
         setPublicLoading(true); setPublicError(null); setPublicResult(null);
 
         try {
@@ -33,15 +27,17 @@ export default function PublicShortlinkForm() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     targetUrl: publicTarget,
-                    cfTurnstile: turnstileToken
+                    cfTurnstile: token
                 }),
             });
 
             const data: PublicLinkResponse = await res.json().catch(() => ({} as PublicLinkResponse));
 
             if (!res.ok) {
-                if (res.status === 400 || res.status === 429) {
-                    setTurnstileToken(""); 
+                if (res.status === 400 && data.error?.includes("Security")) {
+                    setPendingAction(() => (t: string) => performShorten(t));
+                    setShowChallenge(true);
+                    return;
                 }
                 throw new Error(
                     typeof data.error === "string"
@@ -66,8 +62,27 @@ export default function PublicShortlinkForm() {
         }
     }
 
+    async function handlePublicSubmit(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        await performShorten();
+    }
+
+    const handleChallengeSuccess = (token: string) => {
+        setShowChallenge(false);
+        if (pendingAction) {
+            pendingAction(token);
+            setPendingAction(null);
+        }
+    };
+
     return (
         <>
+            {showChallenge && (
+                <ChallengeModal 
+                    onSuccess={handleChallengeSuccess}
+                    onClose={() => setShowChallenge(false)}
+                />
+            )}
             <div className="space-y-4">
                 <div className="flex items-center gap-2 mb-2 border-b-4 border-(--db-border) pb-2 text-(--db-text)">
                     <Link2 className="h-6 w-6" />
@@ -91,23 +106,9 @@ export default function PublicShortlinkForm() {
                         />
                     </div>
 
-                    <div className={`overflow-hidden transition-all duration-300 ${turnstileToken ? 'h-0 opacity-0 my-0' : 'h-auto opacity-100 my-2'}`}>
-                         <Turnstile 
-                            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
-                            onSuccess={(token) => setTurnstileToken(token)}
-                            options={{ size: 'flexible', theme: 'auto' }}
-                         />
-                    </div>
-
-                    {publicError && (
-                        <div className="bg-(--db-danger) text-white p-2 text-xs font-bold border-2 border-(--db-border) flex items-center gap-2">
-                             <span>!</span> {publicError}
-                        </div>
-                    )}
-
                     <button
                         type="submit"
-                        disabled={publicLoading || !turnstileToken}
+                        disabled={publicLoading}
                         className="w-full bg-(--db-text) text-(--db-bg) py-3 font-black text-sm uppercase border-2 border-(--db-border) hover:bg-(--db-primary) hover:text-white hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {publicLoading ? <Loader2 className="h-4 w-4 animate-spin mx-auto"/> : "SHORTEN NOW"}

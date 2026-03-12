@@ -2,28 +2,22 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
-import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 import DeauBitLogo from "@/components/DeauBitLogo";
+import ChallengeModal from "@/components/ChallengeModal";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState("");
-  
-  const turnstileRef = useRef<TurnstileInstance>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (!turnstileToken) {
-        setError("Please complete the security verification.");
-        return;
-    }
-    
+  const [showChallenge, setShowChallenge] = useState(false);
+  const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
+
+  async function performReset(token?: string) {
     setLoading(true);
     setError(null);
 
@@ -31,14 +25,15 @@ export default function ForgotPasswordPage() {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, cfTurnstile: turnstileToken }),
+        body: JSON.stringify({ email, cfTurnstile: token }),
       });
 
       const data = await res.json();
       if (!res.ok) {
           if (res.status === 400 && data.error?.includes("Security")) {
-              turnstileRef.current?.reset();
-              setTurnstileToken("");
+              setPendingAction(() => (t: string) => performReset(t));
+              setShowChallenge(true);
+              return;
           }
           throw new Error(data.error || "Request failed");
       }
@@ -50,6 +45,19 @@ export default function ForgotPasswordPage() {
       setLoading(false);
     }
   }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await performReset();
+  }
+
+  const handleChallengeSuccess = (token: string) => {
+    setShowChallenge(false);
+    if (pendingAction) {
+        pendingAction(token);
+        setPendingAction(null);
+    }
+  };
 
   if (success) {
       return (
@@ -72,6 +80,12 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="min-h-screen bg-(--db-bg) flex flex-col items-center justify-center p-4">
+      {showChallenge && (
+          <ChallengeModal 
+              onSuccess={handleChallengeSuccess}
+              onClose={() => setShowChallenge(false)}
+          />
+      )}
       <div className="mb-8">
            <DeauBitLogo size={60} />
       </div>
@@ -104,15 +118,6 @@ export default function ForgotPasswordPage() {
                 </div>
             </div>
 
-            <div className={`overflow-hidden transition-all duration-300 ${turnstileToken ? 'h-0 opacity-0 my-0' : 'h-auto opacity-100 my-4'}`}>
-                 <Turnstile 
-                    ref={turnstileRef}
-                    siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
-                    onSuccess={(token) => setTurnstileToken(token)}
-                     options={{ size: 'normal', theme: 'auto' }}
-                 />
-            </div>
-
             {error && (
                 <div className="bg-(--db-danger) text-white text-xs font-bold p-3 border-2 border-(--db-border) flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
                     <AlertCircle className="h-4 w-4"/> {error}
@@ -121,7 +126,7 @@ export default function ForgotPasswordPage() {
 
             <button 
                 type="submit" 
-                disabled={loading || !turnstileToken}
+                disabled={loading}
                 className="w-full bg-(--db-primary) text-(--db-primary-fg) border-2 border-(--db-border) py-4 font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 {loading ? <Loader2 className="animate-spin mx-auto h-5 w-5"/> : "SEND RESET LINK"}
