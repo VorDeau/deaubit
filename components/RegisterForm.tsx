@@ -2,11 +2,11 @@
 
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Loader2, Mail, FileSignature, Check, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+import ChallengeModal from "./ChallengeModal";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -16,28 +16,19 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [agreed, setAgreed] = useState(false);
-  const [turnstileToken, setTurnstileToken] = useState("");
+  const [showChallenge, setShowChallenge] = useState(false);
+  const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(""); 
   const router = useRouter();
-  const turnstileRef = useRef<TurnstileInstance>(null);
 
-  const isTurnstileDone = !!turnstileToken;
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function performRegister(token?: string) {
     setLoading(true);
     setError(""); 
 
     if (!agreed) {
         setError("You must agree to the Terms & Privacy Policy.");
-        setLoading(false);
-        return;
-    }
-
-    if (!turnstileToken) {
-        setError("Please complete the security check.");
         setLoading(false);
         return;
     }
@@ -58,15 +49,16 @@ export default function RegisterForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, cfTurnstile: turnstileToken }),
+        body: JSON.stringify({ ...formData, cfTurnstile: token }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
           if (res.status === 400 && data.error?.includes("Security")) {
-             turnstileRef.current?.reset();
-             setTurnstileToken("");
+             setPendingAction(() => (t: string) => performRegister(t));
+             setShowChallenge(true);
+             return;
           }
           throw new Error(data.error || "Registration failed.");
       }
@@ -79,8 +71,27 @@ export default function RegisterForm() {
     }
   }
 
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await performRegister();
+  }
+
+  const handleChallengeSuccess = (token: string) => {
+    setShowChallenge(false);
+    if (pendingAction) {
+        pendingAction(token);
+        setPendingAction(null);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center min-h-full w-full py-8">
+      {showChallenge && (
+          <ChallengeModal 
+              onSuccess={handleChallengeSuccess}
+              onClose={() => setShowChallenge(false)}
+          />
+      )}
       <div className="db-card w-full max-w-lg p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
         
         <div className="flex items-center gap-3 mb-6 border-b-4 border-(--db-border) pb-3">
@@ -179,37 +190,9 @@ export default function RegisterForm() {
               </label>
           </div>
           
-          <div className={`overflow-hidden transition-all duration-300 ${isTurnstileDone ? 'h-0 opacity-0 my-0' : 'h-auto opacity-100 my-2'}`}>
-               <Turnstile 
-                  ref={turnstileRef}
-                  siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || ""}
-                  onSuccess={(token) => setTurnstileToken(token)}
-                  options={{ size: 'flexible', theme: 'auto' }}
-               />
-          </div>
-
-          <div className="min-h-12 w-full flex items-center justify-center px-1 py-1">
-              <div 
-                  className={`
-                      w-full p-2 flex items-center gap-2 text-[9px] font-bold
-                      border-2 
-                      transition-colors duration-200
-                      ${error 
-                          ? "bg-(--db-danger) border-(--db-border) text-white shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake" 
-                          : "bg-transparent border-transparent text-transparent select-none"
-                      }
-                  `}
-              >
-                  <AlertCircle className={`h-4 w-4 shrink-0 ${!error && "opacity-0"}`} />
-                  <span className="leading-tight wrap-break-word w-full">
-                     {error || "Placeholder"}
-                  </span>
-              </div>
-          </div>
-
           <button 
               type="submit" 
-              disabled={loading || !isTurnstileDone || !agreed} 
+              disabled={loading || !agreed} 
               className="w-full mt-0 bg-(--db-text) text-(--db-bg) border-2 border-(--db-border) py-3 font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-50 text-sm disabled:cursor-not-allowed"
           >
               {loading ? <Loader2 className="animate-spin mx-auto w-5 h-5"/> : "CREATE ACCOUNT"}

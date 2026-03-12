@@ -5,7 +5,7 @@ import { createHmac } from "crypto";
 
 const VERIFY_ENDPOINT = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 const TURNSTILE_COOKIE_NAME = "db-cv";
-const TURNSTILE_VALIDITY = 300;
+const TURNSTILE_VALIDITY = 1800;
 const rawSecret = process.env.JWT_SECRET;
 if (!rawSecret) {
   throw new Error("JWT_SECRET is not set");
