@@ -122,11 +122,13 @@ export function CreateShortlinkCard({
             )}
         </div>
 
-        {error && (
-          <div className="bg-(--db-danger) text-(--db-danger-fg) text-[10px] lg:text-xs font-bold p-2 lg:p-3 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake">
-            ❌ {error}
-          </div>
-        )}
+        <div className="min-h-10 flex items-center">
+            {error && (
+                <div className="bg-(--db-danger) text-(--db-danger-fg) text-[10px] lg:text-xs font-bold p-2 lg:p-3 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake w-full">
+                    ❌ {error}
+                </div>
+            )}
+        </div>
 
         <button
           type="submit"

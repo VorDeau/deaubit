@@ -1,8 +1,6 @@
-//app/layout.tsx
-
 import type { Metadata, Viewport } from "next";
 import { JetBrains_Mono, Inter } from "next/font/google";
-import "./globals.css";
+import "@/app/globals.css";
 import PageWrapperClient from "@/components/PageWrapperClient";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -65,12 +63,6 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <meta
-          httpEquiv="Content-Security-Policy"
-          content="script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://static.cloudflareinsights.com; frame-src 'self' https://challenges.cloudflare.com; connect-src 'self' https://challenges.cloudflare.com;"
-        />
-      </head>
       <body
         className={`${inter.variable} ${mono.variable} antialiased font-sans bg-(--db-bg) text-(--db-text) selection:bg-(--db-primary) selection:text-white`}
       >

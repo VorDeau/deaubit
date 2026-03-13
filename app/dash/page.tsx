@@ -3,8 +3,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DeauBitLogo from "@/components/DeauBitLogo";
-import UserMenu from "@/components/UserMenu";
 import { ExistingShortlinksCard, ShortLink } from "@/components/ExistingShortlinksCard";
 import { CreateShortlinkCard } from "@/components/CreateShortlinkCard";
 import AnalyticsModal from "@/components/AnalyticsModal";
@@ -15,8 +13,6 @@ import Link from "next/link";
 
 export default function DashboardPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
-  const [userEmail, setUserEmail] = useState("User");
-  const [userRole, setUserRole] = useState("USER");
   
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -42,11 +38,6 @@ export default function DashboardPage() {
   const [deleteError, setDeleteError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/session").then(r => r.json()).then(data => {
-        if(data.user?.email) setUserEmail(data.user.email);
-        if(data.user?.name) setUserEmail(data.user.name);
-        if(data.user?.role) setUserRole(data.user.role);
-    });
     fetchLinks(1);
   }, []);
 
@@ -138,16 +129,6 @@ export default function DashboardPage() {
   return (
     <div className="w-full h-full flex flex-col gap-6">
       
-      <header className="bg-(--db-surface) border-4 border-(--db-border) p-3 lg:p-4 shadow-[4px_4px_0px_0px_var(--db-border)] lg:shadow-[8px_8px_0px_0px_var(--db-border)] flex items-center justify-between sticky top-0 lg:top-4 z-30 transition-colors">
-        <div className="flex items-center gap-3">
-          <div className="bg-(--db-text) p-1">
-             <DeauBitLogo size={24} />
-          </div>
-          <span className="text-lg lg:text-xl font-black uppercase tracking-tighter hidden sm:block text-(--db-text)">Dashboard</span>
-        </div>
-        <UserMenu username={userEmail} role={userRole} />
-      </header>
-
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] xl:grid-cols-[1fr_400px] gap-6 lg:gap-8 items-start relative">
         <div className="order-2 lg:order-1 min-w-0 h-full flex flex-col animate-in fade-in slide-in-from-left-8 duration-700 delay-100 fill-mode-both">
             <ExistingShortlinksCard

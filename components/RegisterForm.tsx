@@ -5,7 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Mail, FileSignature, Check, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { Loader2, Mail, FileSignature, Check, Eye, EyeOff } from "lucide-react";
 import ChallengeModal from "./ChallengeModal";
 
 export default function RegisterForm() {
@@ -188,6 +188,14 @@ export default function RegisterForm() {
               <label htmlFor="terms_agree_register" className="text-[10px] font-bold text-(--db-text-muted) cursor-pointer select-none leading-tight">
                   I agree to the <Link href="/terms" target="_blank" className="underline hover:text-(--db-text)">Terms of Service</Link> & <Link href="/privacy" target="_blank" className="underline hover:text-(--db-text)">Privacy Policy</Link>.
               </label>
+          </div>
+          
+          <div className="min-h-12 flex items-center">
+             {error && (
+                <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] text-[10px] w-full animate-error-shake">
+                    ❌ {error}
+                </div>
+             )}
           </div>
           
           <button 
