@@ -25,15 +25,12 @@
 .dark {
   color-scheme: dark;
 
-  /* Deep Midnight Blue Tone */
   --db-bg: #030712;
   --db-surface: #0f172a;
-  
-  /* Softer Borders in Dark Mode */
   --db-border: #334155;
 
   --db-text: #f8fafc;
-  --db-text-muted: #94a3b8;
+  --db-text-muted: #cbd5e1;
 
   --db-primary: #6366f1;
   --db-primary-fg: #ffffff;
@@ -47,7 +44,6 @@
   --db-pattern: rgba(255, 255, 255, 0.05);
 }
 
-/* Advanced Card & Animation Utilities */
 .db-card {
   background-color: var(--db-surface);
   border: 4px solid var(--db-border);
@@ -107,7 +103,6 @@
   transform: translate(-2px, -2px);
 }
 
-/* Page Transition & Special Effects */
 @keyframes page-in {
   from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
@@ -197,11 +192,10 @@
   animation: warning-glow 1.5s infinite ease-in-out;
 }
 
-/* Admin Specific Card Style */
 .db-card-admin {
   background-color: var(--db-surface);
-  border: 4px solid #dc2626; /* Hard Red Border */
-  box-shadow: 8px 8px 0px 0px #991b1b; /* Darker Red Shadow */
+  border: 4px solid #dc2626;
+  box-shadow: 8px 8px 0px 0px #991b1b;
   transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
@@ -265,7 +259,6 @@ input:focus, textarea:focus, select:focus {
   box-shadow: 4px 4px 0px 0px var(--db-border);
 }
 
-/* Better UX Scrollbar */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { 
   background: var(--db-bg); 

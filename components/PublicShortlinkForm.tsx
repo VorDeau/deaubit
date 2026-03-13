@@ -106,6 +106,12 @@ export default function PublicShortlinkForm() {
                         />
                     </div>
 
+                    {publicError && (
+                        <div className="bg-(--db-danger) text-white text-[10px] font-bold p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake">
+                            ❌ {publicError}
+                        </div>
+                    )}
+
                     <button
                         type="submit"
                         disabled={publicLoading}

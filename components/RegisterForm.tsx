@@ -190,6 +190,14 @@ export default function RegisterForm() {
               </label>
           </div>
           
+          <div className="min-h-12 flex items-center">
+             {error && (
+                <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] text-[10px] w-full animate-error-shake">
+                    ❌ {error}
+                </div>
+             )}
+          </div>
+          
           <button 
               type="submit" 
               disabled={loading || !agreed} 

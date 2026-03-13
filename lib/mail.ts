@@ -229,7 +229,10 @@ export async function sendAdminGoodbyeEmail(email: string, name: string) {
 export async function sendAbuseReportEmail(data: { linkUrl: string; reason: string; details: string; reporter: string; adminEmail?: string; }) {
   const targetEmail = data.adminEmail || process.env.SMTP_USER;
   let slug = "";
-  try { const urlParts = new URL(data.linkUrl); slug = urlParts.pathname.replace(/^\//, ""); } catch {}
+  try { 
+    const urlParts = new URL(data.linkUrl); 
+    slug = urlParts.pathname.replace(/^\//, ""); 
+  } catch {}
   
   const deleteToken = jwt.sign({ slug, action: 'delete_abuse' }, process.env.JWT_SECRET!, { expiresIn: '7d' });
   const appHost = process.env.NEXT_PUBLIC_APP_HOST || "localhost:3000";

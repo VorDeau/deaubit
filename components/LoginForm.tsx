@@ -176,23 +176,25 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </button>
                     </div>
                     
-                    {error && (
-                        <div className="bg-(--db-danger) text-white font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 animate-error-shake duration-300">
-                            <span>❌</span> {error}
-                        </div>
-                    )}
+                    <div className="min-h-16 flex flex-col justify-center">
+                        {error && (
+                            <div className="bg-(--db-danger) text-white font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 animate-error-shake duration-300">
+                                <span>❌</span> {error}
+                            </div>
+                        )}
 
-                    {unverified && (
-                        <div className="bg-(--db-accent) text-(--db-accent-fg) font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-2 duration-300">
-                            <p className="text-sm mb-2">Account not verified. Check your email for the confirmation code.</p>
-                            <Link
-                                href={`/verify?email=${encodeURIComponent(email)}`}
-                                className="inline-block text-xs font-black uppercase tracking-wider bg-(--db-accent-fg) text-(--db-accent) px-3 py-1.5 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_var(--db-border)] transition-all"
-                            >
-                                Verify your email →
-                            </Link>
-                        </div>
-                    )}
+                        {unverified && (
+                            <div className="bg-(--db-accent) text-(--db-accent-fg) font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                <p className="text-sm mb-2">Account not verified. Check your email for the confirmation code.</p>
+                                <Link
+                                    href={`/verify?email=${encodeURIComponent(email)}`}
+                                    className="inline-block text-xs font-black uppercase tracking-wider bg-(--db-accent-fg) text-(--db-accent) px-3 py-1.5 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_var(--db-border)] transition-all"
+                                >
+                                    Verify your email →
+                                </Link>
+                            </div>
+                        )}
+                    </div>
 
                 </form>
 
