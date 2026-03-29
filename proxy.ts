@@ -47,7 +47,7 @@ function isPublicPath(pathname: string): boolean {
 export default function proxy(req: NextRequest): NextResponse {
   const { pathname } = req.nextUrl;
   
-  const hostHeader = req.headers.get("host") || "";
+  const hostHeader = req.headers.get("x-forwarded-host") || req.headers.get("host") || "";
   const requestHost = hostHeader.split(":")[0];
   
   const appHostClean = APP_HOST.split(":")[0];
@@ -69,7 +69,7 @@ export default function proxy(req: NextRequest): NextResponse {
     }
 
     const firstSegment = pathname.split("/")[1];
-    if (RESERVED_SLUGS.has(firstSegment)) {
+    if (firstSegment && RESERVED_SLUGS.has(firstSegment)) {
       const search = req.nextUrl.search;
       return NextResponse.redirect(`${PROTOCOL}://${APP_HOST}${pathname}${search}`, 301);
     }
