@@ -52,10 +52,13 @@ function getEmailTemplate(title: string, bodyContent: string, isDanger = false) 
 
 async function safeSendMail(options: nodemailer.SendMailOptions) {
     try {
+        const fromRaw = process.env.SMTP_FROM || process.env.SMTP_USER || "";
+        const fromClean = fromRaw.replace(/["\\]/g, "").trim();
+        
         console.log(`[SMTP] Attempting to send email to: ${options.to}`);
         const info = await transporter.sendMail({
             ...options,
-            from: process.env.SMTP_FROM || process.env.SMTP_USER,
+            from: fromClean.includes("<") ? fromClean : `"${fromClean}" <${process.env.SMTP_USER}>`,
         });
         console.log(`[SMTP] Success! MessageID: ${info.messageId}`);
         return info;
