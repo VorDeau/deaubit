@@ -16,8 +16,6 @@ const transporter = nodemailer.createTransport({
     minVersion: "TLSv1.2"
   },
   requireTLS: Number(process.env.SMTP_PORT) === 587,
-  debug: true,
-  logger: true
 });
 
 function getEmailTemplate(title: string, bodyContent: string, isDanger = false) {
@@ -55,15 +53,11 @@ async function safeSendMail(options: nodemailer.SendMailOptions) {
         const fromRaw = process.env.SMTP_FROM || process.env.SMTP_USER || "";
         const fromClean = fromRaw.replace(/["\\]/g, "").trim();
         
-        console.log(`[SMTP] Attempting to send email to: ${options.to}`);
-        const info = await transporter.sendMail({
+        return await transporter.sendMail({
             ...options,
             from: fromClean.includes("<") ? fromClean : `"${fromClean}" <${process.env.SMTP_USER}>`,
         });
-        console.log(`[SMTP] Success! MessageID: ${info.messageId}`);
-        return info;
     } catch (error) {
-        console.error(`[SMTP] FAILED to send email to ${options.to}:`, error);
         throw error;
     }
 }
