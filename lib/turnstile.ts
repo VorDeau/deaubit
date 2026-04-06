@@ -69,8 +69,8 @@ export async function verifyTurnstileWithCookie(req: NextRequest, token?: string
         
         cookieAction = (res: NextResponse) => {
             res.cookies.set(TURNSTILE_COOKIE_NAME, cookieValue, {
-                httpOnly: false, // Must be false so frontend can check existence
-                secure: false,   // Set to false to support both http and https in preview
+                httpOnly: true, 
+                secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
                 path: "/",
                 maxAge: TURNSTILE_VALIDITY,

@@ -16,21 +16,27 @@ export default function GlobalSecurityGate({ children }: { children: React.React
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
     
-    const checkVerification = () => {
-        const hasCookie = document.cookie.includes("db-cv=");
-        if (hasCookie) {
-            setIsVerified(true);
-        } else if (siteKey) {
+    const checkStatus = () => {
+        // Use a flag in localStorage for instant client-side check
+        const lastVerified = localStorage.getItem("db_human_verified");
+        if (lastVerified) {
+            const age = Date.now() - parseInt(lastVerified);
+            if (age < 1800000) { // 30 minutes
+                setIsVerified(true);
+                return;
+            }
+        }
+        
+        if (siteKey) {
             setIsVerified(false);
         }
     };
 
-    checkVerification();
+    checkStatus();
   }, [siteKey]);
 
   const handleSuccess = async (token: string) => {
     setVerifying(true);
-    // Send token to an API endpoint to set the cookie
     try {
       const res = await fetch("/api/auth/verify-turnstile", {
         method: "POST",
@@ -38,10 +44,11 @@ export default function GlobalSecurityGate({ children }: { children: React.React
         body: JSON.stringify({ token }),
       });
       if (res.ok) {
-        // Give a slight delay for smooth Nothing OS transition
+        // Success: Set local flag and verified state
+        localStorage.setItem("db_human_verified", Date.now().toString());
         setTimeout(() => {
           setIsVerified(true);
-        }, 800);
+        }, 500);
       } else {
         setVerifying(false);
       }
@@ -57,7 +64,7 @@ export default function GlobalSecurityGate({ children }: { children: React.React
 
   // The Nothing OS Interstitial Gate
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-(--db-bg) text-(--db-text) animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-(--db-bg) text-(--db-text) animate-in fade-in duration-500">
       <div className="w-full max-w-md p-8 flex flex-col items-center justify-center space-y-8 text-center">
         
         {/* Nothing OS Styling: Minimalist dot-matrix headers */}
