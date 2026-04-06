@@ -5,6 +5,7 @@
 import { usePathname } from "next/navigation";
 import AppShell from "./AppShell";
 import ThemeToggle from "./ThemeToggle";
+import GlobalSecurityGate from "./GlobalSecurityGate";
 
 export default function PageWrapperClient({
   children,
@@ -41,19 +42,19 @@ export default function PageWrapperClient({
 
   if (isAuthPage) {
     return (
-      <>
+      <GlobalSecurityGate>
         <ThemeToggle />
         <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 pb-24 transition-all duration-300">
           <div key={pathname} className="animate-page-in w-full flex flex-col items-center">
             {children}
           </div>
         </div>
-      </>
+      </GlobalSecurityGate>
     );
   }
 
   return (
-    <>
+    <GlobalSecurityGate>
       <ThemeToggle />
       <div className="min-h-screen flex flex-col px-4 items-center md:items-start justify-start py-8 pb-28 transition-all duration-300">
         <AppShell>
@@ -62,6 +63,6 @@ export default function PageWrapperClient({
           </div>
         </AppShell>
       </div>
-    </>
+    </GlobalSecurityGate>
   );
 }

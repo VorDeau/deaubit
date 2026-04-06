@@ -5,8 +5,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Mail, FileSignature, Check, Eye, EyeOff } from "lucide-react";
-import ChallengeModal from "./ChallengeModal";
+import { Loader2, Mail, FileSignature, Check, Eye, EyeOff, AlertTriangle } from "lucide-react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -16,14 +15,11 @@ export default function RegisterForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   
   const [agreed, setAgreed] = useState(false);
-  const [showChallenge, setShowChallenge] = useState(false);
-  const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
-
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>(""); 
   const router = useRouter();
 
-  async function performRegister(token?: string) {
+  async function performRegister() {
     setLoading(true);
     setError(""); 
 
@@ -49,17 +45,12 @@ export default function RegisterForm() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, cfTurnstile: token }),
+        body: JSON.stringify({ ...formData }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-          if (res.status === 400 && data.error?.includes("Security")) {
-             setPendingAction(() => (t: string) => performRegister(t));
-             setShowChallenge(true);
-             return;
-          }
           throw new Error(data.error || "Registration failed.");
       }
 
@@ -76,61 +67,47 @@ export default function RegisterForm() {
     await performRegister();
   }
 
-  const handleChallengeSuccess = (token: string) => {
-    setShowChallenge(false);
-    if (pendingAction) {
-        pendingAction(token);
-        setPendingAction(null);
-    }
-  };
-
   return (
     <div className="flex items-center justify-center min-h-full w-full py-8">
-      {showChallenge && (
-          <ChallengeModal 
-              onSuccess={handleChallengeSuccess}
-              onClose={() => setShowChallenge(false)}
-          />
-      )}
-      <div className="db-card w-full max-w-lg p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div className="db-card w-full max-w-lg p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
         
-        <div className="flex items-center gap-3 mb-6 border-b-4 border-(--db-border) pb-3">
-           <div className="bg-(--db-accent) p-2 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-              <FileSignature className="h-5 w-5 text-(--db-accent-fg)"/>
+        <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
+           <div className="bg-(--db-primary)/10 p-3 rounded-2xl">
+              <FileSignature className="h-6 w-6 text-(--db-primary)"/>
            </div>
            <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter text-(--db-text)">REGISTER</h2>
-              <p className="text-[10px] font-bold text-(--db-text-muted) uppercase">Join the Club</p>
+              <h2 className="text-2xl font-black uppercase tracking-tighter text-(--db-text)">REGISTER</h2>
+              <p className="text-[10px] font-bold text-(--db-text-muted) uppercase tracking-widest">Join the Club</p>
            </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
+        <form onSubmit={handleSubmit} className="space-y-5">
           
           <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Email</label>
+              <label className="font-black text-[10px] uppercase tracking-widest mb-2 block text-(--db-text-muted)">Email</label>
               <div className="relative">
                   <input 
                       type="email" 
                       name="email"
                       autoComplete="username email"
-                      className="w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted)" 
+                      className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-xl px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all" 
                       placeholder="name@example.com"
                       value={formData.email} 
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
                       required 
                   />
-                  <Mail className="absolute right-3 top-2.5 text-(--db-text-muted) w-4 h-4" />
+                  <Mail className="absolute right-4 top-3.5 text-(--db-text-muted) w-5 h-5" />
               </div>
           </div>
 
           <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Password</label>
+              <label className="font-black text-[10px] uppercase tracking-widest mb-2 block text-(--db-text-muted)">Password</label>
               <div className="relative">
                   <input 
                       type={showPassword ? "text" : "password"} 
                       name="password"
                       autoComplete="new-password"
-                      className="w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted) pr-10" 
+                      className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-xl px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all pr-12" 
                       placeholder="••••••••"
                       value={formData.password} 
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
@@ -139,22 +116,22 @@ export default function RegisterForm() {
                   <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform"
+                      className="absolute right-4 top-3.5 text-(--db-text-muted) hover:text-(--db-text) transition-all cursor-pointer"
                   >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
               </div>
           </div>
 
           <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Re-enter Password</label>
+              <label className="font-black text-[10px] uppercase tracking-widest mb-2 block text-(--db-text-muted)">Re-enter Password</label>
               <div className="relative">
                   <input 
                       type={showConfirmPassword ? "text" : "password"} 
                       name="confirmPassword"
                       autoComplete="new-password"
-                      className={`w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted) pr-10 ${
-                          confirmPassword && formData.password !== confirmPassword ? "border-red-500 shadow-[4px_4px_0px_0px_rgba(239,68,68,0.4)]" : ""
+                      className={`w-full bg-(--db-bg) border border-(--db-border)/50 rounded-xl px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all pr-16 ${
+                          confirmPassword && formData.password !== confirmPassword ? "border-red-500/50 ring-2 ring-red-500/10" : ""
                       }`}
                       placeholder="••••••••"
                       value={confirmPassword} 
@@ -162,38 +139,38 @@ export default function RegisterForm() {
                       required 
                   />
                   
-                  <div className="absolute right-3 top-2.5 flex items-center gap-2">
+                  <div className="absolute right-4 top-3.5 flex items-center gap-3">
                       {confirmPassword && formData.password === confirmPassword && (
-                          <Check className="text-green-500 w-4 h-4" />
+                          <Check className="text-green-500 w-5 h-5" />
                       )}
                       <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform"
+                          className="text-(--db-text-muted) hover:text-(--db-text) transition-all cursor-pointer"
                       >
-                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                       </button>
                   </div>
               </div>
           </div>
 
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-3 mt-4">
               <input 
                   type="checkbox" 
                   id="terms_agree_register" 
-                  className="w-4 h-4 accent-(--db-primary) cursor-pointer shrink-0" 
+                  className="w-5 h-5 rounded-lg accent-(--db-primary) cursor-pointer shrink-0" 
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
               />
-              <label htmlFor="terms_agree_register" className="text-[10px] font-bold text-(--db-text-muted) cursor-pointer select-none leading-tight">
-                  I agree to the <Link href="/terms" target="_blank" className="underline hover:text-(--db-text)">Terms of Service</Link> & <Link href="/privacy" target="_blank" className="underline hover:text-(--db-text)">Privacy Policy</Link>.
+              <label htmlFor="terms_agree_register" className="text-[10px] font-black uppercase tracking-widest text-(--db-text-muted) cursor-pointer select-none leading-relaxed">
+                  I agree to the <Link href="/terms" target="_blank" className="underline text-(--db-primary) hover:text-(--db-primary)/80 transition-colors">Terms of Service</Link> & <Link href="/privacy" target="_blank" className="underline text-(--db-primary) hover:text-(--db-primary)/80 transition-colors">Privacy Policy</Link>.
               </label>
           </div>
           
-          <div className="min-h-12 flex items-center">
+          <div className="min-h-16 flex items-center">
              {error && (
-                <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] text-[10px] w-full animate-error-shake">
-                    ❌ {error}
+                <div className="bg-red-500/10 text-red-500 font-bold p-4 rounded-xl border border-red-500/20 text-xs w-full animate-error-shake flex items-center gap-3">
+                    <AlertTriangle className="h-5 w-5 shrink-0" /> {error}
                 </div>
              )}
           </div>
@@ -201,9 +178,9 @@ export default function RegisterForm() {
           <button 
               type="submit" 
               disabled={loading || !agreed} 
-              className="w-full mt-0 bg-(--db-text) text-(--db-bg) border-2 border-(--db-border) py-3 font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-50 text-sm disabled:cursor-not-allowed"
+              className="w-full bg-(--db-primary) text-white rounded-full py-4 font-black uppercase tracking-widest shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 text-sm disabled:cursor-not-allowed"
           >
-              {loading ? <Loader2 className="animate-spin mx-auto w-5 h-5"/> : "CREATE ACCOUNT"}
+              {loading ? <Loader2 className="animate-spin mx-auto w-6 h-6"/> : "CREATE ACCOUNT"}
           </button>
         </form>
       </div>

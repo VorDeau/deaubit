@@ -4,7 +4,6 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Zap } from "lucide-react";
 import DeauBitLogo from "@/components/DeauBitLogo";
 import LoginForm from "@/components/LoginForm";
 import PublicShortlinkForm from "@/components/PublicShortlinkForm";
@@ -53,10 +52,10 @@ function HomeContent() {
   if (checkingSession) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-(--db-bg) z-50">
-        <div className="border-4 border-(--db-border) bg-(--db-surface) p-8 shadow-[8px_8px_0px_0px_var(--db-border)] flex flex-col items-center gap-4">
-          <DeauBitLogo size={48} />
-          <div className="flex items-center gap-2 font-bold text-xl uppercase tracking-widest text-(--db-text)">
-            <Loader2 className="h-6 w-6 animate-spin" /> Loading...
+        <div className="flex flex-col items-center gap-6">
+          <DeauBitLogo size={48} className="animate-pulse" />
+          <div className="font-dot text-[10px] uppercase tracking-[0.5em] text-(--db-text-muted)">
+            Initializing System
           </div>
         </div>
       </div>
@@ -64,72 +63,57 @@ function HomeContent() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8 md:py-16 min-h-[calc(100vh-80px)] flex flex-col justify-center">
+    <div className="w-full max-w-7xl mx-auto px-6 py-8 md:py-24 min-h-[calc(100vh-80px)] flex flex-col justify-center">
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 items-center">
         
-        <div className="lg:col-span-7 order-1 h-full flex flex-col">
-          <div className="db-card animate-float flex flex-col h-full">
+        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1">
+            <div className="mb-10 lg:mb-16">
+                <h1 className="text-6xl sm:text-7xl md:text-9xl font-dot tracking-[0.1em] text-(--db-text) leading-none mb-6">DEAUBIT</h1>
+                <div className="h-1 w-24 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
+            </div>
             
-            <div className="bg-(--db-accent) p-6 md:p-8 border-b-4 border-(--db-border)">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="bg-(--db-surface) p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-                        <DeauBitLogo size={40} />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-(--db-accent-fg) leading-none">DeauBit</h1>
-                        <p className="text-sm font-bold text-(--db-accent-fg) opacity-90 mt-1">Elegant & Brutal URL Shortener.</p>
-                    </div>
+            <p className="text-xs md:text-sm font-black uppercase tracking-[0.4em] text-(--db-text-muted) mb-12 max-w-md leading-relaxed">
+                Refined Link Infrastructure. <br className="hidden md:block" />
+                Minimalist. Private. Secure.
+            </p>
+
+            <div className="w-full max-w-lg mb-12">
+                <PublicShortlinkForm />
+            </div>
+            
+            <div className="flex items-center gap-8 opacity-20 hidden lg:flex mt-4">
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-dot tracking-widest uppercase">Privacy Layer</span>
+                    <div className="h-[1px] w-full bg-(--db-text) mt-1"></div>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-dot tracking-widest uppercase">No Cookies</span>
+                    <div className="h-[1px] w-full bg-(--db-text) mt-1"></div>
+                </div>
+                <div className="flex flex-col">
+                    <span className="text-[9px] font-dot tracking-widest uppercase">Open Engine</span>
+                    <div className="h-[1px] w-full bg-(--db-text) mt-1"></div>
                 </div>
             </div>
+        </div>
 
-            <div className="p-6 space-y-6 flex-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-3 bg-(--db-bg) border-2 border-(--db-border)">
-                        <Zap className="h-5 w-5 text-(--db-primary) shrink-0" />
-                        <p className="text-xs font-bold text-(--db-text) leading-tight">No Tracking. Privacy First. Self-hosted.</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-(--db-text-muted) p-2">
-                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/> 
-                         Operational & Ready
-                    </div>
-                </div>
-
-                <div className="h-1 bg-(--db-bg) border-t-2 border-(--db-border) border-dashed my-2" />
-                
-                <div>
-                     <PublicShortlinkForm />
-                </div>
-            </div>
-
-            <div className="hidden lg:block bg-(--db-text) p-4 text-center border-t-4 border-(--db-border) mt-auto">
-                <span className="text-[10px] font-bold text-(--db-bg) uppercase tracking-widest block mb-2">POWERED BY DEAUPORT</span>
-                <div className="flex justify-center gap-4 text-[10px] font-bold text-(--db-bg)/80">
-                    <Link href="/terms" className="hover:text-white hover:underline transition-colors">Terms</Link>
-                    <span>•</span>
-                    <Link href="/privacy" className="hover:text-white hover:underline transition-colors">Privacy</Link>
-                    <span>•</span>
-                    <Link href="/report" className="text-red-300 hover:text-red-100 hover:underline transition-colors">Report Abuse</Link>
-                </div>
-            </div>
+        <div className="lg:col-span-5 w-full order-1 lg:order-2">
+          <div className="db-card p-2 shadow-2xl bg-(--db-surface)/30 backdrop-blur-2xl border-white/5 rounded-[40px]">
+             <LoginForm nextPath={nextPath} />
           </div>
         </div>
 
-        <div className="lg:col-span-5 order-2 h-full flex flex-col">
-          <LoginForm nextPath={nextPath} />
+      </div>
 
-          <div className="block lg:hidden bg-(--db-text) p-4 text-center border-4 border-(--db-border) mt-6 shadow-[4px_4px_0px_0px_var(--db-border)]">
-              <span className="text-[10px] font-bold text-(--db-bg) uppercase tracking-widest block mb-2">POWERED BY DEAUPORT</span>
-              <div className="flex justify-center gap-4 text-[10px] font-bold text-(--db-bg)/80">
-                  <Link href="/terms" className="hover:text-white hover:underline transition-colors">Terms</Link>
-                  <span>•</span>
-                  <Link href="/privacy" className="hover:text-white hover:underline transition-colors">Privacy</Link>
-                  <span>•</span>
-                  <Link href="/report" className="text-red-300 hover:text-red-100 hover:underline transition-colors">Report Abuse</Link>
-              </div>
+      {/* Landing Footer Links */}
+      <div className="mt-24 pt-8 border-t border-(--db-border)/30 flex flex-wrap justify-center lg:justify-start gap-8 opacity-30">
+          <Link href="/terms" className="text-[9px] font-black uppercase tracking-widest hover:text-(--db-primary) transition-colors">Terms of Service</Link>
+          <Link href="/privacy" className="text-[9px] font-black uppercase tracking-widest hover:text-(--db-primary) transition-colors">Privacy Protocol</Link>
+          <Link href="/report" className="text-[9px] font-black uppercase tracking-widest text-red-500 hover:text-red-400 transition-colors">Report Abuse</Link>
+          <div className="ml-auto text-[9px] font-dot tracking-widest uppercase hidden md:block">
+            Powered by VorDeau &copy; {new Date().getFullYear()}
           </div>
-        </div>
-
       </div>
     </div>
   );
@@ -140,12 +124,7 @@ export default function HomePage() {
     <Suspense 
       fallback={
         <div className="fixed inset-0 flex items-center justify-center bg-(--db-bg) z-50">
-          <div className="border-4 border-(--db-border) bg-(--db-surface) p-8 shadow-[8px_8px_0px_0px_var(--db-border)] flex flex-col items-center gap-4">
-            <DeauBitLogo size={48} />
-            <div className="flex items-center gap-2 font-bold text-xl uppercase tracking-widest text-(--db-text)">
-              <Loader2 className="h-6 w-6 animate-spin" /> Loading...
-            </div>
-          </div>
+          <DeauBitLogo size={48} className="animate-pulse" />
         </div>
       }
     >

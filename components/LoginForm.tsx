@@ -4,9 +4,8 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Loader2, Mail, Eye, EyeOff, Terminal } from "lucide-react";
+import { Loader2, Eye, EyeOff, AlertTriangle } from "lucide-react";
 import type { LoginResponse } from "@/types";
-import ChallengeModal from "./ChallengeModal";
 
 interface LoginFormProps {
     nextPath?: string;
@@ -20,9 +19,6 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
     const [unverified, setUnverified] = useState(false);
     const [loading, setLoading] = useState(false);
     const [cooldown, setCooldown] = useState<number | null>(null);
-    
-    const [showChallenge, setShowChallenge] = useState(false);
-    const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
 
     useEffect(() => {
         if (cooldown === null) return;
@@ -31,7 +27,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
         return () => clearInterval(id);
     }, [cooldown]);
 
-    async function performLogin(token?: string) {
+    async function performLogin() {
         setLoading(true); setError(null); setUnverified(false);
 
         try {
@@ -40,8 +36,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
                     email, 
-                    password,
-                    cfTurnstile: token
+                    password
                 }),
             });
             const data: LoginResponse = await res.json().catch(() => ({}));
@@ -59,11 +54,6 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
             }
             
             if (!res.ok) {
-                if (res.status === 400 && data.error?.includes("Security")) {
-                    setPendingAction(() => (t: string) => performLogin(t));
-                    setShowChallenge(true);
-                    return;
-                }
                 throw new Error(typeof data.error === "string" ? data.error : "Login failed");
             }
             
@@ -81,68 +71,43 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
         await performLogin();
     }
 
-    const handleChallengeSuccess = (token: string) => {
-        setShowChallenge(false);
-        if (pendingAction) {
-            pendingAction(token);
-            setPendingAction(null);
-        }
-    };
-
     return (
         <section className="h-full w-full flex items-center justify-center">
-            {showChallenge && (
-                <ChallengeModal 
-                    onSuccess={handleChallengeSuccess}
-                    onClose={() => setShowChallenge(false)}
-                />
-            )}
-            <div className="db-card w-full max-w-md p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <div className="w-full max-w-md p-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]">
                 
-                <div className="flex items-center gap-4 mb-8 border-b-4 border-(--db-border) pb-4">
-                    <div className="bg-(--db-accent) text-(--db-accent-fg) p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-                        <Terminal className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-black uppercase tracking-tighter text-(--db-text)">LOGIN AREA</h2>
-                        <p className="text-xs font-bold text-(--db-text-muted) uppercase tracking-widest">Secure Access</p>
-                    </div>
+                <div className="flex flex-col items-center mb-12">
+                    <h2 className="text-4xl font-dot tracking-[0.4em] text-(--db-text) mb-2">SYS.AUTH</h2>
+                    <div className="h-0.5 w-12 bg-(--db-primary) rounded-full"></div>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="font-black text-sm uppercase tracking-wider mb-2 block text-(--db-text)">
-                            Email Address
+                <form onSubmit={handleSubmit} className="space-y-12">
+                    <div className="flex flex-col items-center">
+                        <label className="font-black text-[10px] uppercase tracking-[0.3em] mb-4 block text-(--db-text-muted) text-center">
+                            Identity (Email)
                         </label>
-                        <div className="relative group">
-                            <input
-                                type="email"
-                                name="email"
-                                autoComplete="username email"
-                                className="w-full bg-(--db-bg) border-2 border-(--db-border) px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) db-input-focus"
-                                placeholder="user@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                disabled={loading}
-                            />
-                            <Mail className="absolute right-4 top-3.5 h-5 w-5 text-(--db-text-muted) pointer-events-none" />
-                        </div>
+                        <input
+                            type="email"
+                            name="email"
+                            autoComplete="username email"
+                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-(--db-border)/50 px-0 py-3 text-lg font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted)/30 focus:ring-0 focus:border-b-2 focus:border-(--db-primary) outline-none transition-all text-center"
+                            placeholder="USER@SYSTEM.NET"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                            disabled={loading}
+                        />
                     </div>
 
-                    <div>
-                        <div className="flex justify-between items-center mb-2">
-                            <label className="font-black text-sm uppercase tracking-wider block text-(--db-text)">Password</label>
-                            <Link href="/forgot-password" className="text-xs font-bold text-(--db-primary) hover:underline decoration-2 hover:scale-105 transition-transform inline-block">
-                                Forgot Password?
-                            </Link>
-                        </div>
-                        <div className="relative group">
+                    <div className="flex flex-col items-center">
+                        <label className="font-black text-[10px] uppercase tracking-[0.3em] mb-4 block text-(--db-text-muted) text-center">
+                            Access Key
+                        </label>
+                        <div className="relative w-full">
                             <input
                                 type={showPassword ? "text" : "password"}
                                 name="password"
                                 autoComplete="current-password"
-                                className="w-full bg-(--db-bg) border-2 border-(--db-border) px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) db-input-focus"
+                                className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-(--db-border)/50 px-0 py-3 text-lg font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted)/30 focus:ring-0 focus:border-b-2 focus:border-(--db-primary) outline-none transition-all text-center"
                                 placeholder="••••••••"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
@@ -152,45 +117,51 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                             <button
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-3.5 text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform cursor-pointer"
+                                className="absolute right-0 top-3.5 text-(--db-text-muted) hover:text-(--db-text) transition-all cursor-pointer"
                                 disabled={loading}
                             >
-                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                             </button>
+                        </div>
+                        <div className="mt-4">
+                            <Link href="/forgot-password" text-center className="text-[9px] font-black uppercase tracking-widest text-(--db-primary) hover:underline decoration-1 transition-all">
+                                Lost Credentials?
+                            </Link>
                         </div>
                     </div>
 
-                    <div className="pt-2">
+                    <div className="pt-4">
                         <button
                             type="submit"
                             disabled={loading || (cooldown !== null && cooldown > 0)}
-                            className="w-full bg-(--db-primary) text-(--db-primary-fg) border-2 border-(--db-border) py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full bg-(--db-primary) text-white rounded-full py-4.5 font-black text-sm uppercase tracking-[0.3em] shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? (
-                                <span className="flex items-center justify-center gap-2"><Loader2 className="animate-spin h-5 w-5"/> Loading...</span>
+                                <Loader2 className="animate-spin h-5 w-5 mx-auto"/>
                             ) : cooldown ? (
-                                `Wait (${cooldown}s)`
+                                `WAIT ${cooldown}S`
                             ) : (
-                                "LOGIN NOW"
+                                "AUTHORIZE ACCESS"
                             )}
                         </button>
                     </div>
                     
                     <div className="min-h-16 flex flex-col justify-center">
                         {error && (
-                            <div className="bg-(--db-danger) text-white font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 animate-error-shake duration-300">
-                                <span>❌</span> {error}
+                            <div className="text-red-500 font-bold text-xs flex flex-col items-center gap-2 animate-error-shake">
+                                <AlertTriangle className="h-5 w-5" />
+                                <span className="uppercase tracking-widest text-center">{error}</span>
                             </div>
                         )}
 
                         {unverified && (
-                            <div className="bg-(--db-accent) text-(--db-accent-fg) font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <p className="text-sm mb-2">Account not verified. Check your email for the confirmation code.</p>
+                            <div className="flex flex-col items-center gap-4 text-center">
+                                <p className="text-[10px] font-bold text-(--db-text-muted) uppercase tracking-widest">Account Pending Verification</p>
                                 <Link
                                     href={`/verify?email=${encodeURIComponent(email)}`}
-                                    className="inline-block text-xs font-black uppercase tracking-wider bg-(--db-accent-fg) text-(--db-accent) px-3 py-1.5 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_var(--db-border)] transition-all"
+                                    className="text-[10px] font-black uppercase tracking-widest bg-(--db-primary) text-white px-6 py-2 rounded-full shadow-md shadow-(--db-primary)/20 hover:scale-[1.05] transition-all"
                                 >
-                                    Verify your email →
+                                    Verify Manual →
                                 </Link>
                             </div>
                         )}
@@ -198,10 +169,10 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
 
                 </form>
 
-                <div className="mt-8 text-center pt-6 border-t-4 border-(--db-border) border-dotted">
-                    <span className="text-sm font-bold text-(--db-text-muted)">Don&apos;t have an account? </span>
-                    <Link href="/register" className="inline-block ml-1 text-sm font-black bg-(--db-accent) text-(--db-accent-fg) px-2 border-2 border-(--db-border) hover:shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 transition-all">
-                        SIGNUP HERE
+                <div className="mt-12 text-center pt-8 border-t border-(--db-border)/20">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-(--db-text-muted)">Unregistered? </span>
+                    <Link href="/register" className="inline-block ml-1 text-[10px] font-black uppercase tracking-[0.2em] text-(--db-primary) hover:underline decoration-1 transition-all">
+                        CREATE ACCOUNT
                     </Link>
                 </div>
             </div>

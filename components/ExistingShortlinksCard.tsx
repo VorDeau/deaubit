@@ -3,7 +3,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Copy, Trash2, QrCode, BarChart3, ExternalLink, Clock, AlertTriangle, Check, Search, X, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
+import { Copy, Trash2, QrCode, BarChart3, ExternalLink, Check, Search, X, Pencil, ChevronLeft, ChevronRight } from "lucide-react";
 
 export interface ShortLink {
   id: string;
@@ -11,6 +11,7 @@ export interface ShortLink {
   targetUrl: string;
   createdAt: string;
   expiresAt?: string | null;
+  _count?: { clicks: number };
 }
 
 interface ExistingShortlinksCardProps {
@@ -21,10 +22,9 @@ interface ExistingShortlinksCardProps {
   onDelete: (slugs: string[]) => void;
   deletingSlugs?: string[];
   onEdit: (link: ShortLink) => void;
-  onViewTarget: (link: ShortLink) => void;
   onViewStats: (slug: string) => void;
   onViewQr: (slug: string) => void;
-  
+
   currentPage: number;
   totalPages: number;
   totalItems: number;
@@ -60,6 +60,7 @@ function ShortlinkRow({
 }: ShortlinkRowProps) {
   const shortUrl = `${baseUrl}/${link.slug}`;
   const domainLabel = getDomainLabel(link.targetUrl);
+  const clickCount = link._count?.clicks || 0;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl).then(() => {
@@ -72,67 +73,63 @@ function ShortlinkRow({
     const now = new Date();
     const expiry = new Date(link.expiresAt);
     const isExpired = now > expiry;
-    const dateStr = expiry.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
-
-    if (isExpired) {
-      return (
-        <span className="text-[9px] bg-red-100 text-red-800 border border-(--db-border) px-1.5 py-0.5 flex items-center gap-1 font-bold">
-           <AlertTriangle className="h-3 w-3"/> EXP
-        </span>
-      );
-    }
-    return (
-      <span className="text-[9px] bg-orange-100 text-orange-800 border border-(--db-border) px-1.5 py-0.5 flex items-center gap-1 font-bold" title={expiry.toLocaleString()}>
-         <Clock className="h-3 w-3"/> {dateStr}
-      </span>
-    );
+    if (isExpired) return <div className="w-1.5 h-1.5 rounded-full bg-red-500" title="Expired" />;
+    return <div className="w-1.5 h-1.5 rounded-full bg-orange-400" title="Expires Soon" />;
   };
 
   return (
-    <div className={`db-card group relative p-2.5 lg:p-3 flex flex-col justify-between h-full ${selected ? "ring-4 ring-(--db-primary) ring-offset-2 z-10" : ""} ${isDeleting ? "animate-shrink-out pointer-events-none" : ""}`}>
+    <div className={`db-card group relative p-2 px-4 lg:p-3 lg:px-6 flex items-center gap-4 transition-all duration-500 hover:shadow-lg rounded-2xl ${selected ? "ring-2 ring-(--db-primary) z-10" : ""} ${isDeleting ? "animate-shrink-out pointer-events-none" : ""}`}>
       
-      <div className="flex items-start justify-between mb-2">
-          <div className="flex items-center gap-2 overflow-hidden">
-              <input 
-                type="checkbox" 
-                checked={selected} 
-                onChange={() => onToggleSelect(link.slug)}
-                className="w-3.5 h-3.5 accent-(--db-primary) cursor-pointer"
-              />
-              <div className="flex flex-col gap-1">
-                  <span className="text-[8px] font-black uppercase tracking-tighter text-(--db-text-muted) leading-none">Slug</span>
-                  <a href={shortUrl} target="_blank" className={`truncate bg-(--db-accent) text-(--db-accent-fg) text-[10px] lg:text-xs font-black px-2 py-1 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] hover:translate-x-px hover:translate-y-px hover:shadow-none transition-all flex items-center gap-1 cursor-pointer ${isCopied ? "animate-copy-flash" : ""}`}>
-                      /{link.slug} <ExternalLink className="h-3 w-3"/>
-                  </a>
+      <input 
+        type="checkbox" 
+        checked={selected} 
+        onChange={() => onToggleSelect(link.slug)}
+        className="w-4 h-4 rounded-full accent-(--db-primary) cursor-pointer shrink-0"
+      />
+
+      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-6">
+          <div className="flex flex-col min-w-[120px]">
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--db-text-muted) leading-none mb-1">Slug</span>
+              <a href={shortUrl} target="_blank" className={`font-dot text-sm lg:text-base text-(--db-text) hover:text-(--db-primary) transition-colors truncate flex items-center gap-1 ${isCopied ? "animate-copy-flash text-green-500" : ""}`}>
+                  /{link.slug} <ExternalLink className="h-2 w-2 opacity-30" />
+              </a>
+          </div>
+
+          <div className="flex flex-col flex-1 min-w-0">
+              <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--db-text-muted) leading-none mb-1">Destination</span>
+              <span className="text-[10px] font-bold text-(--db-text) truncate opacity-60" title={link.targetUrl}>{domainLabel}</span>
+          </div>
+
+          <div className="flex items-center gap-6 shrink-0">
+              <div className="flex flex-col items-end">
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--db-text-muted) leading-none mb-1">Clicks</span>
+                  <span className="text-[10px] font-black text-(--db-text)">{clickCount.toLocaleString()}</span>
+              </div>
+              <div className="flex flex-col items-end min-w-[60px]">
+                  <span className="text-[8px] font-black uppercase tracking-[0.2em] text-(--db-text-muted) leading-none mb-1">Status</span>
+                  <div className="flex items-center gap-1.5">
+                     {getExpiryStatus() || <div className="w-1.5 h-1.5 rounded-full bg-green-500" title="Active" />}
+                     <span className="text-[8px] font-bold text-(--db-text) opacity-40 uppercase">{link.expiresAt ? "Exp" : "Static"}</span>
+                  </div>
               </div>
           </div>
-          {getExpiryStatus()}
-      </div>
-      
-      <div className="mb-3">
-          <div className="flex items-center gap-2 text-[10px] font-bold text-(--db-text-muted) font-mono bg-(--db-bg) p-1.5 border border-(--db-border) w-full">
-              <span className="truncate flex-1 block text-(--db-text)" title={link.targetUrl}>{domainLabel}</span>
-          </div>
-          <span className="text-[9px] font-bold text-(--db-text-muted) mt-1 block text-right">
-            {new Date(link.createdAt).toLocaleDateString()}
-          </span>
       </div>
 
-      <div className="grid grid-cols-4 gap-2 pt-2 border-t-2 border-dashed border-(--db-border) mt-auto">
-          <button onClick={() => onViewStats(link.slug)} className="py-1 border border-(--db-border) bg-blue-50 text-blue-900 hover:bg-blue-200 transition-colors flex justify-center items-center" title="Stats">
-              <BarChart3 className="h-3.5 w-3.5" />
+      <div className="flex items-center gap-1 lg:gap-2 shrink-0 border-l border-(--db-border)/30 pl-4 ml-2">
+          <button onClick={() => onViewStats(link.slug)} className="p-2 rounded-full hover:bg-(--db-primary)/10 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Stats">
+              <BarChart3 className="h-4 w-4" />
           </button>
           
-          <button onClick={() => onEdit(link)} className="py-1 border border-(--db-border) bg-orange-50 text-orange-900 hover:bg-orange-200 transition-colors flex justify-center items-center" title="Edit">
-              <Pencil className="h-3.5 w-3.5" />
+          <button onClick={() => onEdit(link)} className="p-2 rounded-full hover:bg-(--db-primary)/10 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Edit">
+              <Pencil className="h-4 w-4" />
           </button>
 
-          <button onClick={() => onViewQr(link.slug)} className="py-1 border border-(--db-border) bg-yellow-50 text-yellow-900 hover:bg-yellow-200 transition-colors flex justify-center items-center" title="QR">
-              <QrCode className="h-3.5 w-3.5" />
+          <button onClick={() => onViewQr(link.slug)} className="p-2 rounded-full hover:bg-(--db-primary)/10 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="QR">
+              <QrCode className="h-4 w-4" />
           </button>
           
-          <button onClick={handleCopy} className={`py-1 border border-(--db-border) transition-all flex justify-center items-center gap-1 font-bold text-[10px] ${isCopied ? "animate-copy-flash" : "bg-green-50 text-green-900 hover:bg-green-200"}`}>
-              {isCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+          <button onClick={handleCopy} className={`p-2 rounded-full transition-all ${isCopied ? "bg-green-500 text-white" : "hover:bg-green-500/10 text-(--db-text-muted) hover:text-green-500"}`}>
+              {isCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
           </button>
       </div>
     </div>
@@ -186,7 +183,7 @@ export function ExistingShortlinksCard({
   return (
     <div className="h-full flex flex-col relative">
       
-      <div className="mb-4 flex flex-col gap-3 border-b-4 border-(--db-border) pb-3">
+      <div className="mb-6 flex flex-col gap-4 border-b border-(--db-border)/30 pb-4">
         <div className="flex items-center justify-between">
             <h2 className="text-lg lg:text-xl font-black uppercase tracking-tighter text-(--db-text)">
                 Links <span className="text-(--db-text-muted) text-sm lg:text-lg">({totalItems})</span>
@@ -196,15 +193,15 @@ export function ExistingShortlinksCard({
         <div className="flex gap-2">
             <div className="relative flex-1">
                 <input 
-                    className="w-full bg-(--db-bg) border-2 border-(--db-border) pl-8 pr-4 py-1.5 text-xs lg:text-sm font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:font-normal"
-                    placeholder="Filter current page..."
+                    className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-full pl-10 pr-4 py-2 text-xs lg:text-sm font-bold text-(--db-text) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all placeholder:font-normal"
+                    placeholder="Search links..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                 />
-                <Search className="absolute left-2.5 top-2 h-3.5 w-3.5 text-(--db-text-muted)" />
+                <Search className="absolute left-3.5 top-2.5 h-4 w-4 text-(--db-text-muted)" />
                 {search && (
-                    <button onClick={() => setSearch("")} className="absolute right-2.5 top-2 hover:text-red-500">
-                        <X className="h-3.5 w-3.5" />
+                    <button onClick={() => setSearch("")} className="absolute right-3.5 top-2.5 hover:text-red-500">
+                        <X className="h-4 w-4" />
                     </button>
                 )}
             </div>
@@ -212,17 +209,17 @@ export function ExistingShortlinksCard({
             {selectedIds.size > 0 && (
                 <button 
                     onClick={handleBulkDelete}
-                    className="bg-red-500 text-white border-2 border-(--db-border) px-3 font-black uppercase text-[10px] flex items-center gap-1 hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all"
+                    className="bg-red-500 text-white rounded-full px-4 font-black uppercase text-[10px] flex items-center gap-2 hover:bg-red-600 transition-all shadow-lg shadow-red-500/20"
                 >
-                    <Trash2 className="h-3.5 w-3.5"/> DEL ({selectedIds.size})
+                    <Trash2 className="h-3.5 w-3.5"/> DELETE ({selectedIds.size})
                 </button>
             )}
         </div>
 
-        <div className="flex items-center gap-2 text-[10px] font-bold text-(--db-text)">
+        <div className="flex items-center gap-2 text-[10px] font-black text-(--db-text) tracking-widest">
             <input 
                 type="checkbox" 
-                className="w-3.5 h-3.5 accent-(--db-primary) cursor-pointer"
+                className="w-4 h-4 rounded-full accent-(--db-primary) cursor-pointer"
                 checked={filteredLinks.length > 0 && selectedIds.size === filteredLinks.length}
                 onChange={handleSelectAll}
                 disabled={filteredLinks.length === 0}
@@ -233,13 +230,13 @@ export function ExistingShortlinksCard({
 
       <div className="flex-1 overflow-y-auto pr-1 md:pr-2 pb-4">
         {loadingTable ? (
-            <div className="text-center p-10 font-bold animate-pulse text-(--db-text-muted) text-xs">LOADING DATA...</div>
+            <div className="text-center p-10 font-black animate-pulse text-(--db-text-muted) text-xs tracking-widest">SYNCING DATA...</div>
         ) : filteredLinks.length === 0 ? (
-            <div className="border-4 border-(--db-border) border-dashed p-8 text-center bg-(--db-surface)">
-                <p className="font-black text-sm lg:text-lg mb-1 text-(--db-text)">NO LINKS.</p>
+            <div className="border border-dashed border-(--db-border)/50 rounded-2xl p-12 text-center bg-(--db-surface)/50">
+                <p className="font-black text-sm lg:text-lg mb-1 text-(--db-text-muted) uppercase tracking-tighter">No links found.</p>
             </div>
         ) : (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-3 lg:gap-4">
+            <div className="flex flex-col gap-3">
                 {filteredLinks.map((link) => (
                   <ShortlinkRow 
                     key={link.id} 
@@ -261,25 +258,25 @@ export function ExistingShortlinksCard({
       </div>
 
       {totalPages > 1 && (
-        <div className="pt-4 border-t-4 border-(--db-border) flex items-center justify-between gap-2 mt-auto">
+        <div className="pt-4 border-t border-(--db-border)/30 flex items-center justify-between gap-2 mt-auto">
             <button 
                 onClick={() => onPageChange(currentPage - 1)}
                 disabled={currentPage === 1}
-                className="p-2 border-2 border-(--db-border) bg-(--db-surface) hover:bg-(--db-bg) disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-full border border-(--db-border)/50 bg-(--db-surface) hover:bg-(--db-bg) disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                <ChevronLeft className="h-4 w-4 text-(--db-text)"/>
+                <ChevronLeft className="h-5 w-5 text-(--db-text)"/>
             </button>
             
-            <span className="text-xs font-black text-(--db-text)">
-                PAGE {currentPage} / {totalPages}
+            <span className="text-[10px] font-black text-(--db-text-muted) tracking-[0.2em]">
+                {currentPage} / {totalPages}
             </span>
 
             <button 
                 onClick={() => onPageChange(currentPage + 1)}
                 disabled={currentPage === totalPages}
-                className="p-2 border-2 border-(--db-border) bg-(--db-surface) hover:bg-(--db-bg) disabled:opacity-50 disabled:cursor-not-allowed"
+                className="p-2 rounded-full border border-(--db-border)/50 bg-(--db-surface) hover:bg-(--db-bg) disabled:opacity-30 disabled:cursor-not-allowed transition-all"
             >
-                <ChevronRight className="h-4 w-4 text-(--db-text)"/>
+                <ChevronRight className="h-5 w-5 text-(--db-text)"/>
             </button>
         </div>
       )}

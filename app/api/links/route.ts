@@ -26,6 +26,11 @@ export async function GET(req: NextRequest) {
       prisma.shortLink.findMany({
         where: { userId: user.id },
         orderBy: { createdAt: "desc" },
+        include: {
+          _count: {
+            select: { clicks: true }
+          }
+        },
         skip,
         take: limit,
       }),
