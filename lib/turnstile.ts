@@ -36,9 +36,6 @@ export async function verifyTurnstileToken(token: string) {
     });
 
     const data = await res.json();
-    if (!data.success) {
-        console.error("❌ [Turnstile] Cloudflare rejected token:", data["error-codes"]);
-    }
     return data.success;
   } catch (error) {
     console.error("Turnstile Verification Error:", error);

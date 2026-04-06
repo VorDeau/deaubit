@@ -19,19 +19,16 @@ export default function GlobalSecurityGate({ children }: { children: React.React
     if (lastVerified) {
         const age = Date.now() - parseInt(lastVerified);
         if (age < 1800000) { // 30 minutes
-            console.log("✅ [Gate] Human verified recently (via localStorage)");
             setIsVerified(true);
             return;
         }
     }
-    console.log("🔒 [Gate] Verification required");
     setIsVerified(false);
   }, [siteKey]);
 
   const handleSuccess = async (token: string) => {
     setVerifying(true);
     setError(null);
-    console.log("📡 [Gate] Token received, verifying with backend...");
     
     try {
       const res = await fetch("/api/auth/verify-turnstile", {
@@ -40,22 +37,17 @@ export default function GlobalSecurityGate({ children }: { children: React.React
         body: JSON.stringify({ token }),
       });
       
-      const data = await res.json();
-
       if (res.ok) {
-        console.log("🎉 [Gate] Backend verified successfully");
         localStorage.setItem("db_human_verified", Date.now().toString());
         setTimeout(() => {
           setIsVerified(true);
         }, 500);
       } else {
-        console.error("❌ [Gate] Backend rejected verification:", data.error);
-        setError(data.error || "Verification failed");
+        setError("Verification failed");
         setVerifying(false);
       }
     } catch (err) {
-      console.error("❌ [Gate] Network error during verification");
-      setError("Network error. Please check your connection.");
+      setError("Verification failed");
       setVerifying(false);
     }
   };
@@ -69,9 +61,6 @@ export default function GlobalSecurityGate({ children }: { children: React.React
         
         <div className="space-y-2">
           <h1 className="font-dot text-4xl tracking-nothing text-(--db-primary)">SYS.CHECK</h1>
-          <p className="text-sm font-bold uppercase tracking-widest text-(--db-text-muted)">
-            Security protocol initialization
-          </p>
         </div>
 
         <div className="min-h-32 flex flex-col items-center justify-center w-full">
@@ -99,8 +88,7 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                 siteKey={siteKey || ""} 
                 onSuccess={handleSuccess}
                 onError={() => { 
-                    console.error("❌ [Turnstile] Widget error");
-                    setError("Security widget failed to load."); 
+                    setError("Verification failed"); 
                 }}
                 options={{ theme: 'light', size: 'normal' }}
               />

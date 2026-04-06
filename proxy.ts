@@ -33,6 +33,7 @@ function isPublicPath(pathname: string): boolean {
     "/api/auth/forgot-password",
     "/api/auth/reset-password",
     "/api/auth/verify-turnstile",
+    "/api/auth/resend-otp",
     "/api/report",
     "/api/cron/cleanup",
     "/api/admin/delete", 
