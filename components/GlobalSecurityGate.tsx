@@ -15,11 +15,17 @@ export default function GlobalSecurityGate({ children }: { children: React.React
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
-    // Check if the validation cookie exists
-    const hasCookie = document.cookie.includes("db-cv=");
-    if (!hasCookie && siteKey) {
-      setIsVerified(false);
-    }
+    
+    const checkVerification = () => {
+        const hasCookie = document.cookie.includes("db-cv=");
+        if (hasCookie) {
+            setIsVerified(true);
+        } else if (siteKey) {
+            setIsVerified(false);
+        }
+    };
+
+    checkVerification();
   }, [siteKey]);
 
   const handleSuccess = async (token: string) => {
