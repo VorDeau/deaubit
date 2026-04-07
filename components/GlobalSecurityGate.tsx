@@ -21,14 +21,17 @@ export default function GlobalSecurityGate({ children }: { children: React.React
         const savedTheme = localStorage.getItem("db-theme") as "light" | "dark" | null;
         if (savedTheme) {
             setTheme(savedTheme);
+            // Apply theme class to document for full page background coverage
+            document.documentElement.classList.toggle("dark", savedTheme === "dark");
         } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
             setTheme("dark");
+            document.documentElement.classList.add("dark");
         }
 
         const lastVerified = localStorage.getItem("db_human_verified");
         if (lastVerified) {
             const age = Date.now() - parseInt(lastVerified);
-            if (age < 1800000) {
+            if (age < 1800000) { // 30 minutes
                 setIsVerified(true);
                 return;
             }
@@ -70,7 +73,7 @@ export default function GlobalSecurityGate({ children }: { children: React.React
   if (isVerified) return <>{children}</>;
 
   return (
-    <div className="fixed inset-0 z-9999 flex flex-col items-center justify-center bg-(--db-bg) text-(--db-text) animate-reveal">
+    <div className={`fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-(--db-bg) text-(--db-text) animate-reveal ${theme === 'dark' ? 'dark' : ''}`}>
       <div className="w-full max-w-md p-8 flex flex-col items-center justify-center space-y-10 text-center">
         
         <div className="space-y-3">
@@ -106,7 +109,7 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                     setError("Verification failed"); 
                 }}
                 options={{ 
-                    theme: theme, // Auto Theme applied here
+                    theme: theme,
                     size: 'normal' 
                 }}
               />
