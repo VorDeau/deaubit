@@ -8,7 +8,7 @@ import { CreateShortlinkCard } from "@/components/CreateShortlinkCard";
 import AnalyticsModal from "@/components/AnalyticsModal";
 import QrCodeModal from "@/components/QrCodeModal";
 import EditShortlinkModal from "@/components/EditShortlinkModal"; 
-import { Trash2, Zap, Activity } from "lucide-react";
+import { Trash2, Zap, Activity, Cpu } from "lucide-react";
 
 export default function DashboardPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
@@ -88,35 +88,33 @@ export default function DashboardPage() {
   const getDomainLabel = (url: string) => { try { return new URL(url).hostname; } catch { return url; } };
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-10 md:gap-16">
       
-      {/* Top Welcome Widget Area */}
-      <section className="grid grid-cols-1 md:grid-cols-[1fr_auto] items-center gap-6">
-          <div className="space-y-1">
-              <h2 className="text-4xl font-black uppercase tracking-tighter">DASHBOARD</h2>
-              <div className="flex items-center gap-3 opacity-50">
-                  <span className="font-dot text-[10px] tracking-nothing uppercase">System Online</span>
-                  <div className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                  <span className="h-[1px] w-8 bg-var(--db-text) opacity-20"></span>
-                  <span className="font-dot text-[10px] tracking-nothing uppercase">{totalItems} active shortlinks</span>
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-6 px-2">
+          <div className="space-y-2">
+              <div className="flex items-center gap-2 text-(--db-primary)">
+                  <Cpu className="h-3.5 w-3.5" />
+                  <span className="nothing-label tracking-widest text-(--db-primary)">Node_Active_01</span>
+              </div>
+              <h2 className="text-4xl md:text-6xl nothing-title text-(--db-text)">DASHBOARD</h2>
+              <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.6)]"></div>
+                  <span className="nothing-label normal-case tracking-normal opacity-40">{totalItems} Verified records in database</span>
               </div>
           </div>
-          <div className="flex gap-2">
-              <div className="db-card px-6 py-3 flex items-center gap-3">
-                  <Activity className="h-4 w-4 text-var(--db-primary)" />
-                  <div className="flex flex-col">
-                      <span className="text-[10px] font-dot tracking-nothing uppercase leading-none opacity-40">Total Usage</span>
-                      <span className="text-sm font-black leading-tight">{totalItems} LINKS</span>
-                  </div>
+          
+          <div className="db-card px-8 py-5 flex items-center gap-4 bg-(--db-surface)/50 backdrop-blur-md">
+              <Activity className="h-5 w-5 text-(--db-primary)" />
+              <div className="flex flex-col">
+                  <span className="nothing-label leading-none mb-1 opacity-40">System_Usage</span>
+                  <span className="text-xl font-black leading-tight uppercase tracking-tighter">{totalItems} Slugs</span>
               </div>
           </div>
       </section>
 
-      {/* Main Grid: Create Area & List Area */}
-      <div className="grid grid-cols-1 gap-8">
+      <div className="grid grid-cols-1 gap-12">
         
-        {/* Create Shortlink - Now a prominent horizontal widget */}
-        <div className="w-full">
+        <div className="w-full max-w-4xl">
             <CreateShortlinkCard
               targetUrl={targetUrl}
               slug={slug}
@@ -132,11 +130,10 @@ export default function DashboardPage() {
             />
         </div>
 
-        {/* Links Explorer */}
         <div className="w-full">
-            <div className="flex items-center gap-3 mb-4 pl-4">
-                <Zap className="h-4 w-4" />
-                <h3 className="font-dot text-xs tracking-nothing uppercase">Shortlink Explorer</h3>
+            <div className="flex items-center gap-3 mb-6 px-4">
+                <Zap className="h-4 w-4 text-(--db-primary)" />
+                <h3 className="nothing-label text-(--db-text) opacity-100">Shortlink_Explorer_v2</h3>
             </div>
             <ExistingShortlinksCard
               links={links}
@@ -160,24 +157,26 @@ export default function DashboardPage() {
       {qrSlug && <QrCodeModal slug={qrSlug} shortUrl={`${baseUrl}/${qrSlug}`} onClose={() => setQrSlug(null)} />}
       {editingLink && <EditShortlinkModal link={editingLink} onClose={() => setEditingLink(null)} onUpdate={() => fetchLinks(currentPage)} />}
       
-      {/* Nothing Styled Confirmation Overlay */}
       {pendingDeleteSlugs.length > 0 && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-var(--db-bg)/90 backdrop-blur-xl animate-in fade-in">
-          <div className="db-card w-full max-w-sm p-8 space-y-6">
-            <div className="flex flex-col items-center gap-4 text-center">
-                <div className="p-4 rounded-full bg-var(--db-primary)/10 text-var(--db-primary) animate-soft-pulse">
-                    <Trash2 className="h-10 w-10"/>
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-6 bg-(--db-bg)/90 backdrop-blur-2xl animate-reveal">
+          <div className="db-card w-full max-w-sm p-10 space-y-10 text-center border-(--db-primary)/30">
+            <div className="flex flex-col items-center gap-6">
+                <div className="p-6 rounded-3xl bg-(--db-primary)/10 text-(--db-primary)">
+                    <Trash2 className="h-10 w-10 animate-soft-pulse"/>
                 </div>
-                <div>
-                    <h3 className="font-dot text-xl tracking-widest uppercase">Terminate</h3>
-                    <p className="text-xs font-bold text-var(--db-text-muted) uppercase">Destroying {pendingDeleteSlugs.length} link record(s)</p>
+                <div className="space-y-2">
+                    <h3 className="nothing-title text-2xl">TERMINATE</h3>
+                    <p className="nothing-label text-(--db-primary)">Action Required: Confirmation</p>
                 </div>
+                <p className="text-[10px] font-bold text-(--db-text-muted) uppercase tracking-widest leading-relaxed">
+                    You are about to purge {pendingDeleteSlugs.length} record(s) from the system core. This operation is irreversible.
+                </p>
             </div>
-            <div className="flex flex-col gap-2 pt-4">
-                <button onClick={confirmDelete} disabled={deleteLoading} className="btn-primary w-full py-4 text-sm">
-                    {deleteLoading ? "Terminating..." : "CONFIRM PURGE"}
+            <div className="flex flex-col gap-3">
+                <button onClick={confirmDelete} disabled={deleteLoading} className="btn-primary w-full py-4 text-sm tracking-widest">
+                    {deleteLoading ? "EXECUTING..." : "CONFIRM PURGE"}
                 </button>
-                <button onClick={() => { setPendingDeleteSlugs([]); }} className="btn-secondary w-full py-3 text-xs">ABORT</button>
+                <button onClick={() => { setPendingDeleteSlugs([]); }} className="btn-secondary w-full py-3 text-[10px] nothing-label opacity-100">ABORT_MISSION</button>
             </div>
           </div>
         </div>

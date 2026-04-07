@@ -25,62 +25,63 @@ export function CreateShortlinkCard({
 }: CreateShortlinkCardProps) {
   
   const [isExpanded, setIsExpanded] = useState(false);
-  const isTyping = targetUrl.length > 0 || slug.length > 0 || password.length > 0;
+  const isTyping = targetUrl.length > 0;
 
   return (
-    <div className={`db-card p-4 lg:p-6 ${isTyping ? 'ring-2 ring-(--db-primary)/50' : ''}`}>
+    <div className={`db-card p-6 lg:p-8 transition-all duration-700 ${isTyping ? 'shadow-2xl border-(--db-primary)/30' : 'shadow-xl'}`}>
       
-      <div className="mb-6 flex items-center gap-3 border-b border-(--db-border)/30 pb-4">
-        <div className="bg-(--db-primary)/10 p-2 rounded-xl">
-            <Link2 className="h-5 w-5 text-(--db-primary)" />
+      <div className="mb-8 flex items-center gap-4 border-b border-(--db-border)/30 pb-6">
+        <div className="bg-(--db-primary)/10 p-3 rounded-2xl shrink-0">
+            <Link2 className="h-6 w-6 text-(--db-primary)" />
         </div>
-        <h2 className="text-xl font-black uppercase tracking-tighter text-(--db-text)">Create Link</h2>
+        <div>
+            <h2 className="text-2xl nothing-title text-(--db-text)">GENERATE_LINK</h2>
+            <p className="nothing-label">Infrastructure Creation Node</p>
+        </div>
       </div>
 
-      <form className="space-y-6" onSubmit={onSubmit} autoComplete="off">
+      <form className="space-y-8" onSubmit={onSubmit} autoComplete="off">
         
-        <div className="flex flex-col lg:flex-row gap-4">
-            <div className="flex-1 space-y-1">
-              <label className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-(--db-text-muted) px-1">Target URL</label>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <div className="lg:col-span-8 space-y-2">
+              <label className="nothing-label block ml-1">Destination_Target</label>
               <input
-                className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-2xl px-4 py-3.5 text-sm font-bold text-(--db-text) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all placeholder:font-normal"
-                placeholder="https://example.com/very/long/url"
+                className="w-full text-base font-bold"
+                placeholder="https://example.com/long-resource-identifier"
                 value={targetUrl}
                 onChange={(e) => onChangeTarget(e.target.value)}
                 required
                 disabled={loading}
                 autoComplete="off"
-                name="target_url_unique"
               />
             </div>
 
-            <div className="lg:w-1/3 space-y-1">
-              <label className="text-[10px] lg:text-xs font-black uppercase tracking-widest text-(--db-text-muted) px-1">Slug (Optional)</label>
-              <div className="flex">
-                <span className="bg-(--db-bg) text-(--db-text-muted) px-4 py-3.5 text-sm font-mono font-bold flex items-center border border-(--db-border)/50 border-r-0 rounded-l-2xl">/</span>
+            <div className="lg:col-span-4 space-y-2">
+              <label className="nothing-label block ml-1">Relational_Slug</label>
+              <div className="relative">
+                <span className="absolute left-4 top-3.5 text-(--db-text-muted) font-dot text-sm">/</span>
                 <input
-                  className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-r-2xl px-4 py-3.5 text-sm font-bold text-(--db-text) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all placeholder:font-normal"
-                  placeholder="link"
+                  className="w-full pl-8 font-bold text-base"
+                  placeholder="custom-slug"
                   value={slug}
                   onChange={(e) => onChangeSlug(e.target.value)}
                   disabled={loading}
                   autoComplete="off"
-                  name="slug_unique"
                 />
               </div>
             </div>
         </div>
 
-        <div className="border border-(--db-border)/50 bg-(--db-bg) rounded-2xl overflow-hidden transition-all focus-within:ring-2 focus-within:ring-(--db-primary)/50">
+        <div className="db-card rounded-2xl! bg-(--db-surface-hover) border-(--db-border) overflow-hidden transition-all">
             <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="w-full flex items-center justify-between p-4 focus:outline-none hover:bg-(--db-surface) transition-colors"
+                className="w-full flex items-center justify-between p-4 px-6 hover:bg-(--db-surface) transition-colors"
             >
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3">
                     <Settings2 className="h-4 w-4 text-(--db-text-muted)" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-(--db-text-muted)">
-                        Advanced Settings {(password || expiresAt) && <span className="text-(--db-primary)">• Active</span>}
+                    <span className="nothing-label opacity-100 text-[9px]">
+                        Advanced_Options {(password || expiresAt) && <span className="text-(--db-primary) ml-2">•_ENABLED</span>}
                     </span>
                 </div>
                 {isExpanded ? (
@@ -91,57 +92,58 @@ export function CreateShortlinkCard({
             </button>
             
             {isExpanded && (
-                <div className="p-4 pt-0 grid grid-cols-1 md:grid-cols-2 gap-4 animate-in slide-in-from-top-1 fade-in duration-300">
-                    <div className="h-px bg-(--db-border)/20 mb-1 w-full md:col-span-2"></div>
-                    
-                    <div className="flex items-center gap-3 bg-(--db-surface) border border-(--db-border)/50 rounded-xl px-3 py-3 focus-within:border-(--db-primary) transition-all">
-                        <Lock className="h-4 w-4 text-(--db-text-muted) shrink-0" />
-                        <input
-                            type="text"
-                            className="w-full bg-transparent border-none text-xs font-bold text-(--db-text) focus:ring-0 focus:outline-none p-0 placeholder:text-(--db-text-muted)"
-                            placeholder="Password Protection"
-                            value={password}
-                            onChange={(e) => onChangePassword(e.target.value)}
-                            disabled={loading}
-                            autoComplete="new-password" 
-                            name="link_lock_password_unique" 
-                        />
+                <div className="p-6 pt-0 grid grid-cols-1 md:grid-cols-2 gap-6 animate-reveal">
+                    <div className="space-y-2">
+                        <label className="nothing-label text-[9px] block">Security_Key</label>
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-3.5 h-4 w-4 text-(--db-text-muted)" />
+                            <input
+                                type="text"
+                                className="pl-12 py-3 text-sm font-bold bg-(--db-surface)"
+                                placeholder="Lock link with password"
+                                value={password}
+                                onChange={(e) => onChangePassword(e.target.value)}
+                                disabled={loading}
+                                autoComplete="off"
+                            />
+                        </div>
                     </div>
                     
-                    <div className="flex items-center gap-3 bg-(--db-surface) border border-(--db-border)/50 rounded-xl px-3 py-3 focus-within:border-(--db-primary) transition-all">
-                        <Calendar className="h-4 w-4 text-(--db-text-muted) shrink-0" />
-                        <input
-                            type="datetime-local"
-                            className="w-full bg-transparent border-none text-xs font-bold text-(--db-text) focus:ring-0 focus:outline-none p-0"
-                            value={expiresAt}
-                            onChange={(e) => onChangeExpiresAt(e.target.value)}
-                            disabled={loading}
-                        />
+                    <div className="space-y-2">
+                        <label className="nothing-label text-[9px] block">Self_Destruct_Timer</label>
+                        <div className="relative">
+                            <Calendar className="absolute left-4 top-3.5 h-4 w-4 text-(--db-text-muted)" />
+                            <input
+                                type="datetime-local"
+                                className="pl-12 py-3 text-sm font-bold bg-(--db-surface)"
+                                value={expiresAt}
+                                onChange={(e) => onChangeExpiresAt(e.target.value)}
+                                disabled={loading}
+                            />
+                        </div>
                     </div>
                 </div>
             )}
         </div>
 
-        <div className="min-h-[20px]">
-            {error && (
-                <div className="bg-red-500/10 text-red-500 text-[10px] lg:text-xs font-bold p-3 rounded-xl border border-red-500/20 animate-error-shake w-full flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
-                </div>
-            )}
-        </div>
+        {error && (
+            <div className="bg-red-500/10 text-red-500 font-bold p-4 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake uppercase tracking-widest flex items-center gap-3">
+                <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
+            </div>
+        )}
 
         <button
           type="submit"
           disabled={loading || !targetUrl}
-          className="w-full bg-(--db-primary) text-white rounded-full py-4.5 font-black text-sm uppercase tracking-[0.2em] shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 cursor-pointer"
+          className="btn-primary w-full py-5 text-sm tracking-[0.3em]"
         >
-          {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : <><ArrowRight className="h-5 w-5" /> SHORTEN IT</>}
+          {loading ? <Loader2 className="h-5 w-5 animate-spin"/> : <><ArrowRight className="h-5 w-5" /> GENERATE_INFRASTRUCTURE</>}
         </button>
       </form>
       
-      <div className="mt-6 text-center">
-          <p className="text-[8px] font-dot tracking-[0.3em] opacity-20 uppercase">
-             Powered by VorDeau
+      <div className="mt-8 text-center">
+          <p className="nothing-label opacity-20 text-[8px]">
+             DeauBit Protocol v9.2 • Encrypted Link Mesh
           </p>
       </div>
     </div>

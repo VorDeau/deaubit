@@ -46,21 +46,21 @@ export default function AppShell({
   }
 
   const isAuthPage = [
-    "/", "/login", "/register", "/verify", "/forgot-password", "/reset-password", "/account-deleted", "/setup"
+    "/login", "/register", "/verify", "/forgot-password", "/reset-password", "/account-deleted", "/setup"
   ].includes(pathname);
 
   if (isAuthPage) {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md animate-reveal">
-          <div className="flex justify-center mb-8">
-             <DeauBitLogo size={60} />
+      <div className="min-h-dvh flex flex-col items-center justify-center p-6 sm:p-12">
+        <div className="w-full max-w-110 animate-reveal">
+          <div className="flex justify-center mb-10">
+             <DeauBitLogo size={64} />
           </div>
-          <div className="db-card p-8 shadow-xl">
+          <div className="db-card p-6 sm:p-10 shadow-2xl bg-(--db-surface)">
             {children}
           </div>
-          <footer className="mt-8 text-center">
-            <p className="text-[10px] font-dot tracking-nothing opacity-40 uppercase">
+          <footer className="mt-12 text-center">
+            <p className="nothing-label opacity-40">
               Powered by VorDeau &copy; {new Date().getFullYear()}
             </p>
           </footer>
@@ -71,26 +71,23 @@ export default function AppShell({
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Top Navigation - Sleek & Integrated */}
-      <nav className="sticky top-0 z-50 px-4 py-4 pointer-events-none">
-        <div className="max-w-5xl mx-auto flex items-center justify-between glass-panel backdrop-blur-2xl rounded-full px-6 py-3 pointer-events-auto shadow-lg border-white/5">
-          <div className="flex items-center gap-6">
-            <Link href="/dash" className="hover:scale-110 transition-transform active:scale-95">
+      <nav className="sticky top-0 z-50 px-4 py-6">
+        <div className="max-w-4xl mx-auto flex items-center justify-between glass-panel rounded-full px-6 py-3 shadow-xl">
+          <div className="flex items-center gap-4 sm:gap-8">
+            <Link href="/dash" className="hover:scale-110 transition-transform active:scale-95 shrink-0">
               <DeauBitLogo size={32} />
             </Link>
             
-            <div className="h-6 w-[1px] bg-var(--db-border) opacity-20 hidden sm:block"></div>
-            
-            <div className="flex items-center gap-2">
-              <Link href="/dash" className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-dot tracking-widest transition-all ${pathname === "/dash" ? "bg-var(--db-text) text-var(--db-bg)" : "hover:bg-var(--db-surface-hover) text-var(--db-text-muted)"}`}>
-                <LayoutDashboard className="h-3 w-3" /> DASH
+            <div className="hidden sm:flex items-center gap-1.5">
+              <Link href="/dash" className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-dot tracking-widest transition-all ${pathname === "/dash" ? "bg-(--db-text) text-(--db-bg)" : "hover:bg-(--db-surface-hover) text-(--db-text-muted)"}`}>
+                <LayoutDashboard className="h-3.5 w-3.5" /> <span className="hidden md:inline">DASH</span>
               </Link>
-              <Link href="/dash/settings" className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-dot tracking-widest transition-all ${pathname === "/dash/settings" ? "bg-var(--db-text) text-var(--db-bg)" : "hover:bg-var(--db-surface-hover) text-var(--db-text-muted)"}`}>
-                <Settings className="h-3 w-3" /> SETTINGS
+              <Link href="/dash/settings" className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-dot tracking-widest transition-all ${pathname === "/dash/settings" ? "bg-(--db-text) text-(--db-bg)" : "hover:bg-(--db-surface-hover) text-(--db-text-muted)"}`}>
+                <Settings className="h-3.5 w-3.5" /> <span className="hidden md:inline">SETTINGS</span>
               </Link>
               {user?.role === "ADMIN" && (
-                <Link href="/admin" className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-dot tracking-widest transition-all ${isAdminPage ? "bg-var(--db-primary) text-white" : "text-var(--db-primary) hover:bg-var(--db-primary)/10"}`}>
-                  <ShieldAlert className="h-3 w-3" /> ADMIN
+                <Link href="/admin" className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-[10px] font-dot tracking-widest transition-all ${isAdminPage ? "bg-(--db-primary) text-white" : "text-(--db-primary) hover:bg-(--db-primary)/10"}`}>
+                  <ShieldAlert className="h-3.5 w-3.5" /> <span className="hidden md:inline">ADMIN</span>
                 </Link>
               )}
             </div>
@@ -99,33 +96,36 @@ export default function AppShell({
           <div className="flex items-center gap-4">
             {user && (
               <div className="hidden md:flex flex-col items-end leading-none">
-                <span className="text-[9px] font-bold opacity-40 uppercase tracking-tighter mb-1">Authenticated</span>
-                <span className="text-xs font-black tracking-tight">{user.email.split('@')[0]}</span>
+                <span className="nothing-label opacity-40 scale-75 origin-right mb-0.5">Authenticated</span>
+                <span className="text-xs font-black tracking-tight uppercase">{user.email.split('@')[0]}</span>
               </div>
             )}
             <button 
               onClick={handleLogout}
-              className="p-2.5 rounded-full bg-var(--db-surface) border border-var(--db-border) hover:bg-var(--db-primary) hover:text-white hover:border-var(--db-primary) transition-all active:scale-90 shadow-sm"
+              className="p-3 rounded-full bg-(--db-surface) border border-(--db-border) hover:bg-(--db-primary) hover:text-white hover:border-(--db-primary) transition-all active:scale-90 shadow-sm"
               title="Sign Out"
             >
               <LogOut className="h-4 w-4" />
             </button>
           </div>
         </div>
+        
+        <div className="sm:hidden flex justify-center mt-4 gap-2">
+        </div>
       </nav>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8 animate-reveal">
+      <main className="flex-1 container-nothing py-6 md:py-12 animate-reveal">
         {children}
       </main>
 
-      <footer className="p-8 border-t border-var(--db-border) mt-12 opacity-30">
-        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <DeauBitLogo size={20} />
-            <span className="text-[10px] font-dot tracking-nothing uppercase">DeauBit Utility v9.2</span>
+      <footer className="py-12 border-t border-(--db-border) mt-20 bg-(--db-surface)/30 backdrop-blur-sm">
+        <div className="container-nothing flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-3">
+            <DeauBitLogo size={24} />
+            <span className="nothing-label">DeauBit Utility v9.2</span>
           </div>
-          <div className="text-[10px] font-dot tracking-nothing uppercase">
+          <div className="nothing-label">
             Powered by VorDeau &copy; {new Date().getFullYear()}
           </div>
         </div>

@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Loader2, Eye, EyeOff, AlertTriangle } from "lucide-react";
+import { Loader2, Eye, EyeOff, AlertTriangle, KeyRound, Mail } from "lucide-react";
 import type { LoginResponse } from "@/types";
 
 interface LoginFormProps {
@@ -29,15 +29,11 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
 
     async function performLogin() {
         setLoading(true); setError(null); setUnverified(false);
-
         try {
             const res = await fetch("/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    email, 
-                    password
-                }),
+                body: JSON.stringify({ email, password }),
             });
             const data: LoginResponse = await res.json().catch(() => ({}));
 
@@ -72,110 +68,105 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
     }
 
     return (
-        <section className="h-full w-full flex items-center justify-center">
-            <div className="w-full max-w-md p-8 animate-in fade-in slide-in-from-bottom-8 duration-1000 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]">
-                
-                <div className="flex flex-col items-center mb-12">
-                    <h2 className="text-4xl font-dot tracking-[0.4em] text-(--db-text) mb-2">SYS.AUTH</h2>
-                    <div className="h-0.5 w-12 bg-(--db-primary) rounded-full"></div>
+        <div className="w-full flex flex-col">
+            <div className="flex items-center gap-4 mb-10 border-b border-(--db-border)/30 pb-6">
+                <div className="bg-(--db-primary)/10 p-3 rounded-2xl shrink-0">
+                    <KeyRound className="h-6 w-6 text-(--db-primary)"/>
                 </div>
+                <div>
+                    <h2 className="text-2xl nothing-title text-(--db-text)">AUTHORIZE</h2>
+                    <p className="nothing-label">Access Restricted Area</p>
+                </div>
+            </div>
 
-                <form onSubmit={handleSubmit} className="space-y-12">
-                    <div className="flex flex-col items-center">
-                        <label className="font-black text-[10px] uppercase tracking-[0.3em] mb-4 block text-(--db-text-muted) text-center">
-                            Identity (Email)
-                        </label>
+            <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                    <label className="nothing-label block ml-1">Identity (Email)</label>
+                    <div className="relative">
                         <input
                             type="email"
                             name="email"
                             autoComplete="username email"
-                            className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-(--db-border)/50 px-0 py-3 text-lg font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted)/30 focus:ring-0 focus:border-b-2 focus:border-(--db-primary) outline-none transition-all text-center"
+                            className="pl-12"
                             placeholder="USER@SYSTEM.NET"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                             disabled={loading}
                         />
+                        <Mail className="absolute left-4 top-3.5 text-(--db-text-muted) h-5 w-5" />
                     </div>
+                </div>
 
-                    <div className="flex flex-col items-center">
-                        <label className="font-black text-[10px] uppercase tracking-[0.3em] mb-4 block text-(--db-text-muted) text-center">
-                            Access Key
-                        </label>
-                        <div className="relative w-full">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                autoComplete="current-password"
-                                className="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b border-(--db-border)/50 px-0 py-3 text-lg font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted)/30 focus:ring-0 focus:border-b-2 focus:border-(--db-primary) outline-none transition-all text-center"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                disabled={loading}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-0 top-3.5 text-(--db-text-muted) hover:text-(--db-text) transition-all cursor-pointer"
-                                disabled={loading}
-                            >
-                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                            </button>
-                        </div>
-                        <div className="mt-4">
-                            <Link href="/forgot-password" text-center className="text-[9px] font-black uppercase tracking-widest text-(--db-primary) hover:underline decoration-1 transition-all">
-                                Lost Credentials?
-                            </Link>
-                        </div>
+                <div className="space-y-2">
+                    <div className="flex justify-between items-end px-1">
+                        <label className="nothing-label block">Access Key</label>
+                        <Link href="/forgot-password" className="text-[9px] font-black uppercase text-(--db-primary) hover:underline">
+                            LOST?
+                        </Link>
                     </div>
-
-                    <div className="pt-4">
+                    <div className="relative">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            autoComplete="current-password"
+                            className="pr-12"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                            disabled={loading}
+                        />
                         <button
-                            type="submit"
-                            disabled={loading || (cooldown !== null && cooldown > 0)}
-                            className="w-full bg-(--db-primary) text-white rounded-full py-4.5 font-black text-sm uppercase tracking-[0.3em] shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all duration-500 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] disabled:opacity-50 disabled:cursor-not-allowed"
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute right-4 top-3.5 text-(--db-text-muted) hover:text-(--db-text) transition-all"
+                            disabled={loading}
                         >
-                            {loading ? (
-                                <Loader2 className="animate-spin h-5 w-5 mx-auto"/>
-                            ) : cooldown ? (
-                                `WAIT ${cooldown}S`
-                            ) : (
-                                "AUTHORIZE ACCESS"
-                            )}
+                            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                         </button>
                     </div>
-                    
-                    <div className="min-h-16 flex flex-col justify-center">
-                        {error && (
-                            <div className="text-red-500 font-bold text-xs flex flex-col items-center gap-2 animate-error-shake">
-                                <AlertTriangle className="h-5 w-5" />
-                                <span className="uppercase tracking-widest text-center">{error}</span>
-                            </div>
-                        )}
-
-                        {unverified && (
-                            <div className="flex flex-col items-center gap-4 text-center">
-                                <p className="text-[10px] font-bold text-(--db-text-muted) uppercase tracking-widest">Account Pending Verification</p>
-                                <Link
-                                    href={`/verify?email=${encodeURIComponent(email)}`}
-                                    className="text-[10px] font-black uppercase tracking-widest bg-(--db-primary) text-white px-6 py-2 rounded-full shadow-md shadow-(--db-primary)/20 hover:scale-[1.05] transition-all"
-                                >
-                                    Verify Manual →
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                </form>
-
-                <div className="mt-12 text-center pt-8 border-t border-(--db-border)/20">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-(--db-text-muted)">Unregistered? </span>
-                    <Link href="/register" className="inline-block ml-1 text-[10px] font-black uppercase tracking-[0.2em] text-(--db-primary) hover:underline decoration-1 transition-all">
-                        CREATE ACCOUNT
-                    </Link>
                 </div>
+
+                <button
+                    type="submit"
+                    disabled={loading || (cooldown !== null && cooldown > 0)}
+                    className="btn-primary w-full py-4 text-sm tracking-widest mt-4"
+                >
+                    {loading ? (
+                        <Loader2 className="animate-spin h-5 w-5"/>
+                    ) : cooldown ? (
+                        `WAIT ${cooldown}S`
+                    ) : (
+                        "AUTHORIZE"
+                    )}
+                </button>
+                
+                {error && (
+                    <div className="bg-red-500/10 text-red-500 font-bold p-4 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+                        <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
+                    </div>
+                )}
+
+                {unverified && (
+                    <div className="flex flex-col items-center gap-4 bg-yellow-500/10 p-4 rounded-2xl border border-yellow-500/20">
+                        <p className="nothing-label text-yellow-600">Verification Required</p>
+                        <Link
+                            href={`/verify?email=${encodeURIComponent(email)}`}
+                            className="btn-secondary w-full py-2 text-[10px]"
+                        >
+                            VERIFY NOW
+                        </Link>
+                    </div>
+                )}
+            </form>
+
+            <div className="mt-10 text-center pt-8 border-t border-(--db-border)/30">
+                <span className="nothing-label mr-2">New User?</span>
+                <Link href="/register" className="nothing-label text-(--db-primary) font-black border-b-2 border-transparent hover:border-(--db-primary) transition-all">
+                    CREATE_ACCOUNT
+                </Link>
             </div>
-        </section>
+        </div>
     );
 }
