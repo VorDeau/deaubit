@@ -14,7 +14,7 @@
   --db-accent-fg: #ffffff;
   --db-danger: #ea1506;
   --db-success: #000000;
-  --db-dot: rgba(0, 0, 0, 0.15); /* Lebih tegas */
+  --db-dot: rgba(0, 0, 0, 0.12);
 }
 
 .dark {
@@ -31,18 +31,27 @@
   --db-accent-fg: #000000;
   --db-danger: #ea1506;
   --db-success: #ffffff;
-  --db-dot: rgba(255, 255, 255, 0.15); /* Lebih tegas */
+  --db-dot: rgba(255, 255, 255, 0.1);
 }
 
 body {
   background-color: var(--db-bg);
   color: var(--db-text);
   font-family: var(--font-sans), sans-serif;
-  background-image: radial-gradient(var(--db-dot) 1.5px, transparent 0);
-  background-size: 32px 32px;
   min-height: 100vh;
   transition: background-color 0.4s ease;
   overflow-x: hidden;
+  position: relative;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(var(--db-dot) 1.5px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: -1;
 }
 
 .db-card {
@@ -110,7 +119,6 @@ input, textarea {
 .db-input:focus {
   border-color: var(--db-text);
   background-color: var(--db-surface);
-  box-shadow: 0 0 0 4px rgba(0,0,0,0.02);
 }
 
 .dark .db-input { background-color: #111111; }

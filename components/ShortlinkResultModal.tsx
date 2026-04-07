@@ -30,10 +30,8 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
 
   return (
     <div className="fixed inset-0 z-100 flex items-center justify-center px-6 bg-(--db-bg)/95 backdrop-blur-2xl animate-in fade-in duration-500">
-      {/* Modal Container - Wider Layout (max-w-2xl) */}
       <div className="w-full max-w-2xl db-card p-1 lg:p-1.5 animate-reveal relative border-(--db-primary)/20 overflow-hidden shadow-[0_0_80px_rgba(234,21,6,0.08)]">
         
-        {/* Animated Background Decoration (Techy Bits) */}
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden select-none">
             <div className="absolute top-0 left-0 w-full h-full font-dot text-[8px] leading-none break-all animate-pulse">
                 {Array(20).fill("01011010011010101101010100101010110").join(" ")}
@@ -42,7 +40,6 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
 
         <div className="bg-(--db-surface) rounded-3xl p-8 lg:p-12 flex flex-col md:flex-row items-center gap-10">
             
-            {/* Left Side: Visual Node */}
             <div className="flex flex-col items-center text-center space-y-6 shrink-0">
                 <div className="relative">
                     <div className="p-8 bg-(--db-primary)/10 text-(--db-primary) rounded-4xl border border-(--db-primary)/5">
@@ -61,14 +58,12 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
                 </div>
             </div>
 
-            {/* Right Side: Content & Actions */}
             <div className="flex-1 w-full space-y-8">
                 <div className="space-y-2">
                     <h3 className="text-3xl lg:text-4xl nothing-title text-(--db-text)">LINK_READY</h3>
                     <p className="nothing-label text-[10px] tracking-[0.2em] opacity-60">RELATIONAL_ACCESS_IDENTIFIER</p>
                 </div>
 
-                {/* URL Display Node */}
                 <div className="relative group w-full">
                     <div className="bg-(--db-surface-hover) border-2 border-(--db-border) p-6 rounded-3xl transition-all group-hover:border-(--db-text)/20">
                         <div className="nothing-label text-[8px] absolute -top-2.5 left-6 bg-(--db-bg) px-2 text-(--db-text) font-bold">SECURE_LINK</div>
@@ -81,32 +76,34 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
                     </div>
                 </div>
 
-                {/* Action Controls */}
                 <div className="flex flex-col sm:flex-row gap-4">
                     <button
                       onClick={copyShortUrl}
-                      className={`flex-1 py-4 btn-primary text-[10px] tracking-[0.3em] transition-all ${copied ? 'bg-green-600' : ''}`}
+                      className={`flex-1 py-4 btn-primary text-[9px] tracking-[0.2em] transition-all whitespace-nowrap ${copied ? 'bg-green-600' : ''}`}
                     >
-                      {copied ? (
-                        <><Check className="h-4 w-4 animate-in zoom-in" /> COPIED_TO_CLIPBOARD</>
-                      ) : (
-                        <><Copy className="h-4 w-4" /> COPY_ADDRESS</>
-                      )}
+                      <div className="flex items-center justify-center gap-2">
+                        {copied ? (
+                          <><Check className="h-3.5 w-3.5" /> COPIED_OK</>
+                        ) : (
+                          <><Copy className="h-3.5 w-3.5" /> COPY_ADDRESS</>
+                        )}
+                      </div>
                     </button>
                     
                     <a 
                       href={result.shortUrl} 
                       target="_blank" 
                       rel="noreferrer" 
-                      className="flex-1 py-4 btn-secondary text-[10px] tracking-[0.3em] border-2 border-(--db-border) hover:bg-(--db-text) hover:text-(--db-bg) transition-all"
+                      className="flex-1 py-4 btn-secondary text-[9px] tracking-[0.2em] border-2 border-(--db-border) hover:border-(--db-text) transition-all whitespace-nowrap"
                     >
-                        <ExternalLink className="h-4 w-4 mr-2" /> OPEN_RESOURCE
+                        <div className="flex items-center justify-center gap-2">
+                          <ExternalLink className="h-3.5 w-3.5" /> OPEN_RESOURCE
+                        </div>
                     </a>
                 </div>
             </div>
         </div>
 
-        {/* Close Button */}
         <button 
           onClick={onClose} 
           className="absolute top-6 right-6 p-2 rounded-full hover:bg-(--db-surface-hover) transition-colors opacity-20 hover:opacity-100 group"

@@ -11,15 +11,24 @@ export default function GlobalSecurityGate({ children }: { children: React.React
   const [mounted, setMounted] = useState(false);
   const [verifying, setVerifying] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
     const init = async () => {
         setMounted(true);
+        
+        const savedTheme = localStorage.getItem("db-theme") as "light" | "dark" | null;
+        if (savedTheme) {
+            setTheme(savedTheme);
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+            setTheme("dark");
+        }
+
         const lastVerified = localStorage.getItem("db_human_verified");
         if (lastVerified) {
             const age = Date.now() - parseInt(lastVerified);
-            if (age < 1800000) { // 30 minutes
+            if (age < 1800000) {
                 setIsVerified(true);
                 return;
             }
@@ -96,7 +105,10 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                 onError={() => { 
                     setError("Verification failed"); 
                 }}
-                options={{ theme: 'light', size: 'normal' }}
+                options={{ 
+                    theme: theme, // Auto Theme applied here
+                    size: 'normal' 
+                }}
               />
             </div>
           )}
