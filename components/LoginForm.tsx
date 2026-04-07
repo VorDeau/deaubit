@@ -101,7 +101,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                 <div className="space-y-2">
                     <div className="flex justify-between items-end px-1">
                         <label className="nothing-label block text-[10px] text-(--db-text) font-bold">ACCESS_KEY</label>
-                        <Link href="/forgot-password" className="text-[9px] font-black text-(--db-primary) hover:underline uppercase tracking-widest">
+                        <Link href="/forgot-password" size="sm" className="text-[9px] font-black text-(--db-primary) hover:underline uppercase tracking-widest">
                             Lost?
                         </Link>
                     </div>
