@@ -63,53 +63,38 @@ function HomeContent() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-6 py-4 md:py-12 min-h-[calc(100vh-180px)] flex flex-col justify-center">
+    <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center animate-reveal">
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center w-full">
         
-        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left order-2 lg:order-1">
-            <div className="mb-12 lg:mb-20">
-                <h1 className="text-6xl sm:text-7xl md:text-9xl nothing-title text-(--db-text) mb-6">DEAUBIT</h1>
-                <div className="h-1.5 w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
+        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
+            <div className="mb-8 lg:mb-12">
+                <h1 className="text-5xl sm:text-6xl md:text-8xl nothing-title text-(--db-text) mb-4">DEAUBIT</h1>
+                <div className="h-1.5 w-24 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
             </div>
             
-            <p className="nothing-label normal-case tracking-normal text-sm md:text-base mb-12 max-w-lg leading-relaxed opacity-60">
-                Refined Link Infrastructure for the modern web. <br className="hidden md:block" />
+            <p className="nothing-label normal-case tracking-normal text-sm mb-10 max-w-md leading-relaxed opacity-60">
+                Refined Link Infrastructure. <br className="hidden md:block" />
                 Minimalist. Private. Secure. Pure Utility.
             </p>
 
-            <div className="w-full max-w-xl mb-12">
+            <div className="w-full max-w-lg mb-8">
                 <PublicShortlinkForm />
             </div>
             
-            <div className="items-center gap-10 opacity-20 hidden lg:flex mt-6">
-                <div className="flex flex-col">
-                    <span className="nothing-label text-[8px]">Secure_Protocol</span>
-                    <div className="h-px w-full bg-(--db-text) mt-1"></div>
-                </div>
-                <div className="flex flex-col">
-                    <span className="nothing-label text-[8px]">Zero_Logs</span>
-                    <div className="h-px w-full bg-(--db-text) mt-1"></div>
-                </div>
-                <div className="flex flex-col">
-                    <span className="nothing-label text-[8px]">Encrypted_Mesh</span>
-                    <div className="h-px w-full bg-(--db-text) mt-1"></div>
-                </div>
+            <div className="hidden lg:flex items-center gap-8 opacity-20 mt-4">
+                <Link href="/terms" className="nothing-label text-[8px] hover:text-(--db-text) hover:opacity-100 transition-all">TERMS_OF_SERVICE</Link>
+                <Link href="/privacy" className="nothing-label text-[8px] hover:text-(--db-text) hover:opacity-100 transition-all">PRIVACY_PROTOCOL</Link>
+                <Link href="/report" className="nothing-label text-[8px] text-red-500 hover:text-red-400 transition-all">REPORT_ABUSE</Link>
             </div>
         </div>
 
-        <div className="lg:col-span-5 w-full order-1 lg:order-2 flex justify-center">
-          <div className="db-card p-10 lg:p-12 shadow-2xl bg-(--db-surface) w-full max-w-md border-white/5">
+        <div className="lg:col-span-5 w-full flex justify-center">
+          <div className="db-card p-8 lg:p-10 shadow-2xl bg-(--db-surface) w-full max-w-md border-white/5">
              <LoginForm nextPath={nextPath} />
           </div>
         </div>
 
-      </div>
-
-      <div className="mt-20 pt-10 border-t border-(--db-border)/30 flex flex-wrap justify-center lg:justify-start gap-10">
-          <Link href="/terms" className="nothing-label text-[9px] hover:text-(--db-primary) transition-colors">TERMS_OF_SERVICE</Link>
-          <Link href="/privacy" className="nothing-label text-[9px] hover:text-(--db-primary) transition-colors">PRIVACY_PROTOCOL</Link>
-          <Link href="/report" className="nothing-label text-[9px] text-red-500 hover:text-red-400 transition-colors">REPORT_ABUSE</Link>
       </div>
     </div>
   );

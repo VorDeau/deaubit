@@ -2,112 +2,45 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import { Moon, SunMedium, Loader2 } from "lucide-react";
-
-type Theme = "light" | "dark";
-
-const THEME_COOKIE_NAME = "deaubit_theme";
-const ONE_YEAR = 60 * 60 * 24 * 365;
-
-function getRootDomainFromEnv(): string | null {
-  const base = process.env.NEXT_PUBLIC_BASE_URL;
-  if (!base) return null;
-
-  try {
-    const host = new URL(base).hostname;
-    const parts = host.split(".");
-    if (parts.length < 2) return host;
-    return parts.slice(-2).join(".");
-  } catch {
-    return null;
-  }
-}
-
-const ROOT_DOMAIN = getRootDomainFromEnv();
-
-function writeThemeCookie(theme: Theme) {
-  if (typeof document === "undefined") return;
-
-  document.cookie = `${THEME_COOKIE_NAME}=; path=/; max-age=0; SameSite=Lax`;
-
-  let cookie =
-    `${THEME_COOKIE_NAME}=${encodeURIComponent(theme)}` +
-    `; path=/; max-age=${ONE_YEAR}; SameSite=Lax`;
-
-  if (ROOT_DOMAIN) {
-    cookie += `; domain=.${ROOT_DOMAIN}`;
-  }
-
-  document.cookie = cookie;
-}
+import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 
 export default function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMounted(true);
-    const isDark = document.documentElement.classList.contains("dark");
-    setTheme(isDark ? "dark" : "light");
+    const initTheme = () => {
+        const savedTheme = localStorage.getItem("db-theme") as "light" | "dark" | null;
+        if (savedTheme) {
+          setTheme(savedTheme);
+          document.documentElement.classList.toggle("dark", savedTheme === "dark");
+        } else if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+          setTheme("dark");
+          document.documentElement.classList.add("dark");
+        }
+    };
+    
+    // Use timeout to avoid synchronous cascading render warning
+    const timer = setTimeout(initTheme, 0);
+    return () => clearTimeout(timer);
   }, []);
 
-  function setThemeEverywhere(newTheme: Theme) {
-    const html = document.documentElement;
-
-    if (newTheme === "dark") {
-      html.classList.add("dark");
-    } else {
-      html.classList.remove("dark");
-    }
-
-    try {
-      window.localStorage.setItem("theme", newTheme);
-    } catch {}
-
-    writeThemeCookie(newTheme);
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light";
     setTheme(newTheme);
-  }
-
-  function toggleTheme() {
-    const next: Theme = theme === "dark" ? "light" : "dark";
-    setThemeEverywhere(next);
-  }
-
-  if (!mounted) {
-    return (
-      <div className="fixed right-4 bottom-4 z-50 p-3 bg-(--db-surface) border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-         <Loader2 className="h-6 w-6 animate-spin text-(--db-text)" />
-      </div>
-    );
-  }
-
-  const isDark = theme === "dark";
+    document.documentElement.classList.toggle("dark", newTheme === "dark");
+    localStorage.setItem("db-theme", newTheme);
+  };
 
   return (
     <button
-      type="button"
       onClick={toggleTheme}
-      aria-label="Toggle theme"
-      className={`
-        fixed right-4 bottom-4 z-50 
-        flex items-center justify-center
-        p-3
-        bg-(--db-surface) border-2 border-(--db-border)
-        shadow-[4px_4px_0px_0px_var(--db-border)] 
-        hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] 
-        active:translate-y-0 active:shadow-[2px_2px_0px_0px_var(--db-border)]
-        transition-all 
-        cursor-pointer
-      `}
+      className="fixed bottom-6 right-6 z-100 p-3 rounded-full glass-panel shadow-2xl hover:scale-110 active:scale-95 transition-all duration-500 group border-white/5"
+      title={theme === "light" ? "Activate Dark Protocol" : "Activate Light Protocol"}
     >
-      <div className="text-(--db-text)">
-        {isDark ? (
-            <Moon className="h-6 w-6 fill-current" />
-        ) : (
-            <SunMedium className="h-6 w-6 fill-yellow-400" />
-        )}
+      <div className="relative w-6 h-6">
+        <Sun className={`absolute inset-0 h-6 w-6 text-amber-500 transition-all duration-500 ${theme === "dark" ? "rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"}`} />
+        <Moon className={`absolute inset-0 h-6 w-6 text-indigo-400 transition-all duration-500 ${theme === "light" ? "-rotate-90 scale-0 opacity-0" : "rotate-0 scale-100 opacity-100"}`} />
       </div>
     </button>
   );
