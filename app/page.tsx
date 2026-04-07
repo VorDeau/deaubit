@@ -65,24 +65,30 @@ function HomeContent() {
   return (
     <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center animate-reveal">
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center w-full">
         
         <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="mb-8 lg:mb-12">
-                <h1 className="text-5xl sm:text-6xl md:text-8xl nothing-title text-(--db-text) mb-4">DEAUBIT</h1>
-                <div className="h-1.5 w-24 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
+            <div className="mb-10 lg:mb-14">
+                <h1 className="text-6xl sm:text-7xl md:text-9xl nothing-title text-(--db-text) mb-6">DEAUBIT</h1>
+                <div className="h-2 w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
             </div>
             
-            <p className="nothing-label normal-case tracking-normal text-sm mb-10 max-w-md leading-relaxed opacity-70 text-(--db-text)">
-                Refined Link Infrastructure. <br className="hidden md:block" />
-                Minimalist. Private. Secure. Pure Utility.
-            </p>
+            <div className="mb-12 max-w-xl">
+                <div className="inline-block">
+                    <p className="typewriter-text text-lg md:text-xl font-bold text-(--db-text) leading-relaxed">
+                        Refined Link Infrastructure.
+                    </p>
+                </div>
+                <p className="nothing-label normal-case tracking-normal text-base md:text-lg mt-2 opacity-60 text-(--db-text)">
+                    Minimalist. Private. Secure. Pure Utility.
+                </p>
+            </div>
 
-            <div className="w-full max-w-lg mb-8">
+            <div className="w-full max-w-lg mb-10">
                 <PublicShortlinkForm />
             </div>
             
-            <div className="flex items-center gap-8 mt-4">
+            <div className="hidden lg:flex items-center gap-10 mt-6 border-t border-(--db-border)/30 pt-6">
                 <Link href="/terms" className="nothing-label text-[10px] text-(--db-text) opacity-50 hover:opacity-100 transition-all font-bold">TERMS_OF_SERVICE</Link>
                 <Link href="/privacy" className="nothing-label text-[10px] text-(--db-text) opacity-50 hover:opacity-100 transition-all font-bold">PRIVACY_PROTOCOL</Link>
                 <Link href="/report" className="nothing-label text-[10px] text-red-600 hover:text-red-500 transition-all font-bold">REPORT_ABUSE</Link>
@@ -90,7 +96,7 @@ function HomeContent() {
         </div>
 
         <div className="lg:col-span-5 w-full flex justify-center">
-          <div className="db-card p-8 lg:p-10 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
+          <div className="db-card p-10 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
              <LoginForm nextPath={nextPath} />
           </div>
         </div>
