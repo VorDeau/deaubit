@@ -2,47 +2,35 @@
 
 :root {
   color-scheme: light;
-
   --db-bg: #f0f0f0;
   --db-surface: #ffffff;
   --db-surface-hover: #e8e8e8;
   --db-border: #d0d0d0;
-  
   --db-text: #000000;
   --db-text-muted: #555555;
-  
   --db-primary: #ea1506;
   --db-primary-fg: #ffffff;
-
   --db-accent: #000000;
   --db-accent-fg: #ffffff;
-  
   --db-danger: #ea1506;
   --db-success: #000000;
-
   --db-dot: rgba(0, 0, 0, 0.08); 
 }
 
 .dark {
   color-scheme: dark;
-
   --db-bg: #000000;
   --db-surface: #0a0a0a;
   --db-surface-hover: #141414;
   --db-border: #222222;
-
   --db-text: #ffffff;
   --db-text-muted: #999999;
-
   --db-primary: #ea1506;
   --db-primary-fg: #ffffff;
-
   --db-accent: #ffffff;
   --db-accent-fg: #000000;
-
   --db-danger: #ea1506;
   --db-success: #ffffff;
-
   --db-dot: rgba(255, 255, 255, 0.12);
 }
 
@@ -55,7 +43,6 @@ body {
   min-height: 100vh;
   transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   overflow-x: hidden;
-  line-height: 1.4;
 }
 
 .db-card {
@@ -67,14 +54,9 @@ body {
   overflow: hidden;
 }
 
-.db-card:hover {
-  border-color: var(--db-text);
-}
-
 .glass-panel {
   background: rgba(var(--db-surface), 0.85);
   backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
   border: 1px solid var(--db-border);
 }
 
@@ -92,38 +74,30 @@ body {
   animation: page-reveal 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-input[type="text"], 
-input[type="password"], 
-input[type="email"], 
-input[type="url"], 
-input[type="datetime-local"],
-textarea {
+input, textarea {
+  outline: none;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.db-input {
   background-color: var(--db-surface-hover);
   border: 1px solid var(--db-border);
   border-radius: 12px;
   padding: 0.75rem 1rem;
   color: var(--db-text);
-  transition: all 0.2s ease;
   font-weight: 600;
   width: 100%;
-  outline: none;
+  transition: all 0.2s ease;
 }
 
-input:focus, textarea:focus {
+.db-input:focus {
   border-color: var(--db-text);
   background-color: var(--db-surface);
 }
 
-.dark input {
-  background-color: #111111;
-}
-
-input[type="checkbox"] {
-  width: 1.1rem;
-  height: 1.1rem;
-  cursor: pointer;
-  accent-color: var(--db-primary);
-}
+.dark .db-input { background-color: #111111; }
 
 button, .btn {
   border-radius: 9999px;
@@ -141,13 +115,9 @@ button, .btn {
 .btn-primary {
   background-color: var(--db-primary);
   color: var(--db-primary-fg) !important;
-  border: none;
 }
 
-.btn-primary:hover:not(:disabled) {
-  filter: brightness(1.1);
-  transform: scale(1.02);
-}
+.btn-primary:hover:not(:disabled) { transform: scale(1.02); filter: brightness(1.1); }
 
 .btn-secondary {
   background-color: var(--db-surface);
@@ -158,12 +128,9 @@ button, .btn {
 .btn-secondary:hover:not(:disabled) {
   background-color: var(--db-text);
   color: var(--db-bg);
-  border-color: var(--db-text);
 }
 
-.font-dot {
-  font-family: var(--font-dot), monospace;
-}
+.font-dot { font-family: var(--font-dot), monospace; }
 
 .nothing-label {
   font-family: var(--font-dot);
@@ -171,7 +138,6 @@ button, .btn {
   text-transform: uppercase;
   letter-spacing: 0.15em;
   color: var(--db-text-muted);
-  font-weight: 400;
 }
 
 .nothing-title {
@@ -191,9 +157,4 @@ button, .btn {
 }
 
 ::-webkit-scrollbar { width: 5px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { 
-  background: var(--db-border); 
-  border-radius: 10px;
-}
-::-webkit-scrollbar-thumb:hover { background: var(--db-text-muted); }
+::-webkit-scrollbar-thumb { background: var(--db-border); border-radius: 10px; }

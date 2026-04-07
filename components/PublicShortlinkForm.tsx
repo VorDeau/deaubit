@@ -61,10 +61,10 @@ export default function PublicShortlinkForm() {
         <>
             <div className="w-full max-w-2xl mx-auto">
                 <form className="relative group" onSubmit={handlePublicSubmit}>
-                    <div className="flex items-center bg-(--db-surface) border border-(--db-border) rounded-full pl-6 pr-2 py-2 lg:py-3 transition-all focus-within:ring-4 focus-within:ring-(--db-primary)/10 focus-within:border-(--db-primary) shadow-2xl">
+                    <div className="flex items-center bg-(--db-surface) border border-(--db-border) rounded-full px-6 py-2 lg:py-3 transition-all focus-within:ring-4 focus-within:ring-(--db-primary)/10 focus-within:border-(--db-primary) shadow-2xl">
                         <Link2 className="h-5 w-5 text-(--db-text-muted) mr-4 shrink-0" />
                         <input
-                            className="flex-1 bg-transparent border-none text-sm lg:text-base font-bold text-(--db-text) ring-0! outline-none! p-0 placeholder:font-normal placeholder:text-(--db-text-muted)/40 uppercase tracking-widest shadow-none"
+                            className="flex-1 bg-transparent! border-none! ring-0! outline-none! text-sm lg:text-base font-bold text-(--db-text) p-0 placeholder:font-normal placeholder:text-(--db-text-muted)/40 uppercase tracking-widest shadow-none!"
                             placeholder="Paste destination URL..."
                             value={publicTarget}
                             onChange={(e) => setPublicTarget(e.target.value)}
@@ -74,7 +74,7 @@ export default function PublicShortlinkForm() {
                         <button
                             type="submit"
                             disabled={publicLoading || !publicTarget}
-                            className="bg-(--db-primary) text-white p-3 rounded-full hover:scale-110 active:scale-95 transition-all duration-500 disabled:opacity-30 disabled:grayscale cursor-pointer shadow-lg shadow-(--db-primary)/20"
+                            className="ml-4 bg-(--db-primary) text-white p-3 rounded-full hover:scale-110 active:scale-95 transition-all duration-500 disabled:opacity-30 disabled:grayscale cursor-pointer shadow-lg shadow-(--db-primary)/20"
                         >
                             {publicLoading ? <Loader2 className="h-5 w-5 animate-spin"/> : <ArrowRight className="h-5 w-5" />}
                         </button>

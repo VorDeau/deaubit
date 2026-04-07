@@ -83,12 +83,12 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                 <div className="space-y-2">
                     <label className="nothing-label block ml-1 text-[10px] text-(--db-text) font-bold">IDENTITY_EMAIL</label>
                     <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 z-10 pointer-events-none">
+                        <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 z-10 pointer-events-none">
                             <Mail className="h-5 w-5" />
                         </div>
                         <input
                             type="email"
-                            className="pl-16 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30 outline-none!"
+                            className="db-input pl-14! text-sm font-bold w-full placeholder:opacity-30"
                             placeholder="USER@SYSTEM.NET"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -106,12 +106,12 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </Link>
                     </div>
                     <div className="relative">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 z-10 pointer-events-none">
+                        <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 z-10 pointer-events-none">
                             <KeyRound className="h-5 w-5" />
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="pl-16 pr-14 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30 outline-none!"
+                            className="db-input pl-14! pr-12 text-sm font-bold w-full placeholder:opacity-30"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +121,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 hover:opacity-100 transition-all p-1"
+                            className="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center text-(--db-text) opacity-40 hover:opacity-100 transition-all p-1"
                             disabled={loading}
                         >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
