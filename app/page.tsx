@@ -63,41 +63,40 @@ function HomeContent() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-6 flex flex-col items-center justify-center animate-reveal">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center justify-center animate-reveal">
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center w-full">
         
-        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <div className="mb-10 lg:mb-14">
-                <h1 className="text-6xl sm:text-7xl md:text-9xl nothing-title text-(--db-text) mb-6">DEAUBIT</h1>
-                <div className="h-2 w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
+        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 sm:space-y-12">
+            <div className="space-y-4">
+                <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl nothing-title text-(--db-text) leading-none">DEAUBIT</h1>
+                <div className="h-1.5 sm:h-2 w-24 sm:w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
             </div>
             
-            {/* TECHY SLOGAN AREA */}
-            <div className="mb-12 max-w-2xl space-y-4">
+            <div className="max-w-2xl space-y-4">
                 <div className="inline-block">
-                    <p className="typewriter-text font-dot text-xl md:text-2xl font-bold text-(--db-text) tracking-tight leading-none uppercase">
+                    <p className="typewriter-text font-dot text-lg sm:text-xl md:text-2xl font-bold text-(--db-text) tracking-tight uppercase">
                         Refined Link Infrastructure.
                     </p>
                 </div>
-                <p className="font-dot text-base md:text-lg opacity-60 text-(--db-text) tracking-widest uppercase">
+                <p className="font-dot text-sm sm:text-base md:text-lg opacity-60 text-(--db-text) tracking-widest uppercase leading-relaxed">
                     Minimalist. Private. Secure. Pure Utility.
                 </p>
             </div>
 
-            <div className="w-full max-w-xl mb-10">
+            <div className="w-full max-w-xl">
                 <PublicShortlinkForm />
             </div>
             
-            <div className="hidden lg:flex items-center gap-10 mt-6 border-t border-(--db-border)/30 pt-6">
-                <Link href="/terms" className="nothing-label text-[10px] text-(--db-text) opacity-50 hover:opacity-100 transition-all font-bold">TERMS_OF_SERVICE</Link>
-                <Link href="/privacy" className="nothing-label text-[10px] text-(--db-text) opacity-50 hover:opacity-100 transition-all font-bold">PRIVACY_PROTOCOL</Link>
-                <Link href="/report" className="nothing-label text-[10px] text-red-600 hover:text-red-500 transition-all font-bold">REPORT_ABUSE</Link>
+            <div className="hidden sm:flex flex-wrap items-center justify-center lg:justify-start gap-6 sm:gap-10 opacity-40 pt-6">
+                <Link href="/terms" className="nothing-label text-[9px] sm:text-[10px] hover:text-(--db-primary) transition-all font-bold">TERMS_OF_SERVICE</Link>
+                <Link href="/privacy" className="nothing-label text-[9px] sm:text-[10px] hover:text-(--db-primary) transition-all font-bold">PRIVACY_PROTOCOL</Link>
+                <Link href="/report" className="nothing-label text-[9px] sm:text-[10px] text-red-600 hover:text-red-500 transition-all font-bold">REPORT_ABUSE</Link>
             </div>
         </div>
 
-        <div className="lg:col-span-5 w-full flex justify-center">
-          <div className="db-card p-10 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
+        <div className="lg:col-span-5 w-full flex justify-center mt-10 lg:mt-0">
+          <div className="db-card p-6 sm:p-10 lg:p-12 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
              <LoginForm nextPath={nextPath} />
           </div>
         </div>
