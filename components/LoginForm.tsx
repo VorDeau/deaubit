@@ -88,7 +88,8 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </div>
                         <input
                             type="email"
-                            className="db-input pl-14! text-sm font-bold w-full placeholder:opacity-30"
+                            className="db-input text-sm font-bold w-full placeholder:opacity-30 outline-none!"
+                            style={{ paddingLeft: '4rem' }}
                             placeholder="USER@SYSTEM.NET"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -111,7 +112,8 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="db-input pl-14! pr-12 text-sm font-bold w-full placeholder:opacity-30"
+                            className="db-input text-sm font-bold w-full placeholder:opacity-30 outline-none!"
+                            style={{ paddingLeft: '4rem', paddingRight: '3.5rem' }}
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
