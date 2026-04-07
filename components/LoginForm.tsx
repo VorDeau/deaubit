@@ -83,12 +83,12 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                 <div className="space-y-2">
                     <label className="nothing-label block ml-1 text-[10px] text-(--db-text) font-bold">IDENTITY_EMAIL</label>
                     <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 group-focus-within:opacity-100 group-focus-within:text-(--db-primary) transition-all pointer-events-none">
+                        <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 group-focus-within:opacity-100 group-focus-within:text-(--db-primary) transition-all pointer-events-none">
                             <Mail className="h-5 w-5" />
                         </div>
                         <input
                             type="email"
-                            className="pl-12 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30"
+                            className="pl-14 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30"
                             placeholder="USER@SYSTEM.NET"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
@@ -106,12 +106,12 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         </Link>
                     </div>
                     <div className="relative group">
-                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 group-focus-within:opacity-100 group-focus-within:text-(--db-primary) transition-all pointer-events-none">
+                        <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 group-focus-within:opacity-100 group-focus-within:text-(--db-primary) transition-all pointer-events-none">
                             <KeyRound className="h-5 w-5" />
                         </div>
                         <input
                             type={showPassword ? "text" : "password"}
-                            className="pl-12 pr-12 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30"
+                            className="pl-14 pr-12 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full placeholder:opacity-30"
                             placeholder="••••••••"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
@@ -121,7 +121,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 hover:opacity-100 transition-all p-1"
+                            className="absolute right-0 top-0 bottom-0 w-12 flex items-center justify-center text-(--db-text) opacity-40 hover:opacity-100 transition-all"
                             disabled={loading}
                         >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -151,7 +151,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
 
                 {unverified && (
                     <div className="flex flex-col items-center gap-3 bg-amber-500/10 p-3 rounded-xl border border-amber-500/20 mt-2">
-                        <p className="nothing-label text-amber-600 text-[8px] font-bold">ACTION_REQUIRED: VERIFICATION</p>
+                        <p className="nothing-label text-amber-600 text-[8px] font-bold uppercase">Action_Required: Verify</p>
                         <Link
                             href={`/verify?email=${encodeURIComponent(email)}`}
                             className="btn-secondary w-full py-2 text-[9px] border-amber-500/30 text-amber-700 font-black"
@@ -163,7 +163,7 @@ export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
             </form>
 
             <div className="mt-8 text-center pt-6 border-t border-(--db-border)">
-                <span className="nothing-label text-[10px] text-(--db-text) opacity-60 mr-2">NEW_USER?</span>
+                <span className="nothing-label text-[10px] text-(--db-text) opacity-60 mr-2 uppercase">New_User?</span>
                 <Link href="/register" className="nothing-label text-[10px] text-(--db-primary) font-black border-b border-transparent hover:border-(--db-primary) transition-all">
                     CREATE_IDENTITY
                 </Link>
