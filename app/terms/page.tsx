@@ -5,7 +5,7 @@ import { ArrowLeft, FileText } from "@phosphor-icons/react/dist/ssr";
 
 export default function TermsPage() {
   return (
-    <div className="flex flex-col gap-8 sm:gap-10 pb-20 max-w-3xl">
+    <div className="flex flex-col gap-8 sm:gap-10 pb-20 mx-auto max-w-3xl w-full">
 
       <section className="space-y-3 px-1">
         <Link href="/" className="btn-secondary w-fit px-5 py-2 text-[10px] nothing-label opacity-100 hover:bg-(--db-text) hover:text-(--db-bg) transition-all">

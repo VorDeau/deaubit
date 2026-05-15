@@ -8,7 +8,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 const dot = DotGothic16({ weight: "400", subsets: ["latin"], variable: "--font-dot" });
 
 export const viewport: Viewport = {
-  themeColor: "#ea1506",
+  themeColor: "#a3e635",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   },
   description: "Self-hosted, privacy-focused URL shortener with Nothing OS design logic. Pure utility.",
   keywords: ["url shortener", "link management", "self-hosted", "privacy", "deaubit", "nothing os"],
-  authors: [{ name: "Deauport", url: "https://deau.site" }],
-  creator: "Deauport",
+  authors: [{ name: "DeauBit" }],
+  creator: "DeauBit",
   
   openGraph: {
     type: "website",
@@ -51,9 +51,9 @@ export const metadata: Metadata = {
   },
 
   icons: {
-    icon: "/icon",
-    shortcut: "/icon",
-    apple: "/icon",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
@@ -63,7 +63,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark">
       <body
         className={`${inter.variable} ${dot.variable} antialiased font-sans bg-(--db-bg) text-(--db-text) selection:bg-(--db-primary) selection:text-white`}
       >

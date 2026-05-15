@@ -1,10 +1,10 @@
 {
   "name": "deaubit",
-  "version": "10.2.0",
+  "version": "11.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },

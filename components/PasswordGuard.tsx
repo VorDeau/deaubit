@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, CircleNotch, ShieldCheck, Warning, Activity } from "@phosphor-icons/react";
+import { Lock, CircleNotch, ShieldCheck, Warning } from "@phosphor-icons/react";
 import SlugRedirector from "./SlugRedirector";
 
 export default function PasswordGuard({ slug }: { slug: string }) {
@@ -40,7 +40,7 @@ export default function PasswordGuard({ slug }: { slug: string }) {
           <div>
             <p className="nothing-title text-xl text-(--db-text)">ACCESS_GRANTED</p>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <Activity size={12} className="text-(--db-primary) animate-pulse" />
+              <span className="h-2 w-2 rounded-full bg-(--db-primary) animate-pulse inline-block" />
               <span className="nothing-label text-[9px] text-(--db-primary) opacity-100">CLEARANCE_CONFIRMED</span>
             </div>
           </div>

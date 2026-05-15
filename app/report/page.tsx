@@ -41,7 +41,7 @@ export default function ReportPage() {
   if (success) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] px-4">
-        <div className="db-card w-full max-w-md p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+        <div className="db-card w-full max-w-md mx-auto p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
           <div className="inline-flex p-6 bg-(--db-primary)/15 text-(--db-primary) rounded-3xl mb-8">
             <CheckCircle size={44} weight="fill" />
           </div>
@@ -61,7 +61,7 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 sm:gap-10 pb-20 max-w-2xl">
+    <div className="flex flex-col gap-8 sm:gap-10 pb-20 mx-auto max-w-2xl w-full">
 
       <section className="space-y-3 px-1">
         <Link href="/" className="btn-secondary w-fit px-5 py-2 text-[10px] nothing-label opacity-100 hover:bg-(--db-text) hover:text-(--db-bg) transition-all">

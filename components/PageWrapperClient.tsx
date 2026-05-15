@@ -4,14 +4,9 @@
 
 import { usePathname } from "next/navigation";
 import AppShell from "./AppShell";
-import ThemeToggle from "./ThemeToggle";
 import GlobalSecurityGate from "./GlobalSecurityGate";
 
-export default function PageWrapperClient({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function PageWrapperClient({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const segments = pathname.split("/").filter(Boolean);
 
@@ -31,7 +26,6 @@ export default function PageWrapperClient({
 
   return (
     <GlobalSecurityGate>
-      <ThemeToggle />
       <AppShell>
         <div key={pathname} className="w-full h-full">
           {children}

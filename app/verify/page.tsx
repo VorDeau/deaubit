@@ -6,7 +6,7 @@ import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 
 export default function VerifyPage() {
   return (
-    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border) space-y-8">
+    <div className="db-card w-full max-w-md mx-auto p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border) space-y-8">
       <VerifyForm />
       <div className="text-center border-t border-(--db-border)/30 pt-6">
         <Link

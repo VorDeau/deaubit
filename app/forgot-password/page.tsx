@@ -37,7 +37,7 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="db-card w-full max-w-md p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+      <div className="db-card w-full max-w-md mx-auto p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
         <div className="inline-flex p-6 bg-(--db-primary)/15 text-(--db-primary) rounded-3xl mb-8">
           <CheckCircle size={44} weight="fill" />
         </div>
@@ -56,7 +56,7 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
+    <div className="db-card w-full max-w-md mx-auto p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
       <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
         <div className="bg-(--db-primary)/15 p-3 rounded-2xl shrink-0">
           <Key size={22} className="text-(--db-primary)" />

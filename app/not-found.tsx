@@ -3,7 +3,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileQuestion, ArrowLeft, House } from "@phosphor-icons/react";
+import { FileX, ArrowLeft, House } from "@phosphor-icons/react";
 
 export default function NotFound() {
   return (
@@ -11,7 +11,7 @@ export default function NotFound() {
       <div className="db-card w-full max-w-md p-10 shadow-2xl text-center animate-reveal border-(--db-border)">
 
         <div className="inline-flex p-6 bg-(--db-primary)/15 text-(--db-primary) rounded-3xl mb-8 animate-soft-pulse">
-          <FileQuestion size={44} />
+          <FileX size={44} />
         </div>
 
         <div className="space-y-3 mb-10">

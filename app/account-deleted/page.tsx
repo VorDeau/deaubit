@@ -8,7 +8,7 @@ import { UserMinus, ArrowRight, ShieldSlash } from "@phosphor-icons/react";
 
 export default function AccountDeletedPage() {
   return (
-    <div className="db-card w-full max-w-md p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+    <div className="db-card w-full max-w-md mx-auto p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
 
       <div className="flex justify-center mb-8">
         <DeauBitLogo size={48} />

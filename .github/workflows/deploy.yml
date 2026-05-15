@@ -1,76 +1,63 @@
-name: Deploy to VPS
+name: Deploy to Cloudflare Workers
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
-  build-and-deploy:
-    runs-on: self-hosted
+  deploy:
+    runs-on: ubuntu-latest
+    name: Build & Deploy
 
     steps:
-    - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-    - name: Inject .env
-      run: cp /opt/envfiles/deaubit.env .env
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
 
-    - name: Clean node_modules
-      run: rm -rf node_modules
+      # ── Generate wrangler.toml from example + fill secrets ───
+      - name: Configure wrangler.toml
+        env:
+          DB_ID: ${{ secrets.CF_D1_DATABASE_ID }}
+          KV_ID: ${{ secrets.CF_KV_SESSION_ID }}
+          APP_HOST: ${{ secrets.APP_HOST }}
+          SHORT_HOST: ${{ secrets.SHORT_HOST }}
+          TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
+          MAIL_FROM: ${{ secrets.MAIL_FROM }}
+        run: |
+          cp worker/wrangler.toml.example worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_DB_ID|$DB_ID|g" worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_KV_ID|$KV_ID|g" worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_APP_HOST|$APP_HOST|g" worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_SHORT_HOST|$SHORT_HOST|g" worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_TURNSTILE_SITE_KEY|$TURNSTILE_SITE_KEY|g" worker/wrangler.toml
+          sed -i "s|PLACEHOLDER_MAIL_FROM|$MAIL_FROM|g" worker/wrangler.toml
 
-    - name: Install Dependencies
-      run: npm ci
+      # ── Build Next.js static export ───────────────────────────
+      - name: Install frontend dependencies
+        run: npm ci
 
-    - name: Run Prisma Migration
-      run: |
-        npx prisma generate
-        npx prisma migrate deploy
+      - name: Build static export
+        run: npm run build
+        env:
+          NEXT_PUBLIC_APP_HOST: ${{ secrets.APP_HOST }}
+          NEXT_PUBLIC_SHORT_HOST: ${{ secrets.SHORT_HOST }}
+          NEXT_PUBLIC_PROTOCOL: "https"
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ secrets.TURNSTILE_SITE_KEY }}
 
-    - name: Build
-      run: |
-        npm run build
-        mkdir -p .next/standalone/public
-        mkdir -p .next/standalone/.next/static
-        cp .env .next/standalone/
-        if [ -d "public" ]; then
-          cp -r public/* .next/standalone/public/
-        fi
-        cp -r .next/static/* .next/standalone/.next/static/
+      # ── Deploy Hono Worker + static assets ────────────────────
+      - name: Install worker dependencies
+        run: npm ci
+        working-directory: worker
 
-    - name: Deploy to Kripton
-      run: |
-        /usr/bin/rsync -av --delete \
-          -e "ssh -i /home/github-runner/.ssh/id_ed25519 -o StrictHostKeyChecking=no" \
-          .next/standalone/ \
-          deploy@100.76.93.142:/var/www/deaubit/
-
-    - name: Restart PM2
-      run: |
-        ssh -i /home/github-runner/.ssh/id_ed25519 \
-          -o StrictHostKeyChecking=no \
-          deploy@100.76.93.142 \
-          "cat > /var/www/deaubit/ecosystem.config.js << 'EOFPM2'
-        module.exports = {
-          apps: [
-            {
-              name: 'deaubit',
-              script: '/var/www/deaubit/server.js',
-              cwd: '/var/www/deaubit',
-              env: {
-                NODE_ENV: 'production',
-                PORT: 8888,
-                HOSTNAME: '0.0.0.0'
-              }
-            }
-          ]
-        }
-        EOFPM2
-        pm2 reload deaubit || pm2 start /var/www/deaubit/ecosystem.config.js"
-
-    - name: Cleanup
-      if: always()
-      run: |
-        rm -rf $GITHUB_WORKSPACE/.next
-        rm -rf $GITHUB_WORKSPACE/node_modules
-        rm -f $GITHUB_WORKSPACE/.env
-        echo "Cleanup done!"
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker

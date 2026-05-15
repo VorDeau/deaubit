@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, X, Check, ArrowSquareOut, Link as LinkIcon, ShieldCheck, Activity } from "@phosphor-icons/react";
+import { Copy, X, Check, ArrowSquareOut, Link as LinkIcon, ShieldCheck } from "@phosphor-icons/react";
 import type { ShortlinkResult } from "@/types";
 
 interface ShortlinkResultModalProps { result: ShortlinkResult; onClose: () => void; }
@@ -51,7 +51,7 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
             </div>
             <div className="space-y-1">
               <div className="flex items-center justify-center gap-2">
-                <Activity size={12} className="text-(--db-primary) animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-(--db-primary) animate-pulse inline-block" />
                 <span className="nothing-label text-[9px] text-(--db-primary) opacity-100">NODE_ACTIVE</span>
               </div>
               <p className="nothing-label text-[8px] opacity-30 uppercase">Encrypted_Payload</p>

@@ -1,8 +1,4 @@
-// components/DeauBitLogo.tsx
-
 "use client";
-
-import React from "react";
 
 interface DeauBitLogoProps {
   size?: number;
@@ -11,9 +7,9 @@ interface DeauBitLogoProps {
 
 export default function DeauBitLogo({ size = 48, className = "" }: DeauBitLogoProps) {
   return (
-    <div 
-      className={`relative flex items-center justify-center select-none ${className}`}
+    <div
       style={{ width: size, height: size }}
+      className={`shrink-0 select-none ${className}`}
     >
       <svg
         viewBox="0 0 100 100"
@@ -21,37 +17,22 @@ export default function DeauBitLogo({ size = 48, className = "" }: DeauBitLogoPr
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
       >
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="45" 
-          stroke="currentColor" 
-          strokeWidth="8" 
-          className="text-(--db-text)"
-        />
-        
-        <circle 
-          cx="50" 
-          cy="50" 
-          r="12" 
-          fill="#ea1506" 
-          className="animate-pulse"
-        />
+        {/* Lime chip — primary brand color as background */}
+        <rect width="100" height="100" rx="22" fill="#a3e635" />
 
+        {/* Bold D */}
         <text
-          x="50%"
-          y="52%"
-          dominantBaseline="middle"
+          x="50"
+          y="74"
           textAnchor="middle"
-          fill="currentColor"
-          className="text-(--db-text) font-black"
-          style={{ 
-            fontSize: "32px", 
-            fontFamily: "var(--font-dot), monospace",
-            fontWeight: 900
+          fill="#0a0a0a"
+          style={{
+            fontSize: "64px",
+            fontFamily: "'Courier New', Courier, monospace",
+            fontWeight: 900,
           }}
         >
-          DB
+          D
         </text>
       </svg>
     </div>

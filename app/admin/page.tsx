@@ -64,9 +64,9 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="flex flex-col gap-8 sm:gap-10 md:gap-14 pb-20">
+    <div className="flex flex-col gap-6 sm:gap-8 pb-20">
 
-      <section className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 px-1">
+      <section className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 px-1">
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-(--db-danger)">
             <ShieldWarning size={14} />

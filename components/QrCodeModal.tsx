@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X, DownloadSimple, CircleNotch, QrCode, ShieldCheck } from "@phosphor-icons/react";
+import { X, DownloadSimple, CircleNotch, QrCode } from "@phosphor-icons/react";
 
 interface QrCodeModalProps { slug: string; shortUrl: string; onClose: () => void; }
 
@@ -13,7 +13,9 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
   const [imgLoaded, setImgLoaded] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
 
-  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=5&data=${encodeURIComponent(shortUrl)}`;
+  // Preview: lime on dark (embedded style)
+  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&color=163-230-53&bgcolor=10-10-10&data=${encodeURIComponent(shortUrl)}`;
+  // Download: classic black on white
   const downloadApiUrl = `/api/qr-download?url=${encodeURIComponent(shortUrl)}`;
 
   const handleDownload = async () => {
@@ -38,78 +40,79 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 db-overlay animate-reveal">
-      <div className="db-card animate-modal-in relative w-full max-w-sm shadow-2xl">
+      <div className="db-card animate-modal-in relative w-full max-w-xs shadow-2xl">
 
-        <div className="flex items-center justify-between px-6 py-5 border-b border-(--db-border)">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-(--db-border)">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-(--db-primary)/15 text-(--db-primary) rounded-xl">
-              <QrCode size={18} />
+              <QrCode size={16} />
             </div>
             <div>
-              <h3 className="nothing-title text-base text-(--db-text)">QR_CODE</h3>
-              <p className="nothing-label text-[9px] opacity-40 tracking-widest">/{slug}</p>
+              <h3 className="nothing-title text-sm text-(--db-text)">QR_CODE</h3>
+              <p className="nothing-label text-[8px] opacity-40 mt-0.5">/{slug}</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-(--db-surface-hover) text-(--db-text) opacity-30 hover:opacity-100 transition-all group"
+            className="p-2 rounded-full hover:bg-(--db-surface-hover) opacity-30 hover:opacity-100 transition-all group"
           >
-            <X size={18} className="group-hover:rotate-90 transition-transform duration-300" />
+            <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-5 space-y-4">
 
-          <div className="relative rounded-3xl overflow-hidden bg-white aspect-square flex items-center justify-center border border-(--db-border)/20 shadow-xl shadow-(--db-primary)/5">
-            <div className="qr-scan-line" />
-
+          {/* QR — colored preview embedded into card */}
+          <div className="relative rounded-2xl overflow-hidden bg-(--db-surface-hover) aspect-square border border-(--db-border) flex items-center justify-center">
             {!imgLoaded && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-white">
-                <CircleNotch size={32} className="animate-spin text-(--db-primary)" />
-                <p className="nothing-label text-[9px] text-black animate-pulse">Generating_Matrix...</p>
-              </div>
+              <CircleNotch size={28} className="animate-spin text-(--db-primary)" />
             )}
-
             <Image
               src={previewQrUrl}
               alt={`QR ${slug}`}
               width={320}
               height={320}
-              className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+              className={`w-full h-full object-contain transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0 absolute"}`}
               onLoad={() => setImgLoaded(true)}
               unoptimized
             />
-
-            {imgLoaded && (
-              <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-full border border-green-200 shadow-sm">
-                <ShieldCheck size={14} className="text-green-500" weight="fill" />
-              </div>
-            )}
           </div>
 
-          <div className="bg-(--db-surface-hover) rounded-2xl px-4 py-3 border border-(--db-border)">
-            <p className="nothing-label text-[8px] mb-1 opacity-40">Destination_URL</p>
-            <p className="font-dot text-xs text-(--db-text) truncate tracking-tighter">{shortUrl.replace(/^https?:\/\//, "")}</p>
+          {/* URL */}
+          <div className="px-3 py-2.5 rounded-xl border border-(--db-border) bg-(--db-surface)">
+            <p className="nothing-label text-[8px] opacity-40 mb-0.5">Short_URL</p>
+            <p className="font-dot text-xs text-(--db-text) truncate opacity-60">
+              {shortUrl.replace(/^https?:\/\//, "")}
+            </p>
           </div>
 
           {downloadError && (
-            <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] text-center uppercase tracking-widest">
-              DOWNLOAD_FAILED — RETRY
-            </div>
+            <p className="text-red-500 font-bold text-[10px] text-center uppercase tracking-widest">
+              DOWNLOAD_FAILED
+            </p>
           )}
 
+          {/* Actions */}
           <div className="flex gap-3">
-            <button type="button" onClick={onClose} className="btn-secondary flex-1 py-3.5 text-[10px] nothing-label opacity-100">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1 py-3 text-[10px] nothing-label opacity-100">
               CLOSE
             </button>
             <button
               onClick={handleDownload}
               disabled={downloading || !imgLoaded}
-              className="btn-primary flex-1 py-3.5 text-[10px] nothing-label opacity-100 shadow-lg shadow-(--db-primary)/20 disabled:opacity-30 disabled:grayscale"
+              className="btn-primary flex-1 py-3 text-[10px] nothing-label opacity-100 shadow-lg shadow-(--db-primary)/20 disabled:opacity-30"
             >
-              {downloading ? <CircleNotch size={16} className="animate-spin" /> : <><DownloadSimple size={15} /> DOWNLOAD</>}
+              {downloading
+                ? <CircleNotch size={14} className="animate-spin" />
+                : <><DownloadSimple size={14} /> SAVE</>
+              }
             </button>
           </div>
+
+          <p className="nothing-label text-[8px] text-center opacity-20 normal-case tracking-normal">
+            Download saves as black & white
+          </p>
         </div>
       </div>
     </div>
