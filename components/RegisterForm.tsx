@@ -86,13 +86,13 @@ export default function RegisterForm() {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) group-focus-within:text-(--db-primary) transition-colors pointer-events-none">
                     <Mail className="h-4.5 w-4.5" />
                   </div>
-                  <input 
-                      type="email" 
-                      className="pl-11 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full"
+                  <input
+                      type="email"
+                      className="db-input pl-11!"
                       placeholder="NAME@DOMAIN.COM"
-                      value={formData.email} 
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                      required 
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      required
                   />
               </div>
           </div>
@@ -103,13 +103,13 @@ export default function RegisterForm() {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) group-focus-within:text-(--db-primary) transition-colors pointer-events-none">
                     <KeyRound className="h-4.5 w-4.5" />
                   </div>
-                  <input 
-                      type={showPassword ? "text" : "password"} 
-                      className="pl-11 pr-11 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full"
+                  <input
+                      type={showPassword ? "text" : "password"}
+                      className="db-input pl-11! pr-11!"
                       placeholder="••••••••"
-                      value={formData.password} 
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
-                      required 
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      required
                   />
                   <button
                       type="button"
@@ -127,13 +127,13 @@ export default function RegisterForm() {
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) group-focus-within:text-(--db-primary) transition-colors pointer-events-none">
                     <KeyRound className="h-4.5 w-4.5 opacity-50" />
                   </div>
-                  <input 
-                      type={showConfirmPassword ? "text" : "password"} 
-                      className={`pl-11 pr-11 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full ${confirmPassword && formData.password !== confirmPassword ? "border-red-500/50" : ""}`}
+                  <input
+                      type={showConfirmPassword ? "text" : "password"}
+                      className={`db-input pl-11! pr-11! ${confirmPassword && formData.password !== confirmPassword ? "border-red-500/50!" : ""}`}
                       placeholder="••••••••"
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
-                      required 
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
                   />
                   <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
                       {confirmPassword && formData.password === confirmPassword && (

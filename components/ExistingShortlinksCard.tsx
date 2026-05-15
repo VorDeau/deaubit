@@ -187,13 +187,13 @@ export function ExistingShortlinksCard({
       
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-(--db-surface) border border-(--db-border) rounded-3xl p-6 shadow-sm">
         <div className="relative flex-1 max-w-md">
-            <input 
-                className="w-full bg-(--db-surface-hover) pl-12 pr-10 py-3 text-sm font-bold"
+            <input
+                className="db-input pl-11!"
                 placeholder="Search link logs..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
             />
-            <Search className="absolute left-4 top-3.5 h-4 w-4 text-(--db-text-muted)" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-(--db-text-muted) pointer-events-none z-10" />
             {search && (
                 <button onClick={() => setSearch("")} className="absolute right-4 top-3.5 hover:text-(--db-primary)">
                     <X className="h-4 w-4" />
@@ -237,21 +237,22 @@ export function ExistingShortlinksCard({
             </div>
         ) : (
             <div className="flex flex-col gap-4">
-                {filteredLinks.map((link) => (
-                  <ShortlinkRow 
-                    key={link.id} 
-                    link={link} 
-                    baseUrl={baseUrl} 
-                    getDomainLabel={getDomainLabel} 
-                    onEdit={onEdit}
-                    onViewStats={onViewStats} 
-                    onViewQr={onViewQr} 
-                    selected={selectedIds.has(link.slug)}
-                    onToggleSelect={toggleSelection}
-                    isDeleting={deletingSlugs.includes(link.slug)}
-                    isCopied={copiedSlug === link.slug}
-                    onCopy={handleCopy}
-                  />
+                {filteredLinks.map((link, idx) => (
+                  <div key={link.id} className="animate-item-enter" style={{ animationDelay: `${idx * 45}ms` }}>
+                    <ShortlinkRow
+                      link={link}
+                      baseUrl={baseUrl}
+                      getDomainLabel={getDomainLabel}
+                      onEdit={onEdit}
+                      onViewStats={onViewStats}
+                      onViewQr={onViewQr}
+                      selected={selectedIds.has(link.slug)}
+                      onToggleSelect={toggleSelection}
+                      isDeleting={deletingSlugs.includes(link.slug)}
+                      isCopied={copiedSlug === link.slug}
+                      onCopy={handleCopy}
+                    />
+                  </div>
                 ))}
             </div>
         )}

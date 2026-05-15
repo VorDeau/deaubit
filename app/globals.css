@@ -34,10 +34,12 @@
 
 body {
   background-color: var(--db-bg);
+  background-image: radial-gradient(circle, var(--db-border) 0.75px, transparent 0.75px);
+  background-size: 22px 22px;
   color: var(--db-text);
   font-family: var(--font-sans), sans-serif;
   min-height: 100vh;
-  transition: background-color 0.4s ease;
+  transition: background-color 0.4s ease, color 0.4s ease;
   overflow-x: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -57,8 +59,9 @@ body {
 }
 
 .glass-panel {
-  background: rgba(var(--db-surface), 0.8);
+  background: color-mix(in srgb, var(--db-surface) 80%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--db-border);
 }
 
@@ -168,3 +171,140 @@ button, .btn {
 
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--db-border); border-radius: 10px; }
+
+/* ─── Missing utility classes ─── */
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1.5px solid var(--db-border);
+  color: var(--db-text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--db-surface-hover);
+}
+
+/* ─── Animations ─── */
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+.animate-error-shake {
+  animation: error-shake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.97); }
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes item-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-item-enter {
+  animation: item-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* nth-child stagger delays */
+.animate-item-enter:nth-child(1) { animation-delay: 0ms; }
+.animate-item-enter:nth-child(2) { animation-delay: 45ms; }
+.animate-item-enter:nth-child(3) { animation-delay: 90ms; }
+.animate-item-enter:nth-child(4) { animation-delay: 135ms; }
+.animate-item-enter:nth-child(5) { animation-delay: 180ms; }
+.animate-item-enter:nth-child(6) { animation-delay: 225ms; }
+.animate-item-enter:nth-child(7) { animation-delay: 270ms; }
+.animate-item-enter:nth-child(8) { animation-delay: 315ms; }
+.animate-item-enter:nth-child(9) { animation-delay: 360ms; }
+.animate-item-enter:nth-child(10) { animation-delay: 405ms; }
+
+@keyframes scan {
+  0% { transform: translateY(0%); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(3000%); opacity: 0; }
+}
+
+.qr-scan-line {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, var(--db-primary) 30%, var(--db-primary) 70%, transparent 100%);
+  animation: scan 2.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  z-index: 20;
+  box-shadow: 0 0 8px var(--db-primary);
+}
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count-up {
+  animation: count-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+@keyframes bar-fill {
+  from { width: 0%; }
+}
+
+.animate-bar-fill {
+  animation: bar-fill 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+/* ─── Nothing OS dot-grid background ─── */
+
+.nothing-dot-grid {
+  background-image: radial-gradient(circle, var(--db-border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* ─── Signal dot indicator ─── */
+
+@keyframes signal-ping {
+  0% { transform: scale(1); opacity: 0.8; }
+  70% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.signal-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signal-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: signal-ping 1.8s ease-out infinite;
+}
+
+/* ─── Overlay backdrop ─── */
+
+.db-overlay {
+  background-color: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(20px) saturate(160%);
+}

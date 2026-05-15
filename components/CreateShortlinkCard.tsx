@@ -46,7 +46,7 @@ export function CreateShortlinkCard({
             <div className="lg:col-span-8 space-y-2">
               <label className="nothing-label block ml-1">Destination_Target</label>
               <input
-                className="w-full text-base font-bold"
+                className="db-input"
                 placeholder="https://example.com/long-resource-identifier"
                 value={targetUrl}
                 onChange={(e) => onChangeTarget(e.target.value)}
@@ -59,9 +59,9 @@ export function CreateShortlinkCard({
             <div className="lg:col-span-4 space-y-2">
               <label className="nothing-label block ml-1">Relational_Slug</label>
               <div className="relative">
-                <span className="absolute left-4 top-3.5 text-(--db-text-muted) font-dot text-sm">/</span>
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) font-dot text-sm z-10">/</span>
                 <input
-                  className="w-full pl-8 font-bold text-base"
+                  className="db-input pl-8!"
                   placeholder="custom-slug"
                   value={slug}
                   onChange={(e) => onChangeSlug(e.target.value)}
@@ -96,10 +96,10 @@ export function CreateShortlinkCard({
                     <div className="space-y-2">
                         <label className="nothing-label text-[9px] block">Security_Key</label>
                         <div className="relative">
-                            <Lock className="absolute left-4 top-3.5 h-4 w-4 text-(--db-text-muted)" />
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-(--db-text-muted) z-10 pointer-events-none" />
                             <input
                                 type="text"
-                                className="pl-12 py-3 text-sm font-bold bg-(--db-surface)"
+                                className="db-input pl-11!"
                                 placeholder="Lock link with password"
                                 value={password}
                                 onChange={(e) => onChangePassword(e.target.value)}
@@ -108,14 +108,14 @@ export function CreateShortlinkCard({
                             />
                         </div>
                     </div>
-                    
+
                     <div className="space-y-2">
                         <label className="nothing-label text-[9px] block">Self_Destruct_Timer</label>
                         <div className="relative">
-                            <Calendar className="absolute left-4 top-3.5 h-4 w-4 text-(--db-text-muted)" />
+                            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-(--db-text-muted) z-10 pointer-events-none" />
                             <input
                                 type="datetime-local"
-                                className="pl-12 py-3 text-sm font-bold bg-(--db-surface)"
+                                className="db-input pl-11!"
                                 value={expiresAt}
                                 onChange={(e) => onChangeExpiresAt(e.target.value)}
                                 disabled={loading}

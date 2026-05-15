@@ -1,8 +1,9 @@
-//compnents/PasswordGuard.tsx
+//components/PasswordGuard.tsx
 
 "use client";
+
 import { useState } from "react";
-import { Lock, Loader2 } from "lucide-react";
+import { Lock, Loader2, ShieldCheck, AlertTriangle, Activity } from "lucide-react";
 import SlugRedirector from "./SlugRedirector";
 
 export default function PasswordGuard({ slug }: { slug: string }) {
@@ -12,51 +13,78 @@ export default function PasswordGuard({ slug }: { slug: string }) {
   const [targetUrl, setTargetUrl] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault(); setLoading(true); setError("");
+    e.preventDefault();
+    setLoading(true);
+    setError("");
     try {
-      const res = await fetch(`/api/links/${slug}/verify`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ password }) });
+      const res = await fetch(`/api/links/${slug}/verify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Access Denied");
+      if (!res.ok) throw new Error(data.error || "ACCESS_DENIED");
       setTargetUrl(data.targetUrl);
-    } catch (err) { setError(err instanceof Error ? err.message : "Failed"); setLoading(false); }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "VERIFICATION_FAILED");
+      setLoading(false);
+    }
   }
 
   if (targetUrl) {
     return (
-      <div className="text-center space-y-6">
-        <div className="inline-block p-4 bg-(--db-success) border-4 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] text-white rounded-full">
-           <Lock className="h-8 w-8" />
+      <div className="w-full space-y-6 animate-reveal">
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-green-500/10 text-green-500 rounded-2xl">
+            <ShieldCheck className="h-6 w-6" />
+          </div>
+          <div>
+            <p className="nothing-title text-xl text-(--db-text)">ACCESS_GRANTED</p>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <Activity className="h-3 w-3 text-green-500 animate-pulse" />
+              <span className="nothing-label text-[9px] text-green-500 opacity-100">CLEARANCE_CONFIRMED</span>
+            </div>
+          </div>
         </div>
-        <h1 className="text-2xl font-black uppercase text-(--db-text)">ACCESS GRANTED</h1>
         <SlugRedirector target={targetUrl} delay={2} />
       </div>
     );
   }
 
   return (
-    <div className="w-full text-center space-y-6">
-      <div className="inline-flex h-16 w-16 items-center justify-center bg-(--db-bg) border-4 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-        <Lock className="h-8 w-8 text-(--db-text)" />
-      </div>
-      <div>
-        <h1 className="text-2xl font-black uppercase text-(--db-text)">LOCKED LINK</h1>
-        <p className="text-sm font-bold text-(--db-text-muted) uppercase tracking-widest">Password Required</p>
+    <form onSubmit={handleSubmit} className="w-full space-y-5">
+      <div className="space-y-2">
+        <label className="nothing-label block ml-1 text-[9px]">Security_Key</label>
+        <div className="relative">
+          <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 z-10 pointer-events-none">
+            <Lock className="h-5 w-5" />
+          </div>
+          <input
+            type="password"
+            className="db-input"
+            style={{ paddingLeft: "4rem" }}
+            placeholder="Enter access key"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            autoFocus
+            required
+          />
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4 max-w-xs mx-auto">
-        <input
-          type="password"
-          className="w-full bg-(--db-bg) border-4 border-(--db-border) px-4 py-3 text-center font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:text-(--db-text-muted)"
-          placeholder="ENTER PASSWORD"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          autoFocus
-        />
-        {error && <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) text-xs uppercase">{error}</div>}
-        <button type="submit" disabled={loading} className="w-full bg-(--db-primary) text-(--db-primary-fg) border-4 border-(--db-border) py-3 font-black uppercase shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] active:translate-y-0 transition-all">
-          {loading ? <Loader2 className="h-5 w-5 animate-spin mx-auto" /> : "UNLOCK"}
-        </button>
-      </form>
-    </div>
+      {error && (
+        <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+          <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
+        </div>
+      )}
+
+      <button
+        type="submit"
+        disabled={loading}
+        className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20 disabled:opacity-50"
+      >
+        {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <><Lock className="h-4 w-4" /> UNLOCK_NODE</>}
+      </button>
+    </form>
   );
 }

@@ -100,7 +100,7 @@ export default function SetupPage() {
   );
 
   return (
-    <div className="w-full">
+    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
         <div className="flex items-center gap-4 mb-10 border-b border-(--db-border)/30 pb-6">
             <div className="bg-(--db-primary)/10 p-3 rounded-2xl shrink-0">
                 <Server className="h-6 w-6 text-(--db-primary)"/>
@@ -121,17 +121,17 @@ export default function SetupPage() {
                 </div>
 
                 <div className="space-y-4">
-                    <div className="space-y-1">
-                        <label className="nothing-label ml-1">Root Name</label>
-                        <input className="font-bold" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Administrator" required />
+                    <div className="space-y-1.5">
+                        <label className="nothing-label block ml-1">Root_Name</label>
+                        <input className="db-input" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Administrator" required />
                     </div>
-                    <div className="space-y-1">
-                        <label className="nothing-label ml-1">Root Email</label>
-                        <input type="email" className="font-bold" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="admin@system.local" required />
+                    <div className="space-y-1.5">
+                        <label className="nothing-label block ml-1">Root_Email</label>
+                        <input type="email" className="db-input" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="admin@system.local" required />
                     </div>
-                    <div className="space-y-1">
-                        <label className="nothing-label ml-1">Root Password</label>
-                        <input type="password" className="font-bold" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} placeholder="••••••••" required minLength={8} />
+                    <div className="space-y-1.5">
+                        <label className="nothing-label block ml-1">Root_Password</label>
+                        <input type="password" className="db-input" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} placeholder="••••••••" required minLength={8} />
                     </div>
                 </div>
 
@@ -155,9 +155,13 @@ export default function SetupPage() {
                     <p className="nothing-label mt-1">CODE SENT TO: {formData.email}</p>
                 </div>
                 
-                <input 
-                    className="text-center text-4xl font-dot tracking-[0.5em] py-6" 
-                    placeholder="000000" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} autoFocus 
+                <input
+                    className="db-input text-center text-4xl font-dot tracking-[0.5em] py-6"
+                    placeholder="000000"
+                    maxLength={6}
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                    autoFocus
                 />
                 
                 {error && <div className="bg-red-500/10 text-red-500 p-4 rounded-2xl border border-red-500/20 text-[10px] font-bold uppercase">{error}</div>}

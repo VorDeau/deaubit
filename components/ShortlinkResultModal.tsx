@@ -29,7 +29,7 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
   }
 
   return (
-    <div className="fixed inset-0 z-100 flex items-center justify-center px-6 bg-(--db-bg)/95 backdrop-blur-2xl animate-in fade-in duration-500">
+    <div className="fixed inset-0 z-100 flex items-center justify-center px-6 bg-(--db-bg)/95 backdrop-blur-2xl animate-reveal">
       <div className="w-full max-w-2xl db-card p-1 lg:p-1.5 animate-reveal relative border-(--db-primary)/20 overflow-hidden shadow-[0_0_80px_rgba(234,21,6,0.08)]">
         
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none overflow-hidden select-none">

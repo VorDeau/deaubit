@@ -137,7 +137,7 @@ function VerifyContent() {
                 <input
                     type="email"
                     required
-                    className="pl-11 bg-(--db-surface-hover) border-(--db-border) focus:border-(--db-text) text-sm font-bold w-full"
+                    className="db-input pl-11!"
                     placeholder="USER@DOMAIN.COM"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -172,13 +172,13 @@ function VerifyContent() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-2">
             <label className="nothing-label text-center block text-[8px] opacity-40">Sent to: {email}</label>
-            <input 
-                className="w-full text-center text-3xl font-dot tracking-[0.4em] py-5 bg-(--db-surface-hover) border border-(--db-border) rounded-2xl focus:outline-none focus:border-(--db-text) transition-all" 
-                placeholder="000000" 
-                maxLength={6} 
-                value={otp} 
-                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))} 
-                autoFocus 
+            <input
+                className="db-input text-center text-3xl! font-dot tracking-[0.4em] py-6!"
+                placeholder="000000"
+                maxLength={6}
+                value={otp}
+                onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+                autoFocus
             />
         </div>
         

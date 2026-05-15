@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X, Download, Loader2, QrCode } from "lucide-react";
+import { X, Download, Loader2, QrCode, ShieldCheck } from "lucide-react";
 
 interface QrCodeModalProps { slug: string; shortUrl: string; onClose: () => void; }
 
@@ -12,9 +12,8 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
   const [downloading, setDownloading] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
-  
-  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=5&data=${encodeURIComponent(shortUrl)}`;
 
+  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=5&data=${encodeURIComponent(shortUrl)}`;
   const downloadApiUrl = `/api/qr-download?url=${encodeURIComponent(shortUrl)}`;
 
   const handleDownload = async () => {
@@ -23,74 +22,107 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
     try {
       const response = await fetch(downloadApiUrl);
       const blob = await response.blob();
-      
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a'); 
-      link.href = url; 
+      const link = document.createElement("a");
+      link.href = url;
       link.download = `deaubit-${slug}.png`;
-      
-      document.body.appendChild(link); 
-      link.click(); 
-      document.body.removeChild(link); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch { 
+    } catch {
       setDownloadError(true);
-    } finally { 
-      setDownloading(false); 
+    } finally {
+      setDownloading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="db-card relative w-full max-w-sm p-6 shadow-[12px_12px_0px_0px_var(--db-border)] space-y-6">
-        
-        <div className="flex items-center justify-between border-b-4 border-(--db-border) pb-4">
-          <div>
-            <h3 className="text-lg font-black uppercase flex items-center gap-2 text-(--db-text)">
-              <QrCode className="h-5 w-5" /> QR CODE
-            </h3>
-            <p className="text-xs font-mono bg-(--db-accent) text-black px-1 inline-block mt-1">/{slug}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 db-overlay animate-reveal">
+      <div className="db-card animate-modal-in relative w-full max-w-sm shadow-2xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-7 py-5 border-b border-(--db-border)">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-(--db-primary)/10 text-(--db-primary) rounded-xl">
+              <QrCode className="h-4.5 w-4.5" />
+            </div>
+            <div>
+              <h3 className="nothing-title text-base text-(--db-text)">QR_CODE</h3>
+              <p className="nothing-label text-[9px] opacity-50 tracking-widest">/{slug}</p>
+            </div>
           </div>
-          <button onClick={onClose} className="border-2 border-(--db-border) p-1 hover:bg-red-500 hover:text-white transition-colors"><X className="h-5 w-5"/></button>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-(--db-surface-hover) text-(--db-text) opacity-40 hover:opacity-100 transition-all group"
+          >
+            <X className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
+          </button>
         </div>
 
-        <div className="bg-white border-4 border-(--db-border) p-2 flex items-center justify-center aspect-square relative min-h-75 overflow-hidden">
-          <div className="qr-scan-line z-20" />
-          
-          {!imgLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
-               <Loader2 className="h-10 w-10 animate-spin text-black" />
-               <p className="text-[10px] font-black text-black uppercase animate-pulse tracking-widest">Generating...</p>
+        <div className="p-7 space-y-6">
+
+          {/* QR Display */}
+          <div className="relative rounded-3xl overflow-hidden bg-white aspect-square flex items-center justify-center border border-(--db-border)/20 shadow-xl shadow-(--db-primary)/5">
+            <div className="qr-scan-line" />
+
+            {!imgLoaded && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-10 bg-white">
+                <Loader2 className="h-8 w-8 animate-spin text-(--db-primary)" />
+                <p className="nothing-label text-[9px] text-black animate-pulse">Generating_Matrix...</p>
+              </div>
+            )}
+
+            <Image
+              src={previewQrUrl}
+              alt={`QR ${slug}`}
+              width={320}
+              height={320}
+              className={`w-full h-full object-contain transition-opacity duration-500 ${imgLoaded ? "opacity-100" : "opacity-0"}`}
+              onLoad={() => setImgLoaded(true)}
+              unoptimized
+            />
+
+            {imgLoaded && (
+              <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 rounded-full border border-green-200 shadow-sm">
+                <ShieldCheck className="h-3.5 w-3.5 text-green-500" />
+              </div>
+            )}
+          </div>
+
+          {/* URL label */}
+          <div className="bg-(--db-surface-hover) rounded-2xl px-4 py-3 border border-(--db-border)">
+            <p className="nothing-label text-[8px] mb-1 opacity-40">Destination_URL</p>
+            <p className="font-dot text-xs text-(--db-text) truncate tracking-tighter">{shortUrl.replace(/^https?:\/\//, "")}</p>
+          </div>
+
+          {downloadError && (
+            <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] text-center uppercase tracking-widest">
+              DOWNLOAD_FAILED — RETRY
             </div>
           )}
 
-          <Image 
-            src={previewQrUrl} 
-            alt={`QR ${slug}`} 
-            width={300}
-            height={300}
-            className={`w-full h-full object-contain transition-opacity duration-300 ${imgLoaded ? 'opacity-100 animate-qr-pulse' : 'opacity-0'}`} 
-            onLoad={() => setImgLoaded(true)}
-            unoptimized
-          />
-        </div>
-        
-        {downloadError && (
-          <div className="bg-(--db-danger) text-white text-xs font-bold p-2 border-2 border-(--db-border) text-center">
-            DOWNLOAD FAILED. TRY AGAIN.
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onClose}
+              className="btn-secondary flex-1 py-3.5 text-[10px] nothing-label opacity-100"
+            >
+              CLOSE
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={downloading || !imgLoaded}
+              className="btn-primary flex-1 py-3.5 text-[10px] nothing-label opacity-100 shadow-lg shadow-(--db-primary)/20 disabled:opacity-30 disabled:grayscale"
+            >
+              {downloading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <><Download className="h-3.5 w-3.5" /> DOWNLOAD</>
+              )}
+            </button>
           </div>
-        )}
-
-        <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 font-bold border-2 border-(--db-border) hover:bg-(--db-bg) text-(--db-text)">CLOSE</button>
-          
-          <button 
-            onClick={handleDownload} 
-            disabled={downloading || !imgLoaded} 
-            className="flex-1 py-3 font-bold bg-(--db-primary) text-white border-2 border-(--db-border) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {downloading ? <Loader2 className="h-4 w-4 animate-spin"/> : <><Download className="h-4 w-4"/> DOWNLOAD</>}
-          </button>
         </div>
       </div>
     </div>

@@ -6,11 +6,15 @@ import { ArrowLeft } from "lucide-react";
 
 export default function VerifyPage() {
   return (
-    <div className="w-full space-y-8">
+    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border) space-y-8">
       <VerifyForm />
-      <div className="text-center pt-4">
-        <Link href="/register" className="nothing-label hover:text-(--db-text) flex items-center justify-center gap-2">
-          <ArrowLeft className="h-3 w-3" /> <span className="underline">INCORRECT_EMAIL?_BACK</span>
+      <div className="text-center border-t border-(--db-border)/30 pt-6">
+        <Link
+          href="/register"
+          className="nothing-label text-[9px] hover:text-(--db-text) flex items-center justify-center gap-2 transition-colors"
+        >
+          <ArrowLeft className="h-3 w-3" />
+          <span className="underline">INCORRECT_EMAIL?_BACK</span>
         </Link>
       </div>
     </div>

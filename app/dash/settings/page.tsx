@@ -198,9 +198,9 @@ export default function SettingsPage() {
                     <form onSubmit={handleUpdateProfile} className="space-y-8">
                         <div className="space-y-2">
                             <label className="nothing-label block ml-1">Assigned_Name</label>
-                            <input 
-                                className="w-full text-base font-bold bg-(--db-surface)"
-                                placeholder="User Identity" 
+                            <input
+                                className="db-input"
+                                placeholder="User Identity"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
                             />
@@ -244,14 +244,14 @@ export default function SettingsPage() {
                         <div className="space-y-2">
                             <label className="nothing-label block ml-1">Current_Access_Key</label>
                             <div className="relative">
-                                <input 
-                                    type="password" 
-                                    className="pl-12 bg-(--db-surface) text-base font-bold"
-                                    placeholder="••••••••" 
+                                <input
+                                    type="password"
+                                    className="db-input pl-12!"
+                                    placeholder="••••••••"
                                     value={oldPassword}
                                     onChange={e => setOldPassword(e.target.value)}
                                 />
-                                <Lock className="absolute left-4 top-3.5 h-5 w-5 text-(--db-text-muted)" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-(--db-text-muted) pointer-events-none z-10" />
                             </div>
                         </div>
 
@@ -259,16 +259,16 @@ export default function SettingsPage() {
                             <div className="space-y-2">
                                 <label className="nothing-label block ml-1">New_Access_Key</label>
                                 <div className="relative">
-                                    <input 
+                                    <input
                                         type={showNewPassword ? "text" : "password"}
-                                        className="pl-12 pr-12 bg-(--db-surface) text-base font-bold"
-                                        placeholder="Min. 8 chars" 
+                                        className="db-input pl-12! pr-12!"
+                                        placeholder="Min. 8 chars"
                                         value={newPassword}
                                         onChange={e => setNewPassword(e.target.value)}
                                     />
-                                    <Lock className="absolute left-4 top-3.5 h-5 w-5 text-(--db-text-muted)" />
-                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-4 top-3.5 text-(--db-text-muted) hover:text-(--db-text)">
-                                        {showNewPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-(--db-text-muted) pointer-events-none z-10" />
+                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) hover:text-(--db-text) p-0.5">
+                                        {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                                     </button>
                                 </div>
                             </div>
@@ -276,16 +276,16 @@ export default function SettingsPage() {
                             <div className="space-y-2">
                                 <label className="nothing-label block ml-1">Verify_New_Key</label>
                                 <div className="relative">
-                                    <input 
-                                        type="password" 
-                                        className={`pl-12 bg-(--db-surface) text-base font-bold ${confirmNewPassword && newPassword !== confirmNewPassword ? "border-red-500" : ""}`}
-                                        placeholder="Confirm key" 
+                                    <input
+                                        type="password"
+                                        className={`db-input pl-12! pr-12! ${confirmNewPassword && newPassword !== confirmNewPassword ? "border-red-500/50!" : ""}`}
+                                        placeholder="Confirm key"
                                         value={confirmNewPassword}
                                         onChange={e => setConfirmNewPassword(e.target.value)}
                                     />
-                                    <Lock className="absolute left-4 top-3.5 h-5 w-5 text-(--db-text-muted)" />
+                                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-(--db-text-muted) pointer-events-none z-10" />
                                     {confirmNewPassword && newPassword === confirmNewPassword && (
-                                        <Check className="absolute right-4 top-3.5 h-5 w-5 text-green-500" />
+                                        <Check className="absolute right-12 top-1/2 -translate-y-1/2 h-5 w-5 text-green-500 pointer-events-none" />
                                     )}
                                 </div>
                             </div>
@@ -353,24 +353,24 @@ export default function SettingsPage() {
               </div>
 
               <form onSubmit={handleDeleteAccount} className="space-y-6">
-                 <input 
-                    type="password" 
-                    className="w-full text-center text-lg font-bold bg-(--db-surface-hover) border-(--db-border)"
-                    placeholder="CONFIRM_PASSWORD" 
+                 <input
+                    type="password"
+                    className="db-input text-center font-bold"
+                    placeholder="CONFIRM_PASSWORD"
                     value={deletePassword}
                     onChange={(e) => setDeletePassword(e.target.value)}
                     autoFocus={!showOtpInput}
-                    disabled={showOtpInput} 
+                    disabled={showOtpInput}
                     required
                  />
 
                  {showOtpInput && (
                      <div className="space-y-6 animate-reveal">
-                         <input 
-                            className="w-full text-center text-4xl font-dot tracking-[0.5em] py-6 bg-(--db-surface-hover) border-(--db-border)"
-                            placeholder="000000" 
+                         <input
+                            className="db-input text-center text-3xl! font-dot tracking-[0.5em] py-6!"
+                            placeholder="000000"
                             value={deleteOtp}
-                            onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g,""))}
+                            onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g, ""))}
                             maxLength={6}
                             autoFocus
                             required

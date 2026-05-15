@@ -3,7 +3,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Save, Loader2, Link2, Lock, Calendar } from "lucide-react";
+import { X, Save, Loader2, Link2, Lock, Calendar, AlertTriangle } from "lucide-react";
 import type { ShortLink } from "./ExistingShortlinksCard";
 
 interface EditShortlinkModalProps {
@@ -17,14 +17,12 @@ export default function EditShortlinkModal({ link, onClose, onUpdate }: EditShor
   const [password, setPassword] = useState("");
   const defaultDate = link.expiresAt ? new Date(link.expiresAt).toISOString().slice(0, 16) : "";
   const [expiresAt, setExpiresAt] = useState(defaultDate);
-  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true); setError("");
-
     try {
       const res = await fetch(`/api/links/${link.slug}`, {
         method: "PATCH",
@@ -36,10 +34,8 @@ export default function EditShortlinkModal({ link, onClose, onUpdate }: EditShor
           removeExpiry: expiresAt === "",
         }),
       });
-
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed to update link.");
-
       onUpdate();
       onClose();
     } catch (err) {
@@ -50,71 +46,107 @@ export default function EditShortlinkModal({ link, onClose, onUpdate }: EditShor
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="db-card w-full max-w-lg p-6 shadow-[12px_12px_0px_0px_var(--db-border)]">
-        
-        <div className="flex items-center justify-between border-b-4 border-(--db-border) pb-4 mb-6">
-          <h2 className="text-xl font-black uppercase flex items-center gap-2 text-(--db-text)">
-            <Link2 className="h-6 w-6" /> EDIT LINK
-          </h2>
-          <button onClick={onClose} className="border-2 border-(--db-border) p-1 hover:bg-red-500 hover:text-white transition-colors">
-            <X className="h-5 w-5" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 db-overlay animate-reveal">
+      <div className="db-card animate-modal-in relative w-full max-w-lg shadow-2xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-7 py-5 border-b border-(--db-border)">
+          <div className="flex items-center gap-4">
+            <div className="p-2.5 bg-(--db-primary)/10 text-(--db-primary) rounded-2xl">
+              <Link2 className="h-5 w-5" />
+            </div>
+            <div>
+              <h2 className="nothing-title text-xl text-(--db-text)">MODIFY_LINK</h2>
+              <p className="nothing-label text-[9px] opacity-50 tracking-widest">/{link.slug}</p>
+            </div>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2.5 rounded-full hover:bg-(--db-surface-hover) text-(--db-text) opacity-40 hover:opacity-100 transition-all group"
+          >
+            <X className="h-5 w-5 group-hover:rotate-90 transition-transform duration-300" />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5" autoComplete="off">
-            <div className="bg-(--db-bg) p-3 border-2 border-(--db-border) flex items-center justify-between">
-                <span className="font-bold text-xs text-(--db-text-muted) uppercase">Slug</span>
-                <span className="font-black text-sm font-mono text-(--db-text)">/{link.slug}</span>
+        <div className="p-7">
+          <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
+
+            {/* Slug display */}
+            <div className="flex items-center justify-between bg-(--db-surface-hover) rounded-2xl px-5 py-3 border border-(--db-border)">
+              <span className="nothing-label text-[9px] opacity-50">Slug_Identifier</span>
+              <span className="font-dot text-sm text-(--db-text) tracking-tight">/{link.slug}</span>
             </div>
 
-            <div className="space-y-1">
-                <label className="font-black text-xs uppercase text-(--db-text-muted)">Target URL</label>
-                <input 
-                    className="w-full bg-(--db-bg) border-2 border-(--db-border) p-3 font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all"
-                    value={targetUrl}
-                    onChange={e => setTargetUrl(e.target.value)}
-                    required
-                    type="url"
-                />
+            {/* Target URL */}
+            <div className="space-y-2">
+              <label className="nothing-label block ml-1 text-[9px]">Destination_Target</label>
+              <input
+                className="db-input"
+                value={targetUrl}
+                onChange={(e) => setTargetUrl(e.target.value)}
+                required
+                type="url"
+                placeholder="https://example.com/..."
+              />
             </div>
 
+            {/* Password + Expiry */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1">
-                    <label className="font-black text-xs uppercase text-(--db-text-muted) flex items-center gap-1"><Lock className="h-3 w-3"/> New Password</label>
-                    <input 
-                        className="w-full bg-(--db-bg) border-2 border-(--db-border) p-2 text-sm font-medium focus:outline-none focus:shadow-[2px_2px_0px_0px_var(--db-border)]"
-                        placeholder="Leave blank to keep"
-                        value={password}
-                        onChange={e => setPassword(e.target.value)}
-                        autoComplete="new-password"
-                        type="text"
-                    />
-                </div>
-                <div className="space-y-1">
-                    <label className="font-black text-xs uppercase text-(--db-text-muted) flex items-center gap-1"><Calendar className="h-3 w-3"/> Expiry</label>
-                    <input 
-                        className="w-full bg-(--db-bg) border-2 border-(--db-border) p-2 text-sm font-medium focus:outline-none focus:shadow-[2px_2px_0px_0px_var(--db-border)]"
-                        type="datetime-local"
-                        value={expiresAt}
-                        onChange={e => setExpiresAt(e.target.value)}
-                    />
-                </div>
+              <div className="space-y-2">
+                <label className="nothing-label text-[9px] block ml-1 flex items-center gap-1.5">
+                  <Lock className="h-3 w-3" /> New_Security_Key
+                </label>
+                <input
+                  className="db-input"
+                  placeholder="Leave blank to keep"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoComplete="new-password"
+                  type="text"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="nothing-label text-[9px] block ml-1 flex items-center gap-1.5">
+                  <Calendar className="h-3 w-3" /> Self_Destruct_Timer
+                </label>
+                <input
+                  className="db-input"
+                  type="datetime-local"
+                  value={expiresAt}
+                  onChange={(e) => setExpiresAt(e.target.value)}
+                />
+              </div>
             </div>
 
             {error && (
-                <div className="bg-red-100 border-2 border-(--db-border) text-red-600 p-3 text-xs font-bold text-center">
-                    {error}
-                </div>
+              <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+                <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
+              </div>
             )}
 
+            {/* Actions */}
             <div className="flex gap-3 pt-2">
-                <button type="button" onClick={onClose} className="flex-1 py-3 font-bold border-2 border-(--db-border) text-(--db-text) hover:bg-(--db-bg)">CANCEL</button>
-                <button type="submit" disabled={loading} className="flex-1 py-3 font-bold bg-(--db-primary) text-white border-2 border-(--db-border) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin"/> : <><Save className="h-4 w-4"/> SAVE CHANGES</>}
-                </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn-secondary flex-1 py-3.5 text-[10px] nothing-label opacity-100"
+              >
+                CANCEL
+              </button>
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary flex-1 py-3.5 text-xs tracking-widest shadow-lg shadow-(--db-primary)/20 disabled:opacity-50"
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <><Save className="h-4 w-4" /> COMMIT_CHANGES</>
+                )}
+              </button>
             </div>
-        </form>
+          </form>
+        </div>
       </div>
     </div>
   );

@@ -148,7 +148,7 @@ export default function DashboardPage() {
               currentPage={currentPage}
               totalPages={totalPages}
               totalItems={totalItems}
-              onPageChange={(p) => setCurrentPage(p)}
+              onPageChange={(p) => fetchLinks(p)}
             />
         </div>
       </div>

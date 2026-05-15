@@ -1,6 +1,6 @@
 {
   "name": "deaubit",
-  "version": "10.1.4",
+  "version": "10.2.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
