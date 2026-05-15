@@ -3,5 +3,9 @@
 import RegisterForm from "@/components/RegisterForm";
 
 export default function RegisterPage() {
-  return <RegisterForm />;
+  return (
+    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
+      <RegisterForm />
+    </div>
+  );
 }

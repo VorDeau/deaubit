@@ -5,7 +5,6 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Loader2, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertTriangle } from "lucide-react";
-import DeauBitLogo from "@/components/DeauBitLogo";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -16,19 +15,14 @@ export default function ForgotPasswordPage() {
   async function performReset() {
     setLoading(true);
     setError(null);
-
     try {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
-
       const data = await res.json();
-      if (!res.ok) {
-          throw new Error(data.error || "Request failed");
-      }
-
+      if (!res.ok) throw new Error(data.error || "Request failed");
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -43,78 +37,83 @@ export default function ForgotPasswordPage() {
   }
 
   if (success) {
-      return (
-        <div className="min-h-screen bg-(--db-bg) flex items-center justify-center p-4">
-             <div className="db-card w-full max-w-md p-8 text-center shadow-2xl animate-in fade-in zoom-in-95 duration-500">
-                <div className="inline-flex p-4 bg-green-500/10 text-green-500 rounded-full mb-6 shadow-lg shadow-green-500/20">
-                    <CheckCircle2 className="h-12 w-12" />
-                </div>
-                <h2 className="text-2xl font-black uppercase tracking-tighter text-(--db-text) mb-2">CHECK YOUR INBOX</h2>
-                <p className="text-sm font-bold text-(--db-text-muted) mb-8">
-                    If an account exists for {email}, we have sent password reset instructions.
-                </p>
-                <Link href="/" className="block w-full bg-(--db-primary) text-white py-4 rounded-full font-black uppercase tracking-widest shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
-                    BACK TO LOGIN
-                </Link>
-             </div>
+    return (
+      <div className="db-card w-full max-w-md p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+        <div className="inline-flex p-6 bg-green-500/10 text-green-500 rounded-3xl mb-8">
+          <CheckCircle2 className="h-12 w-12" />
         </div>
-      );
+        <h2 className="nothing-title text-2xl text-(--db-text) mb-3">DISPATCH_SENT</h2>
+        <p className="nothing-label normal-case tracking-normal opacity-50 text-[10px] leading-relaxed mb-2">
+          Sent to: {email}
+        </p>
+        <p className="nothing-label normal-case tracking-normal opacity-40 text-[10px] leading-relaxed mb-10">
+          If that email exists in our system, reset instructions have been dispatched.
+        </p>
+        <Link
+          href="/"
+          className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20"
+        >
+          RETURN_TO_SYSTEM
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-(--db-bg) flex flex-col items-center justify-center p-4">
-      <div className="mb-12 hover:scale-110 transition-transform">
-           <DeauBitLogo size={60} />
+    <div className="db-card w-full max-w-md p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
+
+      <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
+        <div className="bg-(--db-primary)/10 p-3 rounded-2xl shrink-0">
+          <KeyRound className="h-6 w-6 text-(--db-primary)" />
+        </div>
+        <div>
+          <h1 className="nothing-title text-xl text-(--db-text)">RECOVER_ACCESS</h1>
+          <p className="nothing-label text-[9px] opacity-60">Reset_Key_Protocol</p>
+        </div>
       </div>
-      
-      <div className="db-card w-full max-w-md p-8 shadow-2xl animate-in fade-in slide-in-from-bottom-8 duration-700">
-        
-        <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
-            <div className="bg-(--db-primary)/10 p-3 rounded-2xl">
-                <KeyRound className="h-6 w-6 text-(--db-primary)" />
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <label className="nothing-label block ml-1 text-[9px]">Identity_Email</label>
+          <div className="relative">
+            <div className="absolute left-0 top-0 bottom-0 w-14 flex items-center justify-center text-(--db-text) opacity-40 z-10 pointer-events-none">
+              <Mail className="h-5 w-5" />
             </div>
-            <div>
-                <h1 className="text-2xl font-black uppercase tracking-tighter text-(--db-text)">RESET PASSWORD</h1>
-                <p className="text-[10px] font-bold text-(--db-text-muted) uppercase tracking-widest">Recover Access</p>
-            </div>
+            <input
+              type="email"
+              required
+              className="db-input"
+              style={{ paddingLeft: "4rem" }}
+              placeholder="USER@SYSTEM.NET"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-                <label className="font-black text-[10px] uppercase tracking-widest mb-2 block text-(--db-text-muted) px-1">Email Address</label>
-                <div className="relative group">
-                    <input 
-                        type="email" 
-                        required 
-                        className="w-full bg-(--db-bg) border border-(--db-border)/50 rounded-xl px-4 py-3 text-base font-bold text-(--db-text) focus:ring-2 focus:ring-(--db-primary)/50 focus:border-(--db-primary) outline-none transition-all placeholder:font-normal"
-                        placeholder="user@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Mail className="absolute right-4 top-3.5 text-(--db-text-muted) h-5 w-5" />
-                </div>
-            </div>
+        {error && (
+          <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+            <AlertTriangle className="h-4 w-4 shrink-0" /> {error}
+          </div>
+        )}
 
-            {error && (
-                <div className="bg-red-500/10 text-red-500 text-xs font-bold p-4 rounded-xl border border-red-500/20 flex items-center gap-3 animate-error-shake">
-                    <AlertTriangle className="h-5 w-5 shrink-0"/> {error}
-                </div>
-            )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20 disabled:opacity-50"
+        >
+          {loading ? <Loader2 className="animate-spin mx-auto h-5 w-5" /> : "DISPATCH_RESET_LINK"}
+        </button>
+      </form>
 
-            <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-(--db-primary) text-white rounded-full py-4 font-black uppercase tracking-widest shadow-lg shadow-(--db-primary)/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                {loading ? <Loader2 className="animate-spin mx-auto h-6 w-6"/> : "SEND RESET LINK"}
-            </button>
-        </form>
-
-        <div className="mt-8 text-center pt-4">
-            <Link href="/" className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-(--db-text-muted) hover:text-(--db-primary) transition-colors">
-                <ArrowLeft className="h-3.5 w-3.5" /> Back to Login
-            </Link>
-        </div>
+      <div className="mt-8 text-center pt-6 border-t border-(--db-border)/30">
+        <Link
+          href="/"
+          className="nothing-label text-[10px] hover:text-(--db-primary) flex items-center justify-center gap-2 transition-colors"
+        >
+          <ArrowLeft className="h-3.5 w-3.5" /> BACK_TO_SYSTEM
+        </Link>
       </div>
     </div>
   );
