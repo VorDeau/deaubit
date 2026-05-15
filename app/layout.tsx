@@ -1,13 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { JetBrains_Mono, Inter } from "next/font/google";
+import { DotGothic16, Inter } from "next/font/google";
 import "@/app/globals.css";
 import PageWrapperClient from "@/components/PageWrapperClient";
+import PhosphorProvider from "@/components/PhosphorProvider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
-const mono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
+const dot = DotGothic16({ weight: "400", subsets: ["latin"], variable: "--font-dot" });
 
 export const viewport: Viewport = {
-  themeColor: "#4f46e5",
+  themeColor: "#a3e635",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -19,17 +20,17 @@ export const metadata: Metadata = {
     default: "DeauBit",
     template: "%s | DeauBit",
   },
-  description: "Self-hosted, privacy-focused URL shortener with heavy industrial design. No tracking, just links.",
-  keywords: ["url shortener", "link management", "self-hosted", "privacy", "deaubit"],
-  authors: [{ name: "Deauport", url: "https://deau.site" }],
-  creator: "Deauport",
+  description: "Self-hosted, privacy-focused URL shortener with Nothing OS design logic. Pure utility.",
+  keywords: ["url shortener", "link management", "self-hosted", "privacy", "deaubit", "nothing os"],
+  authors: [{ name: "DeauBit" }],
+  creator: "DeauBit",
   
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "/",
-    title: "DeauBit - The Brutalist Shortener",
-    description: "Shorten your links with style. Privacy-first, analytics-included, zero-bullshit.",
+    title: "DeauBit - Pure Utility Shortener",
+    description: "Shorten your links with minimal distraction. Privacy-first, analytics-included.",
     siteName: "DeauBit",
     images: [
       {
@@ -43,16 +44,16 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "DeauBit | Shorten Boldly",
+    title: "DeauBit | Minimal Shortener",
     description: "Privacy-focused URL shortener for the modern web.",
     creator: "@deauport",
     images: ["/api/og"],
   },
 
   icons: {
-    icon: "/icon",
-    shortcut: "/icon",
-    apple: "/icon",
+    icon: "/icon.svg",
+    shortcut: "/icon.svg",
+    apple: "/icon.svg",
   },
 };
 
@@ -62,11 +63,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${mono.variable} antialiased font-sans bg-(--db-bg) text-(--db-text) selection:bg-(--db-primary) selection:text-white`}
+        className={`${inter.variable} ${dot.variable} antialiased font-sans bg-(--db-bg) text-(--db-text) selection:bg-(--db-primary) selection:text-white`}
       >
-        <PageWrapperClient>{children}</PageWrapperClient>
+        <PhosphorProvider>
+          <PageWrapperClient>{children}</PageWrapperClient>
+        </PhosphorProvider>
       </body>
     </html>
   );

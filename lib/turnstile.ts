@@ -69,7 +69,7 @@ export async function verifyTurnstileWithCookie(req: NextRequest, token?: string
         
         cookieAction = (res: NextResponse) => {
             res.cookies.set(TURNSTILE_COOKIE_NAME, cookieValue, {
-                httpOnly: true,
+                httpOnly: true, 
                 secure: process.env.NODE_ENV === "production",
                 sameSite: "lax",
                 path: "/",

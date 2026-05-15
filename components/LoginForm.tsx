@@ -4,207 +4,163 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Loader2, Mail, Eye, EyeOff, Terminal } from "lucide-react";
+import { CircleNotch, Eye, EyeSlash, Warning, Key, Envelope } from "@phosphor-icons/react";
 import type { LoginResponse } from "@/types";
-import ChallengeModal from "./ChallengeModal";
 
 interface LoginFormProps {
-    nextPath?: string;
+  nextPath?: string;
 }
 
 export default function LoginForm({ nextPath = "/dash" }: LoginFormProps) {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [unverified, setUnverified] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [cooldown, setCooldown] = useState<number | null>(null);
-    
-    const [showChallenge, setShowChallenge] = useState(false);
-    const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [unverified, setUnverified] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [cooldown, setCooldown] = useState<number | null>(null);
 
-    useEffect(() => {
-        if (cooldown === null) return;
-        if (cooldown <= 0) { setCooldown(null); return; }
-        const id = setInterval(() => setCooldown((prev) => (prev === null || prev <= 1 ? null : prev - 1)), 1000);
-        return () => clearInterval(id);
-    }, [cooldown]);
+  useEffect(() => {
+    if (cooldown === null) return;
+    if (cooldown <= 0) { setCooldown(null); return; }
+    const id = setInterval(() => setCooldown((prev) => (prev === null || prev <= 1 ? null : prev - 1)), 1000);
+    return () => clearInterval(id);
+  }, [cooldown]);
 
-    async function performLogin(token?: string) {
-        setLoading(true); setError(null); setUnverified(false);
+  async function performLogin() {
+    setLoading(true); setError(null); setUnverified(false);
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      const data: LoginResponse = await res.json().catch(() => ({}));
 
-        try {
-            const res = await fetch("/api/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    email, 
-                    password,
-                    cfTurnstile: token
-                }),
-            });
-            const data: LoginResponse = await res.json().catch(() => ({}));
+      if (res.status === 429) {
+        const retry = typeof data.retryAfter === "number" ? data.retryAfter : 60;
+        setCooldown(retry);
+        setError(`Too many attempts. Wait ${retry}s.`);
+        return;
+      }
+      if (res.status === 403) { setUnverified(true); return; }
+      if (!res.ok) throw new Error(typeof data.error === "string" ? data.error : "Login failed");
 
-            if (res.status === 429) {
-                const retry = typeof data.retryAfter === "number" ? data.retryAfter : 60;
-                setCooldown(retry);
-                setError(`Too many attempts. Wait ${retry}s.`);
-                return;
-            }
-
-            if (res.status === 403) {
-                setUnverified(true);
-                return;
-            }
-            
-            if (!res.ok) {
-                if (res.status === 400 && data.error?.includes("Security")) {
-                    setPendingAction(() => (t: string) => performLogin(t));
-                    setShowChallenge(true);
-                    return;
-                }
-                throw new Error(typeof data.error === "string" ? data.error : "Login failed");
-            }
-            
-            window.location.href = nextPath;
-        } catch (err) {
-            setError(err instanceof Error ? err.message : "Login failed");
-        } finally {
-            setLoading(false);
-        }
+      window.location.href = nextPath;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setLoading(false);
     }
+  }
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
-        if (cooldown !== null && cooldown > 0) return;
-        await performLogin();
-    }
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (cooldown !== null && cooldown > 0) return;
+    await performLogin();
+  }
 
-    const handleChallengeSuccess = (token: string) => {
-        setShowChallenge(false);
-        if (pendingAction) {
-            pendingAction(token);
-            setPendingAction(null);
-        }
-    };
+  return (
+    <div className="w-full flex flex-col">
+      <div className="flex items-center gap-4 mb-8 border-b border-(--db-border) pb-6">
+        <div className="bg-(--db-primary)/15 p-3 rounded-2xl shrink-0">
+          <Key size={22} className="text-(--db-primary)" />
+        </div>
+        <div>
+          <h2 className="text-xl nothing-title text-(--db-text)">AUTHORIZE</h2>
+          <p className="nothing-label text-[10px] text-(--db-text) opacity-50">SECURE_NODE_ACCESS</p>
+        </div>
+      </div>
 
-    return (
-        <section className="h-full w-full flex items-center justify-center">
-            {showChallenge && (
-                <ChallengeModal 
-                    onSuccess={handleChallengeSuccess}
-                    onClose={() => setShowChallenge(false)}
-                />
-            )}
-            <div className="db-card w-full max-w-md p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-                
-                <div className="flex items-center gap-4 mb-8 border-b-4 border-(--db-border) pb-4">
-                    <div className="bg-(--db-accent) text-(--db-accent-fg) p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-                        <Terminal className="h-6 w-6" />
-                    </div>
-                    <div>
-                        <h2 className="text-2xl font-black uppercase tracking-tighter text-(--db-text)">LOGIN AREA</h2>
-                        <p className="text-xs font-bold text-(--db-text-muted) uppercase tracking-widest">Secure Access</p>
-                    </div>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div>
-                        <label className="font-black text-sm uppercase tracking-wider mb-2 block text-(--db-text)">
-                            Email Address
-                        </label>
-                        <div className="relative group">
-                            <input
-                                type="email"
-                                name="email"
-                                autoComplete="username email"
-                                className="w-full bg-(--db-bg) border-2 border-(--db-border) px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) db-input-focus"
-                                placeholder="user@example.com"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                required
-                                disabled={loading}
-                            />
-                            <Mail className="absolute right-4 top-3.5 h-5 w-5 text-(--db-text-muted) pointer-events-none" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className="flex justify-between items-center mb-2">
-                            <label className="font-black text-sm uppercase tracking-wider block text-(--db-text)">Password</label>
-                            <Link href="/forgot-password" className="text-xs font-bold text-(--db-primary) hover:underline decoration-2 hover:scale-105 transition-transform inline-block">
-                                Forgot Password?
-                            </Link>
-                        </div>
-                        <div className="relative group">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                autoComplete="current-password"
-                                className="w-full bg-(--db-bg) border-2 border-(--db-border) px-4 py-3 text-base font-bold text-(--db-text) placeholder:font-normal placeholder:text-(--db-text-muted) db-input-focus"
-                                placeholder="••••••••"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                required
-                                disabled={loading}
-                            />
-                            <button
-                                type="button"
-                                onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-3.5 text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform cursor-pointer"
-                                disabled={loading}
-                            >
-                                {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="pt-2">
-                        <button
-                            type="submit"
-                            disabled={loading || (cooldown !== null && cooldown > 0)}
-                            className="w-full bg-(--db-primary) text-(--db-primary-fg) border-2 border-(--db-border) py-4 font-black text-lg uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            {loading ? (
-                                <span className="flex items-center justify-center gap-2"><Loader2 className="animate-spin h-5 w-5"/> Loading...</span>
-                            ) : cooldown ? (
-                                `Wait (${cooldown}s)`
-                            ) : (
-                                "LOGIN NOW"
-                            )}
-                        </button>
-                    </div>
-                    
-                    <div className="min-h-16 flex flex-col justify-center">
-                        {error && (
-                            <div className="bg-(--db-danger) text-white font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 animate-error-shake duration-300">
-                                <span>❌</span> {error}
-                            </div>
-                        )}
-
-                        {unverified && (
-                            <div className="bg-(--db-accent) text-(--db-accent-fg) font-bold p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-2 duration-300">
-                                <p className="text-sm mb-2">Account not verified. Check your email for the confirmation code.</p>
-                                <Link
-                                    href={`/verify?email=${encodeURIComponent(email)}`}
-                                    className="inline-block text-xs font-black uppercase tracking-wider bg-(--db-accent-fg) text-(--db-accent) px-3 py-1.5 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 hover:shadow-[3px_3px_0px_0px_var(--db-border)] transition-all"
-                                >
-                                    Verify your email →
-                                </Link>
-                            </div>
-                        )}
-                    </div>
-
-                </form>
-
-                <div className="mt-8 text-center pt-6 border-t-4 border-(--db-border) border-dotted">
-                    <span className="text-sm font-bold text-(--db-text-muted)">Don&apos;t have an account? </span>
-                    <Link href="/register" className="inline-block ml-1 text-sm font-black bg-(--db-accent) text-(--db-accent-fg) px-2 border-2 border-(--db-border) hover:shadow-[2px_2px_0px_0px_var(--db-border)] hover:-translate-y-0.5 transition-all">
-                        SIGNUP HERE
-                    </Link>
-                </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="space-y-2">
+          <label className="nothing-label block ml-1 text-[10px] text-(--db-text) font-bold">IDENTITY_EMAIL</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+              <Envelope size={18} />
             </div>
-        </section>
-    );
+            <input
+              type="email"
+              className="db-input pl-10!"
+              placeholder="USER@SYSTEM.NET"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-end px-1">
+            <label className="nothing-label block text-[10px] text-(--db-text) font-bold">ACCESS_KEY</label>
+            <Link href="/forgot-password" className="text-[9px] font-black text-(--db-primary) hover:underline uppercase tracking-widest">
+              Lost?
+            </Link>
+          </div>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+              <Key size={18} />
+            </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              className="db-input pl-10! pr-12!"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text) opacity-40 hover:opacity-100 transition-all"
+              disabled={loading}
+            >
+              {showPassword ? <EyeSlash size={18} /> : <Eye size={18} />}
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading || (cooldown !== null && cooldown > 0)}
+          className="btn-primary w-full py-4 text-xs tracking-[0.2em] mt-2 shadow-lg shadow-(--db-primary)/20 disabled:opacity-40"
+        >
+          {loading ? (
+            <CircleNotch size={20} className="animate-spin" />
+          ) : cooldown ? (
+            `WAIT_${cooldown}S`
+          ) : (
+            "AUTHORIZE_SYSTEM"
+          )}
+        </button>
+
+        {error && (
+          <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+            <Warning size={16} weight="fill" className="shrink-0" /> {error}
+          </div>
+        )}
+
+        {unverified && (
+          <div className="flex flex-col items-center gap-3 bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20">
+            <p className="nothing-label text-amber-600 text-[8px] font-bold uppercase">Action_Required: Verify</p>
+            <Link
+              href={`/verify?email=${encodeURIComponent(email)}`}
+              className="btn-secondary w-full py-2 text-[9px] border-amber-500/30 text-amber-700 font-black"
+            >
+              VERIFY_NOW
+            </Link>
+          </div>
+        )}
+      </form>
+
+      <div className="mt-8 text-center pt-6 border-t border-(--db-border)">
+        <span className="nothing-label text-[10px] text-(--db-text) opacity-50 mr-2 uppercase">New_User?</span>
+        <Link href="/register" className="nothing-label text-[10px] text-(--db-primary) font-black border-b border-transparent hover:border-(--db-primary) transition-all">
+          CREATE_IDENTITY
+        </Link>
+      </div>
+    </div>
+  );
 }

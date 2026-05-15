@@ -5,67 +5,37 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Loader2, Mail, FileSignature, Check, Eye, EyeOff } from "lucide-react";
-import ChallengeModal from "./ChallengeModal";
+import { CircleNotch, Envelope, UserCirclePlus, Check, Eye, EyeSlash, Warning, Key } from "@phosphor-icons/react";
 
 export default function RegisterForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
-  const [confirmPassword, setConfirmPassword] = useState(""); 
-  
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  
   const [agreed, setAgreed] = useState(false);
-  const [showChallenge, setShowChallenge] = useState(false);
-  const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
-
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string>(""); 
+  const [error, setError] = useState<string>("");
   const router = useRouter();
 
-  async function performRegister(token?: string) {
+  async function performRegister() {
     setLoading(true);
-    setError(""); 
+    setError("");
 
-    if (!agreed) {
-        setError("You must agree to the Terms & Privacy Policy.");
-        setLoading(false);
-        return;
-    }
-
-    if (formData.password !== confirmPassword) {
-      setError("Passwords do not match.");
-      setLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 6) {
-        setError("Password must be at least 6 characters.");
-        setLoading(false);
-        return;
-    }
+    if (!agreed) { setError("AGREEMENT_REQUIRED"); setLoading(false); return; }
+    if (formData.password !== confirmPassword) { setError("KEY_MISMATCH"); setLoading(false); return; }
+    if (formData.password.length < 8) { setError("KEY_TOO_SHORT_MIN_8"); setLoading(false); return; }
 
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, cfTurnstile: token }),
+        body: JSON.stringify({ ...formData }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) {
-          if (res.status === 400 && data.error?.includes("Security")) {
-             setPendingAction(() => (t: string) => performRegister(t));
-             setShowChallenge(true);
-             return;
-          }
-          throw new Error(data.error || "Registration failed.");
-      }
-
+      if (!res.ok) throw new Error(data.error || "REGISTRY_FAILED");
       router.push(`/verify?email=${encodeURIComponent(formData.email)}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred.");
+      setError(err instanceof Error ? err.message : "SYSTEM_ERROR");
     } finally {
       setLoading(false);
     }
@@ -76,136 +46,122 @@ export default function RegisterForm() {
     await performRegister();
   }
 
-  const handleChallengeSuccess = (token: string) => {
-    setShowChallenge(false);
-    if (pendingAction) {
-        pendingAction(token);
-        setPendingAction(null);
-    }
-  };
-
   return (
-    <div className="flex items-center justify-center min-h-full w-full py-8">
-      {showChallenge && (
-          <ChallengeModal 
-              onSuccess={handleChallengeSuccess}
-              onClose={() => setShowChallenge(false)}
-          />
-      )}
-      <div className="db-card w-full max-w-lg p-8 shadow-[12px_12px_0px_0px_var(--db-border)] hover:shadow-[16px_16px_0px_0px_var(--db-border)] animate-in fade-in slide-in-from-bottom-8 duration-700">
-        
-        <div className="flex items-center gap-3 mb-6 border-b-4 border-(--db-border) pb-3">
-           <div className="bg-(--db-accent) p-2 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-              <FileSignature className="h-5 w-5 text-(--db-accent-fg)"/>
-           </div>
-           <div>
-              <h2 className="text-xl font-black uppercase tracking-tighter text-(--db-text)">REGISTER</h2>
-              <p className="text-[10px] font-bold text-(--db-text-muted) uppercase">Join the Club</p>
-           </div>
+    <div className="w-full flex flex-col">
+      <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
+        <div className="bg-(--db-primary)/15 p-3 rounded-2xl shrink-0">
+          <UserCirclePlus size={22} className="text-(--db-primary)" />
+        </div>
+        <div>
+          <h2 className="text-xl nothing-title text-(--db-text)">REGISTER</h2>
+          <p className="nothing-label text-[9px]">Initialize_New_Identity</p>
+        </div>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="space-y-1.5">
+          <label className="nothing-label block ml-1 text-[9px]">Email_Identifier</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) pointer-events-none z-10">
+              <Envelope size={17} />
+            </div>
+            <input
+              type="email"
+              className="db-input pl-10!"
+              placeholder="NAME@DOMAIN.COM"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              required
+            />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-3">
-          
-          <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Email</label>
-              <div className="relative">
-                  <input 
-                      type="email" 
-                      name="email"
-                      autoComplete="username email"
-                      className="w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted)" 
-                      placeholder="name@example.com"
-                      value={formData.email} 
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })} 
-                      required 
-                  />
-                  <Mail className="absolute right-3 top-2.5 text-(--db-text-muted) w-4 h-4" />
-              </div>
+        <div className="space-y-1.5">
+          <label className="nothing-label block ml-1 text-[9px]">Access_Key</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) pointer-events-none z-10">
+              <Key size={17} />
+            </div>
+            <input
+              type={showPassword ? "text" : "password"}
+              className="db-input pl-10! pr-11!"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) hover:text-(--db-text) transition-colors p-0.5"
+            >
+              {showPassword ? <EyeSlash size={17} /> : <Eye size={17} />}
+            </button>
           </div>
+        </div>
 
-          <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Password</label>
-              <div className="relative">
-                  <input 
-                      type={showPassword ? "text" : "password"} 
-                      name="password"
-                      autoComplete="new-password"
-                      className="w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted) pr-10" 
-                      placeholder="••••••••"
-                      value={formData.password} 
-                      onChange={(e) => setFormData({ ...formData, password: e.target.value })} 
-                      required 
-                  />
-                  <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-2.5 text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform"
-                  >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-              </div>
+        <div className="space-y-1.5">
+          <label className="nothing-label block ml-1 text-[9px]">Verify_Key</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) pointer-events-none z-10 opacity-50">
+              <Key size={17} />
+            </div>
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              className={`db-input pl-10! pr-11! ${confirmPassword && formData.password !== confirmPassword ? "border-red-500/50!" : ""}`}
+              placeholder="••••••••"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+            <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1">
+              {confirmPassword && formData.password === confirmPassword && (
+                <Check size={16} className="text-(--db-primary)" />
+              )}
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="text-(--db-text-muted) hover:text-(--db-text) transition-colors p-0.5"
+              >
+                {showConfirmPassword ? <EyeSlash size={17} /> : <Eye size={17} />}
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div>
-              <label className="font-black text-[10px] uppercase mb-1 block text-(--db-text)">Re-enter Password</label>
-              <div className="relative">
-                  <input 
-                      type={showConfirmPassword ? "text" : "password"} 
-                      name="confirmPassword"
-                      autoComplete="new-password"
-                      className={`w-full bg-(--db-bg) border-2 border-(--db-border) px-3 py-2 text-sm font-bold text-(--db-text) db-input-focus placeholder:font-normal placeholder:text-(--db-text-muted) pr-10 ${
-                          confirmPassword && formData.password !== confirmPassword ? "border-red-500 shadow-[4px_4px_0px_0px_rgba(239,68,68,0.4)]" : ""
-                      }`}
-                      placeholder="••••••••"
-                      value={confirmPassword} 
-                      onChange={(e) => setConfirmPassword(e.target.value)} 
-                      required 
-                  />
-                  
-                  <div className="absolute right-3 top-2.5 flex items-center gap-2">
-                      {confirmPassword && formData.password === confirmPassword && (
-                          <Check className="text-green-500 w-4 h-4" />
-                      )}
-                      <button
-                          type="button"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="text-(--db-text-muted) hover:text-(--db-text) hover:scale-125 transition-transform"
-                      >
-                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                  </div>
-              </div>
-          </div>
+        <div className="flex items-start gap-3 py-1">
+          <input
+            type="checkbox"
+            id="terms_agree_register"
+            className="mt-1 w-4 h-4 rounded accent-(--db-primary) cursor-pointer shrink-0"
+            checked={agreed}
+            onChange={(e) => setAgreed(e.target.checked)}
+          />
+          <label htmlFor="terms_agree_register" className="text-[9px] font-bold uppercase text-(--db-text-muted) leading-tight cursor-pointer">
+            I accept the <Link href="/terms" target="_blank" className="text-(--db-primary) hover:underline">Terms</Link> & <Link href="/privacy" target="_blank" className="text-(--db-primary) hover:underline">Privacy_Protocol</Link>.
+          </label>
+        </div>
 
-          <div className="flex items-center gap-2 mt-2">
-              <input 
-                  type="checkbox" 
-                  id="terms_agree_register" 
-                  className="w-4 h-4 accent-(--db-primary) cursor-pointer shrink-0" 
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-              />
-              <label htmlFor="terms_agree_register" className="text-[10px] font-bold text-(--db-text-muted) cursor-pointer select-none leading-tight">
-                  I agree to the <Link href="/terms" target="_blank" className="underline hover:text-(--db-text)">Terms of Service</Link> & <Link href="/privacy" target="_blank" className="underline hover:text-(--db-text)">Privacy Policy</Link>.
-              </label>
+        <button
+          type="submit"
+          disabled={loading || !agreed}
+          className="btn-primary w-full py-3.5 text-xs tracking-widest mt-2 shadow-lg shadow-(--db-primary)/20 disabled:opacity-40"
+        >
+          {loading ? <CircleNotch size={20} className="animate-spin" /> : "INITIALIZE_ACCOUNT"}
+        </button>
+
+        {error && (
+          <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[9px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+            <Warning size={16} weight="fill" className="shrink-0" /> {error}
           </div>
-          
-          <div className="min-h-12 flex items-center">
-             {error && (
-                <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)] text-[10px] w-full animate-error-shake">
-                    ❌ {error}
-                </div>
-             )}
-          </div>
-          
-          <button 
-              type="submit" 
-              disabled={loading || !agreed} 
-              className="w-full mt-0 bg-(--db-text) text-(--db-bg) border-2 border-(--db-border) py-3 font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[8px_8px_0px_0px_var(--db-border)] hover:scale-[1.02] active:scale-[0.98] active:translate-y-0 transition-all disabled:opacity-50 text-sm disabled:cursor-not-allowed"
-          >
-              {loading ? <Loader2 className="animate-spin mx-auto w-5 h-5"/> : "CREATE ACCOUNT"}
-          </button>
-        </form>
+        )}
+      </form>
+
+      <div className="mt-8 text-center pt-6 border-t border-(--db-border)/30">
+        <span className="nothing-label text-[9px] mr-2">Authorized_Already?</span>
+        <Link href="/" className="nothing-label text-[9px] text-(--db-primary) font-black border-b border-transparent hover:border-(--db-primary) transition-all">
+          LOGIN_HERE
+        </Link>
       </div>
     </div>
   );

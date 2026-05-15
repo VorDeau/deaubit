@@ -1,28 +1,22 @@
 //app/verify/page.tsx
 
-import DeauBitLogo from "@/components/DeauBitLogo";
 import VerifyForm from "@/components/VerifyForm";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "@phosphor-icons/react/dist/ssr";
 
 export default function VerifyPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12">
-      
-      <div className="w-full max-w-md space-y-6">
-        <div className="flex justify-center mb-4">
-            <DeauBitLogo size={60} />
-        </div>
-
-        <VerifyForm />
-
-        <div className="text-center">
-          <Link href="/register" className="inline-flex items-center gap-2 font-bold text-sm text-(--db-text-muted) hover:text-(--db-text) transition-colors">
-            <ArrowLeft className="h-4 w-4" /> Incorrect Email? Go Back
-          </Link>
-        </div>
+    <div className="db-card w-full max-w-md mx-auto p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border) space-y-8">
+      <VerifyForm />
+      <div className="text-center border-t border-(--db-border)/30 pt-6">
+        <Link
+          href="/register"
+          className="nothing-label text-[9px] hover:text-(--db-text) flex items-center justify-center gap-2 transition-colors"
+        >
+          <ArrowLeft size={12} />
+          <span className="underline">INCORRECT_EMAIL?_BACK</span>
+        </Link>
       </div>
-
     </div>
   );
 }

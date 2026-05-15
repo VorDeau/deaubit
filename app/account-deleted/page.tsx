@@ -4,38 +4,37 @@
 
 import DeauBitLogo from "@/components/DeauBitLogo";
 import Link from "next/link";
-import { UserX, ArrowRight } from "lucide-react";
+import { UserMinus, ArrowRight, ShieldSlash } from "@phosphor-icons/react";
 
 export default function AccountDeletedPage() {
   return (
-    <div className="w-full max-w-md bg-(--db-surface) border-4 border-(--db-border) p-8 shadow-[12px_12px_0px_0px_var(--db-border)] text-center animate-in zoom-in-95 duration-300">
-      
-      <div className="flex justify-center mb-6">
-        <DeauBitLogo size={60} />
+    <div className="db-card w-full max-w-md mx-auto p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+
+      <div className="flex justify-center mb-8">
+        <DeauBitLogo size={48} />
       </div>
 
-      <div className="inline-block p-4 bg-(--db-text) border-4 border-(--db-border) rounded-full mb-6 shadow-[4px_4px_0px_0px_var(--db-border)] text-(--db-bg)">
-         <UserX className="h-10 w-10" />
+      <div className="inline-flex p-6 bg-(--db-danger)/10 text-(--db-danger) rounded-3xl mb-8">
+        <ShieldSlash size={40} className="animate-soft-pulse" />
       </div>
 
-      <h1 className="text-3xl font-black uppercase text-(--db-text) mb-2">ACCOUNT DELETED</h1>
-      <p className="text-sm font-bold text-(--db-text-muted) mb-8 leading-relaxed">
-        We&apos;re sorry to see you go. Your account and all associated data have been permanently removed from our servers.
-      </p>
+      <div className="space-y-3 mb-10">
+        <h1 className="nothing-title text-3xl text-(--db-text)">ACCOUNT_TERMINATED</h1>
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <UserMinus size={12} className="text-(--db-danger)" />
+          <span className="nothing-label text-(--db-danger) text-[9px] opacity-100">Identity_Purged_Successfully</span>
+        </div>
+        <p className="nothing-label normal-case tracking-normal opacity-40 text-[10px] leading-relaxed max-w-xs mx-auto pt-2">
+          All associated data, shortlink mappings, and analytics records have been permanently removed from the system.
+        </p>
+      </div>
 
       <div className="space-y-3">
-        <Link 
-            href="/"
-            className="flex items-center justify-center gap-2 w-full bg-(--db-primary) text-(--db-primary-fg) py-4 font-black uppercase border-2 border-(--db-border) hover:shadow-[6px_6px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all"
-        >
-            Back to Home <ArrowRight className="h-5 w-5" />
+        <Link href="/" className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20">
+          RETURN_TO_SYSTEM <ArrowRight size={16} />
         </Link>
-        
-        <Link 
-            href="/register"
-            className="flex items-center justify-center gap-2 w-full bg-(--db-surface) text-(--db-text) py-3 font-bold uppercase border-2 border-transparent hover:border-(--db-border) transition-all text-xs tracking-widest"
-        >
-            Create New Account
+        <Link href="/register" className="btn-secondary w-full py-3 text-[10px] nothing-label opacity-100">
+          INITIALIZE_NEW_IDENTITY
         </Link>
       </div>
     </div>

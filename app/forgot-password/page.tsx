@@ -4,9 +4,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Loader2, Mail, ArrowLeft, KeyRound, CheckCircle2, AlertCircle } from "lucide-react";
-import DeauBitLogo from "@/components/DeauBitLogo";
-import ChallengeModal from "@/components/ChallengeModal";
+import { CircleNotch, Envelope, ArrowLeft, Key, CheckCircle, Warning } from "@phosphor-icons/react";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -14,30 +12,16 @@ export default function ForgotPasswordPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [showChallenge, setShowChallenge] = useState(false);
-  const [pendingAction, setPendingAction] = useState<((token: string) => void) | null>(null);
-
-  async function performReset(token?: string) {
-    setLoading(true);
-    setError(null);
-
+  async function performReset() {
+    setLoading(true); setError(null);
     try {
       const res = await fetch("/api/auth/forgot-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, cfTurnstile: token }),
+        body: JSON.stringify({ email }),
       });
-
       const data = await res.json();
-      if (!res.ok) {
-          if (res.status === 400 && data.error?.includes("Security")) {
-              setPendingAction(() => (t: string) => performReset(t));
-              setShowChallenge(true);
-              return;
-          }
-          throw new Error(data.error || "Request failed");
-      }
-
+      if (!res.ok) throw new Error(data.error || "Request failed");
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -51,93 +35,76 @@ export default function ForgotPasswordPage() {
     await performReset();
   }
 
-  const handleChallengeSuccess = (token: string) => {
-    setShowChallenge(false);
-    if (pendingAction) {
-        pendingAction(token);
-        setPendingAction(null);
-    }
-  };
-
   if (success) {
-      return (
-        <div className="min-h-screen bg-(--db-bg) flex items-center justify-center p-4">
-             <div className="w-full max-w-md bg-(--db-surface) border-4 border-(--db-border) p-8 shadow-[8px_8px_0px_0px_var(--db-border)] text-center">
-                <div className="inline-flex p-4 bg-(--db-success) border-4 border-(--db-border) rounded-full mb-6 shadow-[4px_4px_0px_0px_var(--db-border)]">
-                    <CheckCircle2 className="h-12 w-12 text-white" />
-                </div>
-                <h2 className="text-2xl font-black uppercase text-(--db-text) mb-2">CHECK YOUR INBOX</h2>
-                <p className="text-sm font-bold text-(--db-text-muted) mb-8">
-                    If an account exists for {email}, we have sent password reset instructions.
-                </p>
-                <Link href="/" className="block w-full bg-(--db-text) text-(--db-bg) py-4 font-black uppercase border-2 border-(--db-border) hover:shadow-[6px_6px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all">
-                    BACK TO LOGIN
-                </Link>
-             </div>
+    return (
+      <div className="db-card w-full max-w-md mx-auto p-10 text-center animate-reveal shadow-2xl border-(--db-border)">
+        <div className="inline-flex p-6 bg-(--db-primary)/15 text-(--db-primary) rounded-3xl mb-8">
+          <CheckCircle size={44} weight="fill" />
         </div>
-      );
+        <div className="space-y-3 mb-10">
+          <p className="nothing-label text-(--db-primary) opacity-100">DISPATCH_SENT</p>
+          <h2 className="nothing-title text-2xl text-(--db-text)">CHECK_YOUR_INBOX</h2>
+          <p className="nothing-label normal-case tracking-normal opacity-40 text-[10px] leading-relaxed max-w-xs mx-auto">
+            Sent to: {email}. If that email exists in our system, reset instructions have been dispatched.
+          </p>
+        </div>
+        <Link href="/" className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20">
+          RETURN_TO_SYSTEM
+        </Link>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-(--db-bg) flex flex-col items-center justify-center p-4">
-      {showChallenge && (
-          <ChallengeModal 
-              onSuccess={handleChallengeSuccess}
-              onClose={() => setShowChallenge(false)}
-          />
-      )}
-      <div className="mb-8">
-           <DeauBitLogo size={60} />
+    <div className="db-card w-full max-w-md mx-auto p-8 sm:p-10 shadow-2xl animate-reveal border-(--db-border)">
+      <div className="flex items-center gap-4 mb-8 border-b border-(--db-border)/30 pb-6">
+        <div className="bg-(--db-primary)/15 p-3 rounded-2xl shrink-0">
+          <Key size={22} className="text-(--db-primary)" />
+        </div>
+        <div>
+          <h1 className="nothing-title text-xl text-(--db-text)">RECOVER_ACCESS</h1>
+          <p className="nothing-label text-[9px] opacity-50">Reset_Key_Protocol</p>
+        </div>
       </div>
-      
-      <div className="w-full max-w-md bg-(--db-surface) border-4 border-(--db-border) p-8 shadow-[12px_12px_0px_0px_var(--db-border)]">
-        
-        <div className="flex items-center gap-4 mb-8 border-b-4 border-(--db-border) pb-4">
-            <div className="bg-(--db-accent) p-3 border-2 border-(--db-border)">
-                <KeyRound className="h-6 w-6 text-(--db-accent-fg)" />
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2">
+          <label className="nothing-label block ml-1 text-[9px]">Identity_Email</label>
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+              <Envelope size={18} />
             </div>
-            <div>
-                <h1 className="text-xl font-black uppercase tracking-tighter text-(--db-text)">RESET PASSWORD</h1>
-                <p className="text-xs font-bold text-(--db-text-muted) uppercase">Recover Access</p>
-            </div>
+            <input
+              type="email"
+              required
+              className="db-input pl-10!"
+              placeholder="USER@SYSTEM.NET"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+            />
+          </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-                <label className="font-black text-xs uppercase tracking-wider mb-2 block text-(--db-text)">Email Address</label>
-                <div className="relative">
-                    <input 
-                        type="email" 
-                        required 
-                        className="w-full bg-(--db-bg) border-2 border-(--db-border) px-4 py-3 text-sm font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:font-normal"
-                        placeholder="user@example.com"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <Mail className="absolute right-4 top-3 text-(--db-text-muted) h-5 w-5" />
-                </div>
-            </div>
+        {error && (
+          <div className="bg-red-500/10 text-red-500 font-bold p-3 rounded-2xl border border-red-500/20 text-[10px] animate-error-shake flex items-center gap-3 uppercase tracking-widest">
+            <Warning size={15} weight="fill" className="shrink-0" /> {error}
+          </div>
+        )}
 
-            {error && (
-                <div className="bg-(--db-danger) text-white text-xs font-bold p-3 border-2 border-(--db-border) flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2">
-                    <AlertCircle className="h-4 w-4"/> {error}
-                </div>
-            )}
+        <button
+          type="submit"
+          disabled={loading}
+          className="btn-primary w-full py-4 text-xs tracking-[0.2em] shadow-lg shadow-(--db-primary)/20 disabled:opacity-40"
+        >
+          {loading ? <CircleNotch size={20} className="animate-spin" /> : "DISPATCH_RESET_LINK"}
+        </button>
+      </form>
 
-            <button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-(--db-primary) text-(--db-primary-fg) border-2 border-(--db-border) py-4 font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] active:translate-y-0 active:shadow-none transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                {loading ? <Loader2 className="animate-spin mx-auto h-5 w-5"/> : "SEND RESET LINK"}
-            </button>
-        </form>
-
-        <div className="mt-6 text-center">
-            <Link href="/" className="inline-flex items-center gap-2 text-xs font-bold text-(--db-text-muted) hover:text-(--db-text) transition-colors">
-                <ArrowLeft className="h-3 w-3" /> Back to Login
-            </Link>
-        </div>
+      <div className="mt-8 text-center pt-6 border-t border-(--db-border)/30">
+        <Link href="/" className="nothing-label text-[10px] hover:text-(--db-primary) flex items-center justify-center gap-2 transition-colors">
+          <ArrowLeft size={13} /> BACK_TO_SYSTEM
+        </Link>
       </div>
     </div>
   );

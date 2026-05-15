@@ -1,127 +1,158 @@
 # DeauBit
 
-DeauBit adalah aplikasi URL shortener self-hosted yang modern dan berfokus pada privasi. Dibangun dengan Next.js dan PostgreSQL.
+Self-hosted URL shortener with analytics, QR codes, and abuse reporting. Runs on Cloudflare Workers with D1 (SQLite) and KV.
 
-## Fitur
+## Stack
 
-- **Shortening:** Membuat tautan pendek kustom atau acak.
-- **Autentikasi:** Sistem akun lengkap (Login, Register, OTP, Reset Password).
-- **Analitik:** Statistik klik, browser, OS, lokasi, dan referer.
-- **QR Code:** Generate QR Code otomatis untuk setiap tautan.
-- **Password Protection:** Opsi mengunci tautan dengan kata sandi.
-- **Expiry Date:** Mengatur tanggal kadaluarsa untuk tautan.
-- **Rate Limiting:** Perlindungan anti-spam ringan menggunakan *In-Memory Map*.
-- **Bot Protection:** Integrasi Cloudflare Turnstile untuk mencegah bot pada halaman Login & Register.
-- **Setup Wizard:** Halaman instalasi awal untuk membuat akun admin.
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 16 (static export) |
+| Backend | Hono.js on Cloudflare Workers |
+| Database | Cloudflare D1 (SQLite) |
+| Sessions | Cloudflare KV |
+| Email | Resend API |
+| Bot protection | Cloudflare Turnstile |
+| Styling | Tailwind CSS v4 |
 
-## Teknologi
+## Features
 
-- **Runtime:** Bun
-- **Framework:** Next.js 16 (App Router)
-- **Database:** PostgreSQL (Prisma ORM)
-- **Security:** Cloudflare Turnstile
-- **Styling:** Tailwind CSS v4
-- **Email:** Nodemailer (SMTP)
+- Custom or auto-generated short slugs
+- Password-protected links
+- Self-destruct (expiry date)
+- Click analytics (browser, OS, country, referrer)
+- QR code generation
+- Abuse reporting system
+- Admin panel
+- Dark theme, Nothing OS aesthetic
 
-## Prasyarat
+---
 
-Pastikan server Anda memiliki:
-- **Node.js**
-- **PostgreSQL Database**
+## Local Setup
 
-## Instalasi
+### Prerequisites
 
-1.  **Clone Repository**
-    ```bash
-    git clone https://github.com/j58c/deaubit.git
-    cd deaubit
-    ```
+- Node.js 20+
+- Wrangler CLI (`npm i -g wrangler`)
+- Cloudflare account
 
-2.  **Install Dependencies**
-    Menggunakan Bun package manager:
-    ```bash
-    npm install
-    ```
-
-3.  **Konfigurasi Environment**
-    Salin `.env.example` ke `.env` dan sesuaikan isinya:
-
-    ```env
-    # Database
-    DATABASE_URL="postgresql://user:pass@localhost:5432/deaubit_db"
-
-    # App Config
-    NEXT_PUBLIC_APP_HOST="localhost:3000"
-    NEXT_PUBLIC_SHORT_HOST="localhost:3000"
-    NEXT_PUBLIC_PROTOCOL="http"
-    NEXT_PUBLIC_BASE_URL="http://localhost:3000"
-
-    # Security (Wajib diganti dengan string acak)
-    JWT_SECRET="rahasia_jwt_panjang_acak"
-    CRON_SECRET="rahasia_cron_job"
-    
-    # Cloudflare Turnstile (Wajib untuk Login/Register)
-    NEXT_PUBLIC_TURNSTILE_SITE_KEY="<SITE_KEY_DARI_CLOUDFLARE>"
-    TURNSTILE_SECRET_KEY="<SECRET_KEY_DARI_CLOUDFLARE>"
-
-    # SMTP Email (Wajib untuk OTP & Reset Password)
-    SMTP_HOST="smtp.provider.com"
-    SMTP_PORT="587"
-    SMTP_USER="email@domain.com"
-    SMTP_PASS="password_smtp"
-    SMTP_FROM="DeauBit <noreply@domain.com>"
-    
-    # Abuse Report
-    ABUSE_REPORT_EMAIL="admin@domain.com"
-    ```
-
-4.  **Setup Database**
-    Generate client Prisma untuk runtime Bun:
-    ```bash
-    npx prisma generate
-    npx prisma db push
-    ```
-
-5.  **Jalankan Server**
-    Untuk pengembangan (Development):
-    ```bash
-    npm dev
-    ```
-
-    Untuk produksi (Production):
-    ```bash
-    npm run build
-    npm run start
-    ```
-
-## Setup Admin
-
-Setelah aplikasi berjalan, Anda wajib membuat akun Administrator pertama untuk mengelola sistem:
-
-1. Buka browser dan akses: `http://localhost:3000/setup`
-2. Isi nama, email, dan password untuk akun root.
-3. Masukkan kode OTP yang dikirim ke email.
-4. Halaman setup akan terkunci otomatis setelah admin dibuat.
-
-## Cron Job (Pembersihan Link)
-
-Untuk menghapus tautan yang sudah kadaluarsa secara otomatis, buat cron job yang memanggil endpoint API berikut (misal: setiap jam):
+### 1. Install dependencies
 
 ```bash
-curl -X POST http://localhost:3000/api/cron/cleanup \
-     -H "Authorization: Bearer RAHASIA_CRON_JOB"
+npm install
+cd worker && npm install && cd ..
 ```
-*Ganti `RAHASIA_CRON_JOB` sesuai nilai `CRON_SECRET` di file .env.*
 
-## Docker Deployment
+### 2. Configure environment
 
-Build dan jalankan menggunakan Docker:
+Create `.env.local` in the root:
+
+```env
+NEXT_PUBLIC_APP_HOST=localhost:3000
+NEXT_PUBLIC_SHORT_HOST=localhost:3000
+NEXT_PUBLIC_PROTOCOL=http
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_turnstile_site_key
+```
+
+### 3. Create Cloudflare resources
 
 ```bash
-docker build -t deaubit .
-docker run -p 3000:3000 --env-file .env deaubit
+cd worker
+
+# Create D1 database
+npx wrangler d1 create deaubit-db
+# Copy the database_id to wrangler.toml
+
+# Create KV namespace
+npx wrangler kv namespace create SESSION
+# Copy the id to wrangler.toml
+
+# Apply database migrations
+npx wrangler d1 migrations apply deaubit-db --local
 ```
 
-## Lisensi
+### 4. Set secrets
 
-[MIT License](LICENSE)
+```bash
+npx wrangler secret put JWT_SECRET
+npx wrangler secret put TURNSTILE_SECRET_KEY
+npx wrangler secret put RESEND_API_KEY
+```
+
+### 5. Run locally
+
+```bash
+# Terminal 1 — Next.js frontend
+npm run dev
+
+# Terminal 2 — Hono Worker
+cd worker && npm run dev
+```
+
+---
+
+## Production Deployment
+
+### 1. Build frontend
+
+```bash
+NEXT_PUBLIC_APP_HOST=your-domain.com \
+NEXT_PUBLIC_TURNSTILE_SITE_KEY=your_key \
+NEXT_PUBLIC_PROTOCOL=https \
+npm run build
+```
+
+### 2. Apply remote migrations
+
+```bash
+cd worker
+npx wrangler d1 migrations apply deaubit-db --remote
+```
+
+### 3. Deploy
+
+```bash
+cd worker
+npm run deploy
+```
+
+### 4. Setup admin account
+
+Visit `https://your-domain.com/setup` to create the first admin account.
+
+---
+
+## Environment Variables Reference
+
+### Frontend (build-time, `NEXT_PUBLIC_*`)
+
+| Variable | Description |
+|---|---|
+| `NEXT_PUBLIC_APP_HOST` | Your domain (e.g. `example.com`) |
+| `NEXT_PUBLIC_SHORT_HOST` | Short URL host (can be same as APP_HOST) |
+| `NEXT_PUBLIC_PROTOCOL` | `https` in production |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile site key (public) |
+
+### Worker (via `wrangler secret put`)
+
+| Variable | Description |
+|---|---|
+| `JWT_SECRET` | Random string, min 32 chars |
+| `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile secret key |
+| `RESEND_API_KEY` | From resend.com dashboard |
+
+### Worker (via `wrangler.toml [vars]`)
+
+| Variable | Description |
+|---|---|
+| `APP_HOST` | Your domain |
+| `SHORT_HOST` | Short URL host |
+| `PROTOCOL` | `https` |
+| `TURNSTILE_SITE_KEY` | Same as NEXT_PUBLIC_TURNSTILE_SITE_KEY |
+| `MAIL_FROM` | Sender email address |
+| `MAIL_FROM_NAME` | Sender display name |
+
+---
+
+## License
+
+MIT

@@ -4,7 +4,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { X, Download, Loader2, QrCode } from "lucide-react";
+import { X, DownloadSimple, CircleNotch, QrCode } from "@phosphor-icons/react";
 
 interface QrCodeModalProps { slug: string; shortUrl: string; onClose: () => void; }
 
@@ -12,85 +12,107 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
   const [downloading, setDownloading] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
-  
-  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=5&data=${encodeURIComponent(shortUrl)}`;
 
+  // Preview: lime on dark (embedded style)
+  const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&color=163-230-53&bgcolor=10-10-10&data=${encodeURIComponent(shortUrl)}`;
+  // Download: classic black on white
   const downloadApiUrl = `/api/qr-download?url=${encodeURIComponent(shortUrl)}`;
 
   const handleDownload = async () => {
-    setDownloading(true);
-    setDownloadError(false);
+    setDownloading(true); setDownloadError(false);
     try {
       const response = await fetch(downloadApiUrl);
       const blob = await response.blob();
-      
       const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a'); 
-      link.href = url; 
+      const link = document.createElement("a");
+      link.href = url;
       link.download = `deaubit-${slug}.png`;
-      
-      document.body.appendChild(link); 
-      link.click(); 
-      document.body.removeChild(link); 
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
-    } catch { 
+    } catch {
       setDownloadError(true);
-    } finally { 
-      setDownloading(false); 
+    } finally {
+      setDownloading(false);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="db-card relative w-full max-w-sm p-6 shadow-[12px_12px_0px_0px_var(--db-border)] space-y-6">
-        
-        <div className="flex items-center justify-between border-b-4 border-(--db-border) pb-4">
-          <div>
-            <h3 className="text-lg font-black uppercase flex items-center gap-2 text-(--db-text)">
-              <QrCode className="h-5 w-5" /> QR CODE
-            </h3>
-            <p className="text-xs font-mono bg-(--db-accent) text-black px-1 inline-block mt-1">/{slug}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 db-overlay animate-reveal">
+      <div className="db-card animate-modal-in relative w-full max-w-xs shadow-2xl">
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-(--db-border)">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-(--db-primary)/15 text-(--db-primary) rounded-xl">
+              <QrCode size={16} />
+            </div>
+            <div>
+              <h3 className="nothing-title text-sm text-(--db-text)">QR_CODE</h3>
+              <p className="nothing-label text-[8px] opacity-40 mt-0.5">/{slug}</p>
+            </div>
           </div>
-          <button onClick={onClose} className="border-2 border-(--db-border) p-1 hover:bg-red-500 hover:text-white transition-colors"><X className="h-5 w-5"/></button>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-full hover:bg-(--db-surface-hover) opacity-30 hover:opacity-100 transition-all group"
+          >
+            <X size={16} className="group-hover:rotate-90 transition-transform duration-300" />
+          </button>
         </div>
 
-        <div className="bg-white border-4 border-(--db-border) p-2 flex items-center justify-center aspect-square relative min-h-75 overflow-hidden">
-          <div className="qr-scan-line z-20" />
-          
-          {!imgLoaded && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 z-10">
-               <Loader2 className="h-10 w-10 animate-spin text-black" />
-               <p className="text-[10px] font-black text-black uppercase animate-pulse tracking-widest">Generating...</p>
-            </div>
+        <div className="p-5 space-y-4">
+
+          {/* QR — colored preview embedded into card */}
+          <div className="relative rounded-2xl overflow-hidden bg-(--db-surface-hover) aspect-square border border-(--db-border) flex items-center justify-center">
+            {!imgLoaded && (
+              <CircleNotch size={28} className="animate-spin text-(--db-primary)" />
+            )}
+            <Image
+              src={previewQrUrl}
+              alt={`QR ${slug}`}
+              width={320}
+              height={320}
+              className={`w-full h-full object-contain transition-opacity duration-300 ${imgLoaded ? "opacity-100" : "opacity-0 absolute"}`}
+              onLoad={() => setImgLoaded(true)}
+              unoptimized
+            />
+          </div>
+
+          {/* URL */}
+          <div className="px-3 py-2.5 rounded-xl border border-(--db-border) bg-(--db-surface)">
+            <p className="nothing-label text-[8px] opacity-40 mb-0.5">Short_URL</p>
+            <p className="font-dot text-xs text-(--db-text) truncate opacity-60">
+              {shortUrl.replace(/^https?:\/\//, "")}
+            </p>
+          </div>
+
+          {downloadError && (
+            <p className="text-red-500 font-bold text-[10px] text-center uppercase tracking-widest">
+              DOWNLOAD_FAILED
+            </p>
           )}
 
-          <Image 
-            src={previewQrUrl} 
-            alt={`QR ${slug}`} 
-            width={300}
-            height={300}
-            className={`w-full h-full object-contain transition-opacity duration-300 ${imgLoaded ? 'opacity-100 animate-qr-pulse' : 'opacity-0'}`} 
-            onLoad={() => setImgLoaded(true)}
-            unoptimized
-          />
-        </div>
-        
-        {downloadError && (
-          <div className="bg-(--db-danger) text-white text-xs font-bold p-2 border-2 border-(--db-border) text-center">
-            DOWNLOAD FAILED. TRY AGAIN.
+          {/* Actions */}
+          <div className="flex gap-3">
+            <button type="button" onClick={onClose} className="btn-secondary flex-1 py-3 text-[10px] nothing-label opacity-100">
+              CLOSE
+            </button>
+            <button
+              onClick={handleDownload}
+              disabled={downloading || !imgLoaded}
+              className="btn-primary flex-1 py-3 text-[10px] nothing-label opacity-100 shadow-lg shadow-(--db-primary)/20 disabled:opacity-30"
+            >
+              {downloading
+                ? <CircleNotch size={14} className="animate-spin" />
+                : <><DownloadSimple size={14} /> SAVE</>
+              }
+            </button>
           </div>
-        )}
 
-        <div className="flex gap-3">
-          <button onClick={onClose} className="flex-1 py-3 font-bold border-2 border-(--db-border) hover:bg-(--db-bg) text-(--db-text)">CLOSE</button>
-          
-          <button 
-            onClick={handleDownload} 
-            disabled={downloading || !imgLoaded} 
-            className="flex-1 py-3 font-bold bg-(--db-primary) text-white border-2 border-(--db-border) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {downloading ? <Loader2 className="h-4 w-4 animate-spin"/> : <><Download className="h-4 w-4"/> DOWNLOAD</>}
-          </button>
+          <p className="nothing-label text-[8px] text-center opacity-20 normal-case tracking-normal">
+            Download saves as black & white
+          </p>
         </div>
       </div>
     </div>

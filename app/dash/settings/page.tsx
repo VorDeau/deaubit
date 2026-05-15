@@ -3,431 +3,340 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { User, Lock, Loader2, Save, Shield, Trash2, AlertTriangle, X, ArrowLeft, Check, Eye, EyeOff, ChevronDown, ChevronUp, RefreshCw } from "lucide-react";
-import Link from "next/link";
+import { User, Lock, CircleNotch, Shield, Trash, Warning, X, Check, Eye, EyeSlash, ArrowClockwise } from "@phosphor-icons/react";
 
 export default function SettingsPage() {
-  
+
   const [name, setName] = useState("");
   const [loadingProfile, setLoadingProfile] = useState(false);
   const [profileMessage, setProfileMessage] = useState("");
   const [profileError, setProfileError] = useState("");
-  const [isProfileExpanded, setIsProfileExpanded] = useState(true);
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmNewPassword, setConfirmNewPassword] = useState(""); 
-  const [showNewPassword, setShowNewPassword] = useState(false); 
+  const [confirmNewPassword, setConfirmNewPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
   const [loadingSecurity, setLoadingSecurity] = useState(false);
   const [securityMessage, setSecurityMessage] = useState("");
   const [securityError, setSecurityError] = useState("");
-  const [isSecurityExpanded, setIsSecurityExpanded] = useState(false);
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deletePassword, setDeletePassword] = useState("");
-  const [deleteOtp, setDeleteOtp] = useState(""); 
+  const [deleteOtp, setDeleteOtp] = useState("");
   const [showOtpInput, setShowOtpInput] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteError, setDeleteError] = useState("");
-
   const [resendCooldown, setResendCooldown] = useState(0);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendMessage, setResendMessage] = useState("");
 
   useEffect(() => {
     fetch("/api/session").then(r => r.json()).then(data => {
-        if(data.user?.name) setName(data.user.name);
+      if (data.user?.name) setName(data.user.name);
     });
   }, []);
 
   useEffect(() => {
     if (resendCooldown > 0) {
-        const timer = setInterval(() => setResendCooldown(prev => prev - 1), 1000);
-        return () => clearInterval(timer);
+      const t = setInterval(() => setResendCooldown(p => p - 1), 1000);
+      return () => clearInterval(t);
     }
   }, [resendCooldown]);
 
   async function handleUpdateProfile(e: React.FormEvent) {
     e.preventDefault();
     setLoadingProfile(true); setProfileMessage(""); setProfileError("");
-
     try {
       const res = await fetch("/api/auth/update-profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name }),
       });
-      
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Update failed");
-      
-      setProfileMessage("NAME UPDATED");
+      setProfileMessage("NAME_UPDATED");
     } catch (err) {
-      setProfileError(err instanceof Error ? err.message : "Failed to update profile");
-    } finally {
-      setLoadingProfile(false);
-    }
+      setProfileError(err instanceof Error ? err.message : "Update failed");
+    } finally { setLoadingProfile(false); }
   }
 
   async function handleUpdateSecurity(e: React.FormEvent) {
     e.preventDefault();
     setLoadingSecurity(true); setSecurityMessage(""); setSecurityError("");
-
-    if (!newPassword || !oldPassword) {
-        setSecurityError("Please fill in all password fields.");
-        setLoadingSecurity(false);
-        return;
-    }
-
-    if (newPassword !== confirmNewPassword) {
-        setSecurityError("New passwords do not match.");
-        setLoadingSecurity(false);
-        return;
-    }
-
+    if (!newPassword || !oldPassword) { setSecurityError("Fill in all fields."); setLoadingSecurity(false); return; }
+    if (newPassword !== confirmNewPassword) { setSecurityError("Keys do not match."); setLoadingSecurity(false); return; }
     try {
       const res = await fetch("/api/auth/update-profile", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ oldPassword, newPassword }),
       });
-      
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Update failed");
-      
-      setSecurityMessage("PASSWORD UPDATED");
+      setSecurityMessage("KEYS_ROTATED");
       setOldPassword(""); setNewPassword(""); setConfirmNewPassword("");
     } catch (err) {
-      setSecurityError(err instanceof Error ? err.message : "Failed to update password");
-    } finally {
-      setLoadingSecurity(false);
-    }
+      setSecurityError(err instanceof Error ? err.message : "Update failed");
+    } finally { setLoadingSecurity(false); }
   }
 
   async function handleDeleteAccount(e: React.FormEvent) {
     e.preventDefault();
     setDeleteLoading(true); setDeleteError("");
-
     try {
       const res = await fetch("/api/auth/delete-account", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-            password: deletePassword,
-            otp: showOtpInput ? deleteOtp : undefined
-        }),
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password: deletePassword, otp: showOtpInput ? deleteOtp : undefined }),
       });
-
       const data = await res.json();
-
-      if (!res.ok) throw new Error(data.error || "Failed to delete account");
-
-      if (data.requireOtp) {
-          setShowOtpInput(true);
-          setDeleteLoading(false);
-          setResendCooldown(60);
-          return;
-      }
-
-      window.location.href = "/account-deleted"; 
+      if (!res.ok) throw new Error(data.error || "Failed");
+      if (data.requireOtp) { setShowOtpInput(true); setDeleteLoading(false); setResendCooldown(60); return; }
+      window.location.href = "/account-deleted";
     } catch (err) {
-      setDeleteError(err instanceof Error ? err.message : "Gagal");
+      setDeleteError(err instanceof Error ? err.message : "Error");
       setDeleteLoading(false);
     }
   }
 
   async function handleResendDeleteCode() {
     if (resendCooldown > 0) return;
-    setResendLoading(true);
-    setResendMessage("");
+    setResendLoading(true); setResendMessage("");
     try {
-        const res = await fetch("/api/auth/resend-delete-code", { method: "POST" });
-        if(!res.ok) throw new Error("Failed");
-        setResendCooldown(60);
-        setResendMessage("Code sent to your email.");
-    } catch {
-        setDeleteError("Failed to resend verification code.");
-    } finally {
-        setResendLoading(false);
-    }
+      const res = await fetch("/api/auth/resend-delete-code", { method: "POST" });
+      if (!res.ok) throw new Error("Failed");
+      setResendCooldown(60);
+      setResendMessage("Code dispatched.");
+    } catch { setDeleteError("Dispatch failed."); }
+    finally { setResendLoading(false); }
   }
 
   const closeDeleteModal = () => {
-      setShowDeleteModal(false);
-      setShowOtpInput(false);
-      setDeletePassword("");
-      setDeleteOtp("");
-      setDeleteError("");
+    setShowDeleteModal(false); setShowOtpInput(false);
+    setDeletePassword(""); setDeleteOtp(""); setDeleteError("");
   };
 
   return (
-    <div className="w-full max-w-4xl space-y-8 pb-20"> 
-      
-      <div className="border-b-4 border-(--db-border) pb-4 lg:pb-6">
-        <Link 
-          href="/dash" 
-          className="inline-flex items-center gap-2 mb-4 lg:mb-6 px-3 py-1.5 bg-(--db-surface) border-2 border-(--db-border) font-black text-[10px] lg:text-xs uppercase tracking-widest text-(--db-text) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all"
-        >
-            <ArrowLeft className="h-3.5 w-3.5" /> Back to Dashboard
-        </Link>
-        <h1 className="text-3xl lg:text-4xl font-black uppercase tracking-tighter text-(--db-text)">Account Settings</h1>
-        <p className="text-xs lg:text-sm font-bold text-(--db-text-muted) mt-1">Manage your identity & security preferences.</p>
+    <div className="max-w-2xl mx-auto flex flex-col gap-5 sm:gap-6 pb-20">
+
+      {/* ── Header ── */}
+      <div className="space-y-2 px-1">
+        <h1 className="text-4xl sm:text-5xl nothing-title">SETTINGS</h1>
+        <p className="nothing-label normal-case tracking-normal opacity-40">Profile & security management</p>
       </div>
 
-      <div className="space-y-6">
-        
-        {}
-        <div className="db-card shadow-[6px_6px_0px_0px_var(--db-border)] transition-all">
-            <button 
-                onClick={() => setIsProfileExpanded(!isProfileExpanded)}
-                className="w-full flex items-center justify-between p-4 lg:p-5 hover:bg-(--db-bg) transition-colors focus:outline-none"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="bg-(--db-accent) p-2 border-2 border-(--db-border) shadow-[2px_2px_0px_0px_var(--db-border)]">
-                        <User className="h-5 w-5 lg:h-6 lg:w-6 text-(--db-accent-fg)" />
-                    </div>
-                    <div className="text-left">
-                        <h2 className="text-lg lg:text-xl font-black uppercase text-(--db-text) leading-none">Basic Profile</h2>
-                        <p className="text-[10px] font-bold text-(--db-text-muted) mt-1">Change your display name</p>
-                    </div>
-                </div>
-                {isProfileExpanded ? <ChevronUp className="h-6 w-6 text-(--db-text)"/> : <ChevronDown className="h-6 w-6 text-(--db-text)"/>}
-            </button>
-
-            {isProfileExpanded && (
-                <div className="p-4 lg:p-6 border-t-2 lg:border-t-4 border-(--db-border) animate-in slide-in-from-top-2">
-                    <form onSubmit={handleUpdateProfile} className="space-y-4">
-                        <div>
-                            <label className="font-black text-xs uppercase mb-1.5 block text-(--db-text-muted) tracking-wider">Display Name</label>
-                            <input 
-                                className="w-full bg-(--db-bg) border-2 border-(--db-border) p-3 lg:p-4 font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] focus:border-(--db-primary) transition-all placeholder:text-(--db-text-muted) placeholder:font-normal text-sm"
-                                placeholder="Your Name" 
-                                value={name}
-                                onChange={e => setName(e.target.value)}
-                            />
-                        </div>
-
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
-                            <div className="flex-1 w-full text-left">
-                                {profileMessage && <div className="p-2 bg-(--db-success) border-2 border-(--db-border) text-white font-bold text-xs text-center uppercase shadow-[2px_2px_0px_0px_var(--db-border)]">{profileMessage}</div>}
-                                {profileError && <div className="p-2 bg-(--db-danger) border-2 border-(--db-border) text-white font-bold text-xs text-center uppercase shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake">{profileError}</div>}
-                            </div>
-                            <button type="submit" disabled={loadingProfile} className="w-full md:w-auto bg-(--db-text) text-(--db-bg) py-3 px-6 border-2 border-(--db-border) font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] active:translate-y-0 active:shadow-[2px_2px_0px_0px_var(--db-border)] transition-all flex items-center justify-center gap-2 text-xs disabled:opacity-50">
-                                {loadingProfile ? <Loader2 className="h-4 w-4 animate-spin"/> : <><Save className="h-4 w-4"/> SAVE PROFILE</>}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
+      {/* ── Identity ── */}
+      <div className="db-card overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-(--db-border)/50">
+          <div className="p-2.5 bg-(--db-accent) rounded-xl shrink-0">
+            <User size={16} className="text-(--db-accent-fg)" />
+          </div>
+          <div>
+            <h2 className="nothing-title text-base text-(--db-text)">IDENTITY_CORE</h2>
+            <p className="nothing-label text-[9px] opacity-50 mt-0.5">Display name configuration</p>
+          </div>
         </div>
-
-        {}
-        <div className="db-card shadow-[6px_6px_0px_0px_var(--db-border)] transition-all">
-            <button 
-                onClick={() => setIsSecurityExpanded(!isSecurityExpanded)}
-                className="w-full flex items-center justify-between p-4 lg:p-5 hover:bg-(--db-bg) transition-colors focus:outline-none"
-            >
-                <div className="flex items-center gap-3">
-                    <div className="bg-(--db-primary) p-2 border-2 border-(--db-border) text-(--db-primary-fg) shadow-[2px_2px_0px_0px_var(--db-border)]">
-                        <Shield className="h-5 w-5 lg:h-6 lg:w-6" />
-                    </div>
-                    <div className="text-left">
-                        <h2 className="text-lg lg:text-xl font-black uppercase text-(--db-text) leading-none">Security</h2>
-                        <p className="text-[10px] font-bold text-(--db-text-muted) mt-1">Update your password</p>
-                    </div>
-                </div>
-                {isSecurityExpanded ? <ChevronUp className="h-6 w-6 text-(--db-text)"/> : <ChevronDown className="h-6 w-6 text-(--db-text)"/>}
-            </button>
-
-            {isSecurityExpanded && (
-                <div className="p-4 lg:p-6 border-t-2 lg:border-t-4 border-(--db-border) animate-in slide-in-from-top-2">
-                    <form onSubmit={handleUpdateSecurity} className="space-y-4 lg:space-y-6">
-                        
-                        <div>
-                            <label className="font-black text-xs uppercase mb-1.5 block text-(--db-text-muted) tracking-wider">Current Password</label>
-                            <div className="relative">
-                                <input 
-                                    type="password" 
-                                    className="w-full bg-(--db-bg) border-2 border-(--db-border) p-3 pl-10 lg:p-4 lg:pl-12 font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:text-(--db-text-muted) placeholder:font-normal text-sm"
-                                    placeholder="••••••••" 
-                                    value={oldPassword}
-                                    onChange={e => setOldPassword(e.target.value)}
-                                />
-                                <Lock className="absolute left-3.5 top-3.5 h-4 w-4 lg:h-5 lg:w-5 text-(--db-text-muted)" />
-                            </div>
-                        </div>
-
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div>
-                                <label className="font-black text-xs uppercase mb-1.5 block text-(--db-text-muted) tracking-wider">New Password</label>
-                                <div className="relative">
-                                    <input 
-                                        type={showNewPassword ? "text" : "password"}
-                                        className="w-full bg-(--db-bg) border-2 border-(--db-border) p-3 pl-10 pr-10 lg:p-4 lg:pl-12 font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:text-(--db-text-muted) placeholder:font-normal text-sm"
-                                        placeholder="Min. 6 chars" 
-                                        value={newPassword}
-                                        onChange={e => setNewPassword(e.target.value)}
-                                    />
-                                    <Lock className="absolute left-3.5 top-3.5 h-4 w-4 lg:h-5 lg:w-5 text-(--db-text-muted)" />
-                                    <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3.5 top-3.5 text-(--db-text-muted) hover:text-(--db-text)">
-                                        {showNewPassword ? <EyeOff className="h-4 w-4 lg:h-5 lg:w-5" /> : <Eye className="h-4 w-4 lg:h-5 lg:w-5" />}
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="font-black text-xs uppercase mb-1.5 block text-(--db-text-muted) tracking-wider">Confirm Password</label>
-                                <div className="relative">
-                                    <input 
-                                        type="password" 
-                                        className={`w-full bg-(--db-bg) border-2 border-(--db-border) p-3 pl-10 lg:p-4 lg:pl-12 font-bold text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-border)] transition-all placeholder:text-(--db-text-muted) placeholder:font-normal text-sm ${confirmNewPassword && newPassword !== confirmNewPassword ? "border-red-500" : ""}`}
-                                        placeholder="Retype password" 
-                                        value={confirmNewPassword}
-                                        onChange={e => setConfirmNewPassword(e.target.value)}
-                                    />
-                                    <Lock className="absolute left-3.5 top-3.5 h-4 w-4 lg:h-5 lg:w-5 text-(--db-text-muted)" />
-                                    {confirmNewPassword && newPassword === confirmNewPassword && (
-                                        <Check className="absolute right-3.5 top-3.5 h-4 w-4 lg:h-5 lg:w-5 text-green-500" />
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col md:flex-row items-center justify-between gap-4 pt-2">
-                            <div className="flex-1 w-full text-left">
-                                {securityMessage && <div className="p-2 bg-(--db-success) border-2 border-(--db-border) text-white font-bold text-xs text-center uppercase shadow-[2px_2px_0px_0px_var(--db-border)]">{securityMessage}</div>}
-                                {securityError && <div className="p-2 bg-(--db-danger) border-2 border-(--db-border) text-white font-bold text-xs text-center uppercase shadow-[2px_2px_0px_0px_var(--db-border)] animate-error-shake">{securityError}</div>}
-                            </div>
-                            <button type="submit" disabled={loadingSecurity} className="w-full md:w-auto bg-(--db-text) text-(--db-bg) py-3 px-6 border-2 border-(--db-border) font-black uppercase tracking-widest shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 hover:shadow-[6px_6px_0px_0px_var(--db-border)] active:translate-y-0 active:shadow-[2px_2px_0px_0px_var(--db-border)] transition-all flex items-center justify-center gap-2 text-xs disabled:opacity-50">
-                                {loadingSecurity ? <Loader2 className="h-4 w-4 animate-spin"/> : <><Save className="h-4 w-4"/> UPDATE PASSWORD</>}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            )}
-        </div>
-
-      </div>
-
-      <div className="mt-12 lg:mt-20 border-t-4 border-(--db-border) border-dashed pt-8 lg:pt-10">
-        <div className="flex items-center gap-3 mb-4 lg:mb-6">
-            <div className="bg-(--db-danger) p-1.5 lg:p-2 border-2 border-(--db-border) text-white shadow-[4px_4px_0px_0px_var(--db-border)]">
-                <AlertTriangle className="h-5 w-5 lg:h-6 lg:w-6" />
+        <form onSubmit={handleUpdateProfile} className="p-6 space-y-5">
+          <div className="space-y-2">
+            <label className="nothing-label block ml-1">Assigned_Name</label>
+            <input
+              className="db-input"
+              placeholder="User Identity"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-h-5">
+              {profileMessage && (
+                <span className="text-(--db-primary) font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5">
+                  <Check size={13} /> {profileMessage}
+                </span>
+              )}
+              {profileError && (
+                <span className="text-red-500 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 animate-error-shake">
+                  <Warning size={13} weight="fill" /> {profileError}
+                </span>
+              )}
             </div>
-            <h2 className="text-xl lg:text-2xl font-black uppercase text-(--db-danger)">Danger Zone</h2>
-        </div>
-
-        <div className="db-card border-4 border-(--db-danger) p-4 lg:p-6 shadow-[8px_8px_0px_0px_var(--db-danger)]">
-            <h3 className="text-base lg:text-lg font-black uppercase text-(--db-danger) mb-2">DELETE ACCOUNT PERMANENTLY</h3>
-            <p className="text-xs lg:text-sm font-bold text-(--db-text) mb-6">
-                Once you delete your account, there is no going back. All your shortlinks, analytics data, and settings will be permanently removed.
-            </p>
-            <button 
-                onClick={() => setShowDeleteModal(true)}
-                className="bg-(--db-danger) text-white font-black uppercase py-2.5 lg:py-3 px-6 border-2 border-(--db-border) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all flex items-center gap-2 text-xs lg:text-sm"
-            >
-                <Trash2 className="h-4 w-4 lg:h-5 lg:w-5" /> DELETE MY ACCOUNT
+            <button type="submit" disabled={loadingProfile} className="btn-primary px-7 py-3 text-xs tracking-widest shrink-0 disabled:opacity-40">
+              {loadingProfile ? <CircleNotch size={15} className="animate-spin" /> : "SAVE"}
             </button>
+          </div>
+        </form>
+      </div>
+
+      {/* ── Security ── */}
+      <div className="db-card overflow-hidden">
+        <div className="flex items-center gap-3 px-6 py-5 border-b border-(--db-border)/50">
+          <div className="p-2.5 bg-(--db-primary)/15 rounded-xl shrink-0">
+            <Shield size={16} className="text-(--db-primary)" />
+          </div>
+          <div>
+            <h2 className="nothing-title text-base text-(--db-text)">SECURITY_PROTOCOL</h2>
+            <p className="nothing-label text-[9px] opacity-50 mt-0.5">Access key rotation</p>
+          </div>
+        </div>
+        <form onSubmit={handleUpdateSecurity} className="p-6 space-y-5">
+          <div className="space-y-2">
+            <label className="nothing-label block ml-1">Current_Key</label>
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+                <Lock size={15} />
+              </div>
+              <input
+                type="password"
+                className="db-input pl-10!"
+                placeholder="••••••••"
+                value={oldPassword}
+                onChange={e => setOldPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="nothing-label block ml-1">New_Key</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+                  <Lock size={15} />
+                </div>
+                <input
+                  type={showNewPassword ? "text" : "password"}
+                  className="db-input pl-10! pr-10!"
+                  placeholder="Min. 8 chars"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                />
+                <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) hover:text-(--db-text) transition-colors">
+                  {showNewPassword ? <EyeSlash size={15} /> : <Eye size={15} />}
+                </button>
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="nothing-label block ml-1">Confirm_New_Key</label>
+              <div className="relative">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-(--db-text-muted) z-10 pointer-events-none">
+                  <Lock size={15} />
+                </div>
+                <input
+                  type="password"
+                  className={`db-input pl-10! pr-10! ${confirmNewPassword && newPassword !== confirmNewPassword ? "border-red-500/50!" : ""}`}
+                  placeholder="Confirm key"
+                  value={confirmNewPassword}
+                  onChange={e => setConfirmNewPassword(e.target.value)}
+                />
+                {confirmNewPassword && newPassword === confirmNewPassword && (
+                  <Check size={14} className="absolute right-4 top-1/2 -translate-y-1/2 text-(--db-primary) pointer-events-none" />
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-h-5">
+              {securityMessage && (
+                <span className="text-(--db-primary) font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5">
+                  <Check size={13} /> {securityMessage}
+                </span>
+              )}
+              {securityError && (
+                <span className="text-red-500 font-bold text-[10px] uppercase tracking-widest flex items-center gap-1.5 animate-error-shake">
+                  <Warning size={13} weight="fill" /> {securityError}
+                </span>
+              )}
+            </div>
+            <button type="submit" disabled={loadingSecurity} className="btn-primary px-7 py-3 text-xs tracking-widest shrink-0 disabled:opacity-40">
+              {loadingSecurity ? <CircleNotch size={15} className="animate-spin" /> : "ROTATE"}
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* ── Danger Zone ── */}
+      <div className="mt-4 pt-8 border-t border-dashed border-(--db-danger)/20">
+        <div className="flex items-center gap-2 mb-5 px-1">
+          <Warning size={18} weight="fill" className="text-(--db-danger)" />
+          <h2 className="nothing-title text-xl text-(--db-danger)">DANGER_ZONE</h2>
+        </div>
+        <div className="db-card border-(--db-danger)/15 p-6">
+          <p className="nothing-label normal-case tracking-normal opacity-50 text-[10px] leading-relaxed mb-5 max-w-md">
+            Terminating your account permanently removes all shortlinks, analytics, and data. This cannot be undone.
+          </p>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="btn-secondary border-(--db-danger)/30 text-(--db-danger) hover:bg-(--db-danger) hover:text-white hover:border-(--db-danger) px-7 py-3 text-xs tracking-widest"
+          >
+            <Trash size={14} /> TERMINATE_ACCOUNT
+          </button>
         </div>
       </div>
 
+      {/* ── Delete Modal ── */}
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in">
-           <div className="db-card w-full max-w-sm p-6 shadow-[12px_12px_0px_0px_var(--db-danger)] relative">
-              <button 
-                 onClick={closeDeleteModal} 
-                 className="absolute top-3 right-3 border-2 border-(--db-border) p-1 hover:bg-(--db-bg) text-(--db-text)"
-              >
-                 <X className="h-5 w-5" />
-              </button>
+        <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl animate-reveal">
+          <div className="db-card w-full max-w-sm p-7 space-y-6 border-(--db-danger)/20 relative">
+            <button onClick={closeDeleteModal} className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-(--db-surface-hover) transition-colors opacity-40 hover:opacity-100">
+              <X size={16} />
+            </button>
 
-              <div className="text-center mb-6">
-                 <div className="inline-block p-3 bg-(--db-danger) border-4 border-(--db-border) rounded-full mb-3 text-white shadow-[4px_4px_0px_0px_var(--db-border)]">
-                    <Trash2 className="h-6 w-6" />
-                 </div>
-                 <h2 className="text-2xl font-black uppercase leading-none text-(--db-text) mb-2">
-                    {showOtpInput ? "SECURITY CHECK" : "FINAL WARNING"}
-                 </h2>
-                 <p className="font-bold text-(--db-text-muted) text-xs">
-                    {showOtpInput 
-                        ? "Enter the confirmation code sent to your email to authorize DESTRUCTION." 
-                        : "Enter your password to confirm deletion."}
-                 </p>
+            <div className="text-center space-y-2">
+              <div className="inline-flex p-4 bg-(--db-danger)/10 text-(--db-danger) rounded-3xl">
+                <Trash size={28} className="animate-soft-pulse" />
               </div>
+              <h2 className="nothing-title text-2xl">{showOtpInput ? "CONFIRM" : "WARNING"}</h2>
+              <p className="nothing-label text-(--db-danger)">ACCOUNT_DESTRUCTION</p>
+              <p className="nothing-label normal-case tracking-normal opacity-40 text-[10px]">
+                {showOtpInput ? "Enter the code sent to your email." : "Enter your password to proceed."}
+              </p>
+            </div>
 
-              <form onSubmit={handleDeleteAccount} className="space-y-4">
-                 <input 
-                    type="password" 
-                    className="w-full bg-(--db-bg) border-4 border-(--db-border) p-3 font-bold text-center text-base text-(--db-text) focus:outline-none focus:shadow-[6px_6px_0px_0px_var(--db-border)] transition-all placeholder:text-(--db-text-muted) disabled:opacity-50"
-                    placeholder="YOUR PASSWORD" 
-                    value={deletePassword}
-                    onChange={(e) => setDeletePassword(e.target.value)}
-                    autoFocus={!showOtpInput}
-                    disabled={showOtpInput} 
+            <form onSubmit={handleDeleteAccount} className="space-y-4">
+              <input
+                type="password"
+                className="db-input text-center font-bold"
+                placeholder="Your password"
+                value={deletePassword}
+                onChange={e => setDeletePassword(e.target.value)}
+                disabled={showOtpInput}
+                required
+              />
+
+              {showOtpInput && (
+                <div className="space-y-4 animate-reveal">
+                  <input
+                    className="db-input text-center text-2xl! font-dot tracking-[0.5em] py-5!"
+                    placeholder="000000"
+                    value={deleteOtp}
+                    onChange={e => setDeleteOtp(e.target.value.replace(/\D/g, ""))}
+                    maxLength={6}
+                    autoFocus
                     required
-                 />
-
-                 {showOtpInput && (
-                     <div className="animate-in slide-in-from-top-2 fade-in space-y-3">
-                         <input 
-                            type="text" 
-                            className="w-full bg-(--db-bg) border-4 border-(--db-border) p-3 font-mono font-bold text-center text-xl tracking-widest text-(--db-text) focus:outline-none focus:shadow-[4px_4px_0px_0px_var(--db-danger)] transition-all placeholder:text-(--db-text-muted)"
-                            placeholder="000000" 
-                            value={deleteOtp}
-                            onChange={(e) => setDeleteOtp(e.target.value.replace(/\D/g,""))}
-                            maxLength={6}
-                            autoFocus
-                            required
-                         />
-                         
-                          <div className="text-center">
-                             <button 
-                                 type="button" 
-                                 onClick={handleResendDeleteCode}
-                                 disabled={resendCooldown > 0 || resendLoading}
-                                 className="text-[10px] font-bold text-(--db-text-muted) hover:text-red-500 flex items-center justify-center gap-1 mx-auto disabled:opacity-50 transition-colors"
-                             >
-                                 {resendLoading ? (
-                                     <Loader2 className="h-3 w-3 animate-spin"/>
-                                 ) : (
-                                     <RefreshCw className={`h-3 w-3 ${resendCooldown === 0 ? "hover:rotate-180 transition-transform" : ""}`}/>
-                                 )}
-                                 {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend Code"}
-                             </button>
-                             {resendMessage && (
-                                 <p className="text-[10px] font-bold text-(--db-success) mt-1">{resendMessage}</p>
-                             )}
-                          </div>
-                     </div>
-                 )}
-
-                 {deleteError && (
-                    <div className="bg-(--db-danger) text-white font-bold p-2 border-2 border-(--db-border) text-center uppercase text-xs animate-error-shake">
-                       {deleteError}
-                    </div>
-                 )}
-
-                 <div className="flex gap-2 pt-2">
-                    <button 
-                       type="button"
-                       onClick={closeDeleteModal}
-                       className="flex-1 py-3 font-black border-4 border-(--db-border) text-(--db-text) hover:bg-(--db-bg) uppercase text-xs"
-                    >
-                       Cancel
+                  />
+                  <div className="text-center">
+                    <button type="button" onClick={handleResendDeleteCode} disabled={resendCooldown > 0 || resendLoading}
+                      className="nothing-label hover:text-(--db-text) flex items-center justify-center gap-2 mx-auto disabled:opacity-40 transition-colors">
+                      {resendLoading ? <CircleNotch size={12} className="animate-spin" /> : <ArrowClockwise size={12} />}
+                      {resendCooldown > 0 ? `RESEND_IN_${resendCooldown}S` : "RESEND_CODE"}
                     </button>
-                    <button 
-                       type="submit"
-                       disabled={deleteLoading}
-                       className="flex-1 py-3 font-black bg-(--db-danger) text-white border-4 border-(--db-border) hover:shadow-[4px_4px_0px_0px_var(--db-border)] hover:-translate-y-1 transition-all uppercase flex justify-center items-center gap-2 text-xs"
-                    >
-                       {deleteLoading ? <Loader2 className="animate-spin h-4 w-4"/> : (showOtpInput ? "CONFIRM DELETION" : "CONFIRM DELETE")}
-                    </button>
-                 </div>
-              </form>
-           </div>
+                    {resendMessage && <p className="nothing-label text-(--db-primary) mt-1.5">{resendMessage}</p>}
+                  </div>
+                </div>
+              )}
+
+              {deleteError && (
+                <div className="bg-red-500/10 text-red-500 p-3 rounded-2xl border border-red-500/20 text-[10px] text-center uppercase tracking-widest animate-error-shake">
+                  {deleteError}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-1">
+                <button type="button" onClick={closeDeleteModal} className="flex-1 py-3 btn-secondary text-[10px] nothing-label opacity-100">ABORT</button>
+                <button type="submit" disabled={deleteLoading} className="flex-1 py-3 btn-danger text-xs tracking-widest disabled:opacity-40">
+                  {deleteLoading ? <CircleNotch size={16} className="animate-spin" /> : showOtpInput ? "TERMINATE" : "PROCEED"}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
-
     </div>
   );
 }

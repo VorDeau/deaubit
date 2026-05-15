@@ -1,0 +1,7 @@
+# Copy this file to .dev.vars for local Worker development.
+# These replace wrangler secrets when running `wrangler dev`.
+# NEVER commit .dev.vars to git.
+
+JWT_SECRET="random-string-min-32-chars"
+TURNSTILE_SECRET_KEY="your_turnstile_secret_key"
+RESEND_API_KEY="re_your_resend_api_key"

@@ -1,8 +1,7 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/node_modules
-/.pnp
+# ── Dependencies ─────────────────────────────────
+node_modules/
+worker/node_modules/
+.pnp
 .pnp.*
 .yarn/*
 !.yarn/patches
@@ -10,34 +9,42 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# ── Build outputs ─────────────────────────────────
 /.next/
 /out/
-
-# production
 /build
+/coverage
+*.tsbuildinfo
 
-# misc
+# ── Environment & secrets ─────────────────────────
+.env
+.env.local
+.env.*
+!.env.example
+
+# ── Cloudflare Wrangler local state ───────────────
+.wrangler/
+worker/.wrangler/
+worker/.dev.vars
+
+# ── Next.js generated ─────────────────────────────
+next-env.d.ts
+
+# ── Prisma generated ──────────────────────────────
+/lib/generated/prisma
+/node_modules/.prisma/
+
+# ── Local deploy helpers ──────────────────────────
+worker/wrangler.toml
+
+# ── OS & editor ───────────────────────────────────
 .DS_Store
 *.pem
+.vercel
+Thumbs.db
 
-# debug
+# ── Logs ──────────────────────────────────────────
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
-
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
-
-/lib/generated/prisma

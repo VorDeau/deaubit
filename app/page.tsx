@@ -4,7 +4,6 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Loader2, Zap } from "lucide-react";
 import DeauBitLogo from "@/components/DeauBitLogo";
 import LoginForm from "@/components/LoginForm";
 import PublicShortlinkForm from "@/components/PublicShortlinkForm";
@@ -52,11 +51,11 @@ function HomeContent() {
 
   if (checkingSession) {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-(--db-bg) z-50">
-        <div className="border-4 border-(--db-border) bg-(--db-surface) p-8 shadow-[8px_8px_0px_0px_var(--db-border)] flex flex-col items-center gap-4">
-          <DeauBitLogo size={48} />
-          <div className="flex items-center gap-2 font-bold text-xl uppercase tracking-widest text-(--db-text)">
-            <Loader2 className="h-6 w-6 animate-spin" /> Loading...
+      <div className="fixed inset-0 flex items-center justify-center bg-(--db-bg) z-60">
+        <div className="flex flex-col items-center gap-8">
+          <DeauBitLogo size={64} className="animate-pulse" />
+          <div className="nothing-label tracking-[0.5em] animate-pulse">
+            INITIALIZING_CORE_SYSTEM
           </div>
         </div>
       </div>
@@ -64,69 +63,41 @@ function HomeContent() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 py-8 md:py-16 min-h-[calc(100vh-80px)] flex flex-col justify-center">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center justify-center animate-reveal">
       
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center w-full">
         
-        <div className="lg:col-span-7 order-1 h-full flex flex-col">
-          <div className="db-card animate-float flex flex-col h-full">
+        <div className="lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 sm:space-y-12">
+            <div className="space-y-4">
+                <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl nothing-title text-(--db-text) leading-none">DEAUBIT</h1>
+                <div className="h-1.5 sm:h-2 w-24 sm:w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0"></div>
+            </div>
             
-            <div className="bg-(--db-accent) p-6 md:p-8 border-b-4 border-(--db-border)">
-                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <div className="bg-(--db-surface) p-3 border-2 border-(--db-border) shadow-[4px_4px_0px_0px_var(--db-border)]">
-                        <DeauBitLogo size={40} />
-                    </div>
-                    <div>
-                        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-(--db-accent-fg) leading-none">DeauBit</h1>
-                        <p className="text-sm font-bold text-(--db-accent-fg) opacity-90 mt-1">Elegant & Brutal URL Shortener.</p>
-                    </div>
+            <div className="max-w-2xl space-y-4">
+                <div className="inline-block">
+                    <p className="typewriter-text font-dot text-lg sm:text-xl md:text-2xl font-bold text-(--db-text) tracking-tight uppercase">
+                        Refined Link Infrastructure.
+                    </p>
                 </div>
+                <p className="font-dot text-sm sm:text-base md:text-lg opacity-60 text-(--db-text) tracking-widest uppercase leading-relaxed">
+                    Minimalist. Private. Secure. Pure Utility.
+                </p>
             </div>
 
-            <div className="p-6 space-y-6 flex-1">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex items-start gap-3 p-3 bg-(--db-bg) border-2 border-(--db-border)">
-                        <Zap className="h-5 w-5 text-(--db-primary) shrink-0" />
-                        <p className="text-xs font-bold text-(--db-text) leading-tight">No Tracking. Privacy First. Self-hosted.</p>
-                    </div>
-                    <div className="flex items-center gap-2 text-xs font-bold text-(--db-text-muted) p-2">
-                         <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"/> 
-                         Operational & Ready
-                    </div>
-                </div>
-
-                <div className="h-1 bg-(--db-bg) border-t-2 border-(--db-border) border-dashed my-2" />
-                
-                <div>
-                     <PublicShortlinkForm />
-                </div>
+            <div className="w-full max-w-xl">
+                <PublicShortlinkForm />
             </div>
-
-            <div className="hidden lg:block bg-(--db-text) p-4 text-center border-t-4 border-(--db-border) mt-auto">
-                <span className="text-[10px] font-bold text-(--db-bg) uppercase tracking-widest block mb-2">POWERED BY DEAUPORT</span>
-                <div className="flex justify-center gap-4 text-[10px] font-bold text-(--db-bg)/80">
-                    <Link href="/terms" className="hover:text-white hover:underline transition-colors">Terms</Link>
-                    <span>•</span>
-                    <Link href="/privacy" className="hover:text-white hover:underline transition-colors">Privacy</Link>
-                    <span>•</span>
-                    <Link href="/report" className="text-red-300 hover:text-red-100 hover:underline transition-colors">Report Abuse</Link>
-                </div>
+            
+            <div className="hidden sm:flex flex-wrap items-center justify-center lg:justify-start gap-6 sm:gap-10 opacity-40 pt-6">
+                <Link href="/terms" className="nothing-label text-[9px] sm:text-[10px] hover:text-(--db-primary) transition-all font-bold">TERMS_OF_SERVICE</Link>
+                <Link href="/privacy" className="nothing-label text-[9px] sm:text-[10px] hover:text-(--db-primary) transition-all font-bold">PRIVACY_PROTOCOL</Link>
+                <Link href="/report" className="nothing-label text-[9px] sm:text-[10px] text-red-600 hover:text-red-500 transition-all font-bold">REPORT_ABUSE</Link>
             </div>
-          </div>
         </div>
 
-        <div className="lg:col-span-5 order-2 h-full flex flex-col">
-          <LoginForm nextPath={nextPath} />
-
-          <div className="block lg:hidden bg-(--db-text) p-4 text-center border-4 border-(--db-border) mt-6 shadow-[4px_4px_0px_0px_var(--db-border)]">
-              <span className="text-[10px] font-bold text-(--db-bg) uppercase tracking-widest block mb-2">POWERED BY DEAUPORT</span>
-              <div className="flex justify-center gap-4 text-[10px] font-bold text-(--db-bg)/80">
-                  <Link href="/terms" className="hover:text-white hover:underline transition-colors">Terms</Link>
-                  <span>•</span>
-                  <Link href="/privacy" className="hover:text-white hover:underline transition-colors">Privacy</Link>
-                  <span>•</span>
-                  <Link href="/report" className="text-red-300 hover:text-red-100 hover:underline transition-colors">Report Abuse</Link>
-              </div>
+        <div className="lg:col-span-5 w-full flex justify-center mt-10 lg:mt-0">
+          <div className="db-card p-6 sm:p-10 lg:p-12 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
+             <LoginForm nextPath={nextPath} />
           </div>
         </div>
 
@@ -140,12 +111,7 @@ export default function HomePage() {
     <Suspense 
       fallback={
         <div className="fixed inset-0 flex items-center justify-center bg-(--db-bg) z-50">
-          <div className="border-4 border-(--db-border) bg-(--db-surface) p-8 shadow-[8px_8px_0px_0px_var(--db-border)] flex flex-col items-center gap-4">
-            <DeauBitLogo size={48} />
-            <div className="flex items-center gap-2 font-bold text-xl uppercase tracking-widest text-(--db-text)">
-              <Loader2 className="h-6 w-6 animate-spin" /> Loading...
-            </div>
-          </div>
+          <DeauBitLogo size={48} className="animate-pulse" />
         </div>
       }
     >
