@@ -109,7 +109,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           <div className="container-nothing flex items-center justify-between">
             <div className="flex items-center gap-3">
               <DeauBitLogo size={22} />
-              <span className="nothing-label text-[10px] opacity-40">DeauBit_v9.2</span>
+              <span className="nothing-label text-[10px] opacity-40">DeauBit_v{process.env.NEXT_PUBLIC_APP_VERSION}</span>
             </div>
             <div className="nothing-label text-[10px] opacity-20">
               VorDeau &copy; {new Date().getFullYear()}

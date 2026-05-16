@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
+import { version } from "./package.json";
 
 const nextConfig: NextConfig = {
-  // Static export for Cloudflare Workers deployment
+  env: {
+    NEXT_PUBLIC_APP_VERSION: version,
+  },
   output: "export",
   distDir: "out",
 
-  compress: false,         // Cloudflare handles compression
+  compress: false,
   poweredByHeader: false,
 
   typescript: {
@@ -13,10 +16,9 @@ const nextConfig: NextConfig = {
   },
 
   images: {
-    unoptimized: true,     // Required for static export
+    unoptimized: true,
   },
 
-  // Trailing slash for consistent static file serving
   trailingSlash: false,
 };
 
