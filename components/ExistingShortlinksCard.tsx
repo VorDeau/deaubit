@@ -57,7 +57,6 @@ function ShortlinkRow({
     navigator.clipboard.writeText(shortUrl).then(() => onCopy(link.slug)).catch(() => {});
   };
 
-  // Long press for copy on mobile
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const startPress = () => {
     pressTimer.current = setTimeout(() => { handleCopy(); pressTimer.current = null; }, 500);
@@ -69,10 +68,8 @@ function ShortlinkRow({
   return (
     <div className={`db-card p-4 sm:p-5 transition-all duration-500 hover:shadow-xl bg-(--db-surface) ${selected ? "border-(--db-primary)/40 bg-(--db-primary)/3" : ""} ${isDeleting ? "opacity-0 scale-95 pointer-events-none" : ""}`}>
 
-      {/* ── Mobile layout ── */}
       <div className="flex flex-col gap-3 sm:hidden">
 
-        {/* Row 1: checkbox + slug */}
         <div className="flex items-start gap-3">
           <input
             type="checkbox"
@@ -99,7 +96,6 @@ function ShortlinkRow({
           </div>
         </div>
 
-        {/* Row 2: hits + status + action buttons */}
         <div className="flex items-center gap-3 pl-7">
           <div className="flex flex-col">
             <span className="nothing-label text-[8px] mb-0.5 opacity-50">Hits</span>
@@ -128,7 +124,6 @@ function ShortlinkRow({
         </div>
       </div>
 
-      {/* ── Desktop layout ── */}
       <div className="hidden sm:flex sm:items-center sm:gap-4">
         <input
           type="checkbox"
@@ -161,7 +156,6 @@ function ShortlinkRow({
         </div>
       </div>
 
-      {/* Actions — desktop only */}
       <div className="hidden sm:flex items-center gap-1 shrink-0">
         <button onClick={() => onViewStats(link.slug)} className="p-2 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Analytics">
           <ChartBar size={15} />

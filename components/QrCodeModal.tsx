@@ -13,9 +13,7 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
   const [imgLoaded, setImgLoaded] = useState(false);
   const [downloadError, setDownloadError] = useState(false);
 
-  // Preview: lime on dark (embedded style)
   const previewQrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=20&color=163-230-53&bgcolor=10-10-10&data=${encodeURIComponent(shortUrl)}`;
-  // Download: classic black on white
   const downloadApiUrl = `/api/qr-download?url=${encodeURIComponent(shortUrl)}`;
 
   const handleDownload = async () => {
@@ -42,7 +40,6 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 db-overlay animate-reveal">
       <div className="db-card animate-modal-in relative w-full max-w-xs shadow-2xl">
 
-        {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-(--db-border)">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-(--db-primary)/15 text-(--db-primary) rounded-xl">
@@ -63,7 +60,6 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
 
         <div className="p-5 space-y-4">
 
-          {/* QR — colored preview embedded into card */}
           <div className="relative rounded-2xl overflow-hidden bg-(--db-surface-hover) aspect-square border border-(--db-border) flex items-center justify-center">
             {!imgLoaded && (
               <CircleNotch size={28} className="animate-spin text-(--db-primary)" />
@@ -79,7 +75,6 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
             />
           </div>
 
-          {/* URL */}
           <div className="px-3 py-2.5 rounded-xl border border-(--db-border) bg-(--db-surface)">
             <p className="nothing-label text-[8px] opacity-40 mb-0.5">Short_URL</p>
             <p className="font-dot text-xs text-(--db-text) truncate opacity-60">
@@ -93,7 +88,6 @@ export default function QrCodeModal({ slug, shortUrl, onClose }: QrCodeModalProp
             </p>
           )}
 
-          {/* Actions */}
           <div className="flex gap-3">
             <button type="button" onClick={onClose} className="btn-secondary flex-1 py-3 text-[10px] nothing-label opacity-100">
               CLOSE

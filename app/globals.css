@@ -1,6 +1,5 @@
 @import "tailwindcss";
 
-/* ─── Single Dark Theme ─── */
 :root {
   color-scheme: dark;
   --db-bg: #000000;
@@ -29,8 +28,6 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── Card ─── */
-
 .db-card {
   background-color: var(--db-surface);
   border: 1px solid var(--db-border);
@@ -44,16 +41,12 @@ body {
   .db-card { border-radius: 28px; }
 }
 
-/* ─── Glass Panel ─── */
-
 .glass-panel {
   background: color-mix(in srgb, var(--db-surface) 80%, transparent);
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--db-border);
 }
-
-/* ─── Input — Pill Shape ─── */
 
 .db-input {
   background-color: #111111;
@@ -81,8 +74,6 @@ body {
 textarea.db-input {
   border-radius: 16px;
 }
-
-/* ─── Buttons ─── */
 
 button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   border-radius: 9999px;
@@ -131,8 +122,6 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   color: var(--db-danger-fg) !important;
 }
 
-/* ─── Typography ─── */
-
 .font-dot { font-family: var(--font-dot), monospace; }
 
 .nothing-label {
@@ -153,8 +142,6 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   letter-spacing: -0.05em;
   line-height: 0.9;
 }
-
-/* ─── Container ─── */
 
 .container-nothing {
   width: 100%;
@@ -177,12 +164,8 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   .container-nothing { max-width: 1280px; }
 }
 
-/* ─── Scrollbar ─── */
-
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-thumb { background: var(--db-border); border-radius: 10px; }
-
-/* ─── Typewriter ─── */
 
 .typewriter-text {
   overflow: hidden;
@@ -193,8 +176,6 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
 
 @keyframes typing { from { width: 0 } to { width: 100% } }
 @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--db-primary) } }
-
-/* ─── Animations ─── */
 
 @keyframes page-reveal {
   from { opacity: 0; transform: translateY(10px); }
@@ -271,8 +252,6 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   animation: bar-fill 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
 }
 
-/* ─── Signal Dot ─── */
-
 @keyframes signal-ping {
   0% { transform: scale(1); opacity: 0.8; }
   70% { transform: scale(2.2); opacity: 0; }
@@ -295,21 +274,15 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   animation: signal-ping 1.8s ease-out infinite;
 }
 
-/* ─── Overlay ─── */
-
 .db-overlay {
   background-color: rgba(0, 0, 0, 0.92);
   backdrop-filter: blur(20px) saturate(160%);
 }
 
-/* ─── Scroll Hint Arrow ─── */
-
 @keyframes caret-drift {
   0%, 100% { transform: translateY(0px); opacity: 0.35; }
   50%       { transform: translateY(7px); opacity: 0.65; }
 }
-
-/* ─── Fluid Ring Loader ─── */
 
 @keyframes ring-rotate {
   from { transform: rotate(-90deg); }
@@ -332,8 +305,6 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   50%  { stroke-dashoffset: 30;  stroke-opacity: 0.25; }
   100% { stroke-dashoffset: 188; stroke-opacity: 0.1; }
 }
-
-/* ─── Nothing Dot Grid ─── */
 
 .nothing-dot-grid {
   background-image: radial-gradient(circle, var(--db-border) 1px, transparent 1px);

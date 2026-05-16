@@ -39,10 +39,8 @@ export default function DashboardPage() {
   useEffect(() => {
     fetchLinks(1, true);
 
-    // Poll every 10s for cross-device sync (silent, no loading spinner)
     const interval = setInterval(() => fetchLinks(currentPageRef.current), 10000);
 
-    // Refresh immediately when tab becomes visible again
     const onVisible = () => { if (document.visibilityState === "visible") fetchLinks(currentPageRef.current); };
     document.addEventListener("visibilitychange", onVisible);
 
@@ -108,7 +106,6 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 sm:gap-8">
 
-      {/* ── Page Header ── */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 px-1">
         <div>
           <p className="nothing-label text-(--db-primary) mb-2">Node_Active_01</p>
@@ -120,10 +117,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* ── Main Grid: form left | explorer right on desktop ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[380px_1fr] gap-6 lg:gap-8 items-start">
 
-        {/* Create Link */}
         <CreateShortlinkCard
           targetUrl={targetUrl}
           slug={slug}
@@ -138,7 +133,6 @@ export default function DashboardPage() {
           onChangeExpiresAt={setExpiresAt}
         />
 
-        {/* Link Explorer */}
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between px-1">
             <p className="nothing-label opacity-100">Shortlink_Explorer</p>
@@ -163,13 +157,11 @@ export default function DashboardPage() {
 
       </div>
 
-      {/* ── Modals ── */}
       {createdLink && <ShortlinkResultModal result={createdLink} onClose={() => setCreatedLink(null)} />}
       {analyticsSlug && <AnalyticsModal slug={analyticsSlug} onClose={() => setAnalyticsSlug(null)} />}
       {qrSlug && <QrCodeModal slug={qrSlug} shortUrl={`${baseUrl}/${qrSlug}`} onClose={() => setQrSlug(null)} />}
       {editingLink && <EditShortlinkModal link={editingLink} onClose={() => setEditingLink(null)} onUpdate={() => fetchLinks(currentPage, true)} />}
 
-      {/* ── Delete Confirm ── */}
       {pendingDeleteSlugs.length > 0 && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl animate-reveal">
           <div className="db-card w-full max-w-xs p-8 space-y-6 text-center">

@@ -79,13 +79,11 @@ function HomeContent() {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-16 lg:items-center w-full">
 
-        {/* ── Login — full screen on mobile, right col on desktop ── */}
         <div className="order-1 lg:order-2 lg:col-span-5 min-h-dvh lg:min-h-0 flex flex-col items-center justify-center relative py-10 lg:py-0 w-full">
           <div className="db-card p-6 sm:p-10 lg:p-12 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
             <LoginForm nextPath={nextPath} />
           </div>
 
-          {/* Scroll hint — mobile only */}
           <div className="lg:hidden absolute bottom-8 left-0 right-0 flex justify-center">
             <button
               onClick={scrollToBranding}
@@ -99,7 +97,6 @@ function HomeContent() {
           </div>
         </div>
 
-        {/* ── Branding — below fold on mobile, left col on desktop ── */}
         <div
           ref={brandingRef}
           className="order-2 lg:order-1 lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 lg:space-y-12 py-16 lg:py-0"

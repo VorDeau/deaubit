@@ -12,12 +12,10 @@ export default function GlobalSecurityGate({ children }: { children: React.React
   const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
   useEffect(() => {
-    // Check cached verification (30 min TTL)
     const last = localStorage.getItem("db_human_verified");
     if (last && Date.now() - parseInt(last) < 1800000) {
       setStatus("verified");
     }
-    // Otherwise, invisible Turnstile auto-executes on render
   }, []);
 
   const handleSuccess = async (token: string) => {
@@ -59,9 +57,7 @@ export default function GlobalSecurityGate({ children }: { children: React.React
               />
             )}
 
-            {/* Fluid ring loader */}
             <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
-              {/* Outer ring — slow counter-rotate */}
               <svg
                 viewBox="0 0 100 100"
                 width={140} height={140}
@@ -79,7 +75,6 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                 />
               </svg>
 
-              {/* Inner ring — main fluid animation */}
               <svg
                 viewBox="0 0 100 100"
                 width={110} height={110}
@@ -97,7 +92,6 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                 />
               </svg>
 
-              {/* Logo center */}
               <DeauBitLogo size={44} />
             </div>
 

@@ -117,13 +117,11 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto flex flex-col gap-5 sm:gap-6 pb-20">
 
-      {/* ── Header ── */}
       <div className="space-y-2 px-1">
         <h1 className="text-4xl sm:text-5xl nothing-title">SETTINGS</h1>
         <p className="nothing-label normal-case tracking-normal opacity-40">Profile & security management</p>
       </div>
 
-      {/* ── Identity ── */}
       <div className="db-card overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-(--db-border)/50">
           <div className="p-2.5 bg-(--db-accent) rounded-xl shrink-0">
@@ -164,7 +162,6 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      {/* ── Security ── */}
       <div className="db-card overflow-hidden">
         <div className="flex items-center gap-3 px-6 py-5 border-b border-(--db-border)/50">
           <div className="p-2.5 bg-(--db-primary)/15 rounded-xl shrink-0">
@@ -251,7 +248,6 @@ export default function SettingsPage() {
         </form>
       </div>
 
-      {/* ── Danger Zone ── */}
       <div className="mt-4 pt-8 border-t border-dashed border-(--db-danger)/20">
         <div className="flex items-center gap-2 mb-5 px-1">
           <Warning size={18} weight="fill" className="text-(--db-danger)" />
@@ -270,7 +266,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* ── Delete Modal ── */}
       {showDeleteModal && (
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/90 backdrop-blur-2xl animate-reveal">
           <div className="db-card w-full max-w-sm p-7 space-y-6 border-(--db-danger)/20 relative">

@@ -20,10 +20,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserInfo | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  // Navbar only for authenticated dashboard pages
   const isDashboard = pathname.startsWith("/dash") || pathname.startsWith("/admin");
-
-  // Public document pages (no navbar, top-aligned)
   const isPublicDoc = ["/terms", "/privacy", "/report"].includes(pathname);
 
   useEffect(() => {
@@ -54,7 +51,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     await handleLogout();
   }
 
-  // ── Dashboard layout (with navbar) ──────────────────────────
   if (isDashboard) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -117,7 +113,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </footer>
 
-        {/* ── Logout Confirm Modal ── */}
         {showLogoutConfirm && (
           <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-reveal">
             <div className="db-card w-full max-w-xs p-7 space-y-5 text-center relative">
@@ -151,7 +146,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ── Public document layout (no navbar, centered) ─────────────
   if (isPublicDoc) {
     return (
       <div className="min-h-dvh flex flex-col">
@@ -167,7 +161,6 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // ── Default: centered (home, auth pages, redirect pages, etc.) ──
   return (
     <div className="min-h-dvh flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 lg:p-8">
