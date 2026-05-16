@@ -86,15 +86,17 @@ function HomeContent() {
           </div>
 
           {/* Scroll hint — mobile only */}
-          <button
-            onClick={scrollToBranding}
-            className={`lg:hidden absolute bottom-8 flex flex-col items-center gap-0.5 transition-all duration-500 ${showScroll ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
-          >
-            <span className="nothing-label text-[8px] opacity-30 mb-1">EXPLORE</span>
-            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out infinite" }} />
-            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.22s infinite" }} className="opacity-40" />
-            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.44s infinite" }} className="opacity-20" />
-          </button>
+          <div className="lg:hidden absolute bottom-8 left-0 right-0 flex justify-center">
+            <button
+              onClick={scrollToBranding}
+              className={`flex flex-col items-center gap-0.5 transition-all duration-500 ${showScroll ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+            >
+              <span className="nothing-label text-[8px] opacity-30 mb-1">EXPLORE</span>
+              <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out infinite" }} />
+              <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.22s infinite" }} className="opacity-40" />
+              <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.44s infinite" }} className="opacity-20" />
+            </button>
+          </div>
         </div>
 
         {/* ── Branding — below fold on mobile, left col on desktop ── */}
