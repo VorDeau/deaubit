@@ -1,6 +1,6 @@
 {
   "name": "deaubit",
-  "version": "11.0.4",
+  "version": "11.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -11,45 +11,20 @@
   "dependencies": {
     "@marsidev/react-turnstile": "^1.4.1",
     "@phosphor-icons/react": "^2.1.10",
-    "@prisma/adapter-pg": "6.4.1",
-    "@prisma/client": "6.4.1",
-    "@types/ua-parser-js": "^0.7.39",
-    "bcryptjs": "^3.0.3",
-    "dotenv": "^17.2.3",
-    "fast-geoip": "^1.1.88",
-    "ioredis": "^5.10.0",
-    "jsonwebtoken": "^9.0.2",
-    "lucide-react": "^0.553.0",
-    "next": "^16.1.1",
-    "nodemailer": "^8.0.4",
-    "pg": "^8.16.3",
+    "next": "^16.2.6",
     "qrcode.react": "^4.2.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "recharts": "^3.5.1",
-    "ua-parser-js": "^2.0.6"
+    "recharts": "^3.5.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.17",
-    "@types/jsonwebtoken": "^9.0.10",
-    "@types/node": "^20.19.25",
-    "@types/nodemailer": "^7.0.4",
-    "@types/pg": "^8.15.6",
+    "@types/node": "^22.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "baseline-browser-mapping": "^2.9.0",
-    "caniuse-lite": "^1.0.30001757",
-    "dotenv-cli": "^11.0.0",
     "eslint": "^9.39.1",
     "eslint-config-next": "16.0.3",
-    "prisma": "6.4.1",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.9.3"
-  },
-  "overrides": {
-    "effect": "3.20.0"
-  },
-  "trustedDependencies": [
-    "unrs-resolver"
-  ]
+  }
 }

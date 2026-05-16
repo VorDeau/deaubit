@@ -30,3 +30,7 @@ MAIL_FROM_NAME = "DeauBit"
 
 [triggers]
 crons = ["0 3 * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
