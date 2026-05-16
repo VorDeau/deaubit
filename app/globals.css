@@ -302,6 +302,13 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   backdrop-filter: blur(20px) saturate(160%);
 }
 
+/* ─── Scroll Hint Arrow ─── */
+
+@keyframes caret-drift {
+  0%, 100% { transform: translateY(0px); opacity: 0.35; }
+  50%       { transform: translateY(7px); opacity: 0.65; }
+}
+
 /* ─── Fluid Ring Loader ─── */
 
 @keyframes ring-rotate {

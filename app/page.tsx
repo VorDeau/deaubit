@@ -2,18 +2,30 @@
 
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import { useEffect, useState, useRef, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DeauBitLogo from "@/components/DeauBitLogo";
 import LoginForm from "@/components/LoginForm";
 import PublicShortlinkForm from "@/components/PublicShortlinkForm";
 import Link from "next/link";
+import { CaretDown } from "@phosphor-icons/react";
 
 function HomeContent() {
   const [checkingSession, setCheckingSession] = useState(true);
+  const [showScroll, setShowScroll] = useState(true);
+  const brandingRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
   const nextPath = searchParams.get("next") || "/dash";
+
+  useEffect(() => {
+    const onScroll = () => setShowScroll(window.scrollY < 40);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToBranding = () =>
+    brandingRef.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(() => {
     let cancelled = false;
@@ -63,29 +75,43 @@ function HomeContent() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center justify-center animate-reveal">
-      
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16 items-center w-full">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-10 flex flex-col items-center lg:justify-center animate-reveal">
 
-        {/* Login card — first on mobile, right on desktop */}
-        <div className="order-1 lg:order-2 lg:col-span-5 w-full flex justify-center">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-0 lg:gap-16 lg:items-center w-full">
+
+        {/* ── Login — full screen on mobile, right col on desktop ── */}
+        <div className="order-1 lg:order-2 lg:col-span-5 min-h-dvh lg:min-h-0 flex flex-col items-center justify-center relative py-10 lg:py-0 w-full">
           <div className="db-card p-6 sm:p-10 lg:p-12 shadow-2xl bg-(--db-surface) w-full max-w-md border-(--db-border)">
             <LoginForm nextPath={nextPath} />
           </div>
+
+          {/* Scroll hint — mobile only */}
+          <button
+            onClick={scrollToBranding}
+            className={`lg:hidden absolute bottom-8 flex flex-col items-center gap-0.5 transition-all duration-500 ${showScroll ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4 pointer-events-none"}`}
+          >
+            <span className="nothing-label text-[8px] opacity-30 mb-1">EXPLORE</span>
+            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out infinite" }} />
+            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.22s infinite" }} className="opacity-40" />
+            <CaretDown size={15} style={{ animation: "caret-drift 1.3s ease-in-out 0.44s infinite" }} className="opacity-20" />
+          </button>
         </div>
 
-        {/* Branding — second on mobile, left on desktop */}
-        <div className="order-2 lg:order-1 lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-6 lg:space-y-12">
+        {/* ── Branding — below fold on mobile, left col on desktop ── */}
+        <div
+          ref={brandingRef}
+          className="order-2 lg:order-1 lg:col-span-7 flex flex-col items-center lg:items-start text-center lg:text-left space-y-8 lg:space-y-12 py-16 lg:py-0"
+        >
           <div className="space-y-3">
-            <h1 className="text-4xl sm:text-6xl lg:text-9xl nothing-title text-(--db-text) leading-none">DEAUBIT</h1>
+            <h1 className="text-5xl sm:text-6xl lg:text-9xl nothing-title text-(--db-text) leading-none">DEAUBIT</h1>
             <div className="h-1.5 w-20 sm:w-32 bg-(--db-primary) rounded-full mx-auto lg:mx-0" />
           </div>
 
-          <div className="space-y-2 sm:space-y-4">
-            <p className="typewriter-text font-dot text-base sm:text-xl md:text-2xl font-bold text-(--db-text) tracking-tight uppercase">
+          <div className="space-y-3 sm:space-y-4">
+            <p className="typewriter-text font-dot text-lg sm:text-xl md:text-2xl font-bold text-(--db-text) tracking-tight uppercase">
               Refined Link Infrastructure.
             </p>
-            <p className="font-dot text-xs sm:text-base opacity-60 text-(--db-text) tracking-widest uppercase leading-relaxed">
+            <p className="font-dot text-sm sm:text-base opacity-60 text-(--db-text) tracking-widest uppercase leading-relaxed">
               Minimalist. Private. Secure. Pure Utility.
             </p>
           </div>

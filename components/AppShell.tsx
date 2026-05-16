@@ -4,7 +4,7 @@
 
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { SquaresFour, GearSix, SignOut, ShieldWarning } from "@phosphor-icons/react";
+import { SquaresFour, GearSix, SignOut, ShieldWarning, X } from "@phosphor-icons/react";
 import { useEffect, useState } from "react";
 import DeauBitLogo from "./DeauBitLogo";
 
@@ -18,6 +18,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   // Navbar only for authenticated dashboard pages
   const isDashboard = pathname.startsWith("/dash") || pathname.startsWith("/admin");
@@ -46,6 +47,11 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     await fetch("/api/logout", { method: "POST" });
     router.push("/");
     router.refresh();
+  }
+
+  async function confirmLogout() {
+    setShowLogoutConfirm(false);
+    await handleLogout();
   }
 
   // ── Dashboard layout (with navbar) ──────────────────────────
@@ -83,7 +89,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                     </span>
                   </div>
                   <button
-                    onClick={handleLogout}
+                    onClick={() => setShowLogoutConfirm(true)}
                     className="p-2 sm:p-2.5 rounded-full bg-(--db-surface) border border-(--db-border) hover:bg-(--db-danger) hover:text-white hover:border-(--db-danger) transition-all active:scale-90 shadow-sm"
                     title="Logout"
                   >
@@ -110,6 +116,37 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
         </footer>
+
+        {/* ── Logout Confirm Modal ── */}
+        {showLogoutConfirm && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-reveal">
+            <div className="db-card w-full max-w-xs p-7 space-y-5 text-center relative">
+              <button
+                onClick={() => setShowLogoutConfirm(false)}
+                className="absolute top-4 right-4 p-1.5 rounded-full hover:bg-(--db-surface-hover) transition-colors opacity-40 hover:opacity-100"
+              >
+                <X size={15} />
+              </button>
+              <div className="inline-flex p-4 bg-(--db-surface-hover) rounded-3xl">
+                <SignOut size={26} className="text-(--db-text-muted)" />
+              </div>
+              <div className="space-y-1">
+                <h3 className="nothing-title text-lg">SIGN_OUT</h3>
+                <p className="nothing-label normal-case tracking-normal opacity-40 text-[10px]">
+                  Terminate your current session?
+                </p>
+              </div>
+              <div className="flex gap-3 pt-1">
+                <button onClick={() => setShowLogoutConfirm(false)} className="flex-1 py-3 btn-secondary text-[10px] nothing-label opacity-100">
+                  CANCEL
+                </button>
+                <button onClick={confirmLogout} className="flex-1 py-3 btn-primary text-[10px] tracking-widest">
+                  CONFIRM
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

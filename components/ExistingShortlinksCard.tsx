@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { Copy, Trash, QrCode, ChartBar, ArrowSquareOut, Check, MagnifyingGlass, X, PencilSimple, CaretLeft, CaretRight, CircleNotch } from "@phosphor-icons/react";
 
 export interface ShortLink {
@@ -51,73 +51,112 @@ function ShortlinkRow({
   const shortUrl = `${baseUrl}/${link.slug}`;
   const domainLabel = getDomainLabel(link.targetUrl);
   const clickCount = link._count?.clicks || 0;
+  const isExpired = link.expiresAt && new Date() > new Date(link.expiresAt);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shortUrl).then(() => onCopy(link.slug)).catch(() => {});
   };
 
-  const isExpired = link.expiresAt && new Date() > new Date(link.expiresAt);
+  // Long press for copy on mobile
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startPress = () => {
+    pressTimer.current = setTimeout(() => { handleCopy(); pressTimer.current = null; }, 500);
+  };
+  const endPress = () => {
+    if (pressTimer.current) { clearTimeout(pressTimer.current); pressTimer.current = null; }
+  };
 
   return (
-    <div className={`db-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-all duration-500 hover:shadow-xl bg-(--db-surface) ${selected ? "border-(--db-primary)/40 bg-(--db-primary)/3" : ""} ${isDeleting ? "opacity-0 scale-95 pointer-events-none" : ""}`}>
+    <div className={`db-card p-4 sm:p-5 transition-all duration-500 hover:shadow-xl bg-(--db-surface) ${selected ? "border-(--db-primary)/40 bg-(--db-primary)/3" : ""} ${isDeleting ? "opacity-0 scale-95 pointer-events-none" : ""}`}>
 
-      {/* Top row on mobile: checkbox + slug + actions */}
-      <div className="flex items-center gap-3 sm:contents">
+      {/* ── Mobile layout ── */}
+      <div className="flex flex-col gap-3 sm:hidden">
+
+        {/* Row 1: checkbox + slug */}
+        <div className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={selected}
+            onChange={() => onToggleSelect(link.slug)}
+            className="w-4 h-4 accent-(--db-primary) cursor-pointer shrink-0 mt-1"
+          />
+          <div className="flex-1 min-w-0">
+            <a
+              href={shortUrl}
+              target="_blank"
+              onMouseDown={startPress} onMouseUp={endPress} onMouseLeave={endPress}
+              onTouchStart={startPress} onTouchEnd={endPress}
+              className={`font-dot text-base font-bold truncate flex items-center gap-1.5 transition-colors select-none ${isCopied ? "text-(--db-primary)" : "text-(--db-text)"}`}
+            >
+              {isCopied && <Check size={13} className="shrink-0" />}
+              /{link.slug}
+              <ArrowSquareOut size={11} className="opacity-20 shrink-0" />
+            </a>
+            <span className="text-xs text-(--db-text-muted) truncate opacity-40 block mt-0.5" title={link.targetUrl}>
+              {domainLabel}
+            </span>
+            {isCopied && <span className="nothing-label text-[8px] text-(--db-primary) mt-0.5 block">COPIED</span>}
+          </div>
+        </div>
+
+        {/* Row 2: hits + status + action buttons */}
+        <div className="flex items-center gap-3 pl-7">
+          <div className="flex flex-col">
+            <span className="nothing-label text-[8px] mb-0.5 opacity-50">Hits</span>
+            <span className="text-sm font-black tracking-tighter">{clickCount.toLocaleString()}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="nothing-label text-[8px] mb-0.5 opacity-50">Status</span>
+            <div className="flex items-center gap-1">
+              <div className={`w-1.5 h-1.5 rounded-full ${isExpired ? "bg-(--db-danger)" : "bg-(--db-primary)"}`} />
+              <span className="nothing-label tracking-normal text-[8px] opacity-40">
+                {isExpired ? "EXP" : link.expiresAt ? "TEMP" : "LIVE"}
+              </span>
+            </div>
+          </div>
+          <div className="ml-auto flex items-center gap-0.5">
+            <button onClick={() => onViewStats(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all">
+              <ChartBar size={16} />
+            </button>
+            <button onClick={() => onEdit(link)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all">
+              <PencilSimple size={16} />
+            </button>
+            <button onClick={() => onViewQr(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all">
+              <QrCode size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Desktop layout ── */}
+      <div className="hidden sm:flex sm:items-center sm:gap-4">
         <input
           type="checkbox"
           checked={selected}
           onChange={() => onToggleSelect(link.slug)}
           className="w-4 h-4 accent-(--db-primary) cursor-pointer shrink-0"
         />
-
         <div className="flex-1 min-w-0">
-          <a
-            href={shortUrl}
-            target="_blank"
-            className={`font-dot text-base sm:text-lg font-bold truncate flex items-center gap-1.5 transition-colors ${isCopied ? "text-(--db-primary)" : "text-(--db-text) hover:text-(--db-primary)"}`}
-          >
+          <a href={shortUrl} target="_blank"
+            className={`font-dot text-lg font-bold truncate flex items-center gap-1.5 transition-colors ${isCopied ? "text-(--db-primary)" : "text-(--db-text) hover:text-(--db-primary)"}`}>
             /{link.slug}
             <ArrowSquareOut size={12} className="opacity-20 shrink-0" />
           </a>
-          <span className="text-xs font-semibold text-(--db-text-muted) truncate opacity-50 block" title={link.targetUrl}>
-            {domainLabel}
-          </span>
+          <span className="text-xs font-semibold text-(--db-text-muted) truncate opacity-50 block" title={link.targetUrl}>{domainLabel}</span>
         </div>
-
-        {/* Actions — visible right of slug on mobile */}
-        <div className="flex items-center gap-0.5 shrink-0 sm:hidden">
-          <button onClick={() => onViewStats(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Analytics">
-            <ChartBar size={16} />
-          </button>
-          <button onClick={() => onEdit(link)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Edit">
-            <PencilSimple size={16} />
-          </button>
-          <button onClick={() => onViewQr(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="QR">
-            <QrCode size={16} />
-          </button>
-          <button
-            onClick={handleCopy}
-            className={`p-2.5 rounded-full transition-all ${isCopied ? "bg-(--db-primary) text-(--db-primary-fg)" : "hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary)"}`}
-            title="Copy"
-          >
-            {isCopied ? <Check size={16} /> : <Copy size={16} />}
-          </button>
-        </div>
-      </div>
-
-      {/* Stats row on mobile */}
-      <div className="flex items-center gap-4 pl-7 sm:pl-0 sm:gap-6 sm:flex-1 sm:justify-end">
-        <div className="flex flex-col sm:items-center">
-          <span className="nothing-label text-[8px] mb-0.5">Hits</span>
-          <span className="text-sm font-black text-(--db-text) tracking-tighter">{clickCount.toLocaleString()}</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="nothing-label text-[8px] mb-0.5">Status</span>
-          <div className="flex items-center gap-1.5">
-            <div className={`w-2 h-2 rounded-full ${isExpired ? "bg-(--db-danger)" : "bg-(--db-primary) shadow-[0_0_6px_rgba(163,230,53,0.5)]"}`} />
-            <span className="nothing-label tracking-normal text-[8px] opacity-40">
-              {isExpired ? "EXPIRED" : link.expiresAt ? "TEMP" : "LIVE"}
-            </span>
+        <div className="flex items-center gap-6">
+          <div className="flex flex-col items-center">
+            <span className="nothing-label text-[8px] mb-0.5">Hits</span>
+            <span className="text-sm font-black tracking-tighter">{clickCount.toLocaleString()}</span>
+          </div>
+          <div className="flex flex-col">
+            <span className="nothing-label text-[8px] mb-0.5">Status</span>
+            <div className="flex items-center gap-1.5">
+              <div className={`w-2 h-2 rounded-full ${isExpired ? "bg-(--db-danger)" : "bg-(--db-primary) shadow-[0_0_6px_rgba(163,230,53,0.5)]"}`} />
+              <span className="nothing-label tracking-normal text-[8px] opacity-40">
+                {isExpired ? "EXPIRED" : link.expiresAt ? "TEMP" : "LIVE"}
+              </span>
+            </div>
           </div>
         </div>
       </div>
