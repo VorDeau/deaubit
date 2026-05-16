@@ -302,6 +302,30 @@ button, .btn, .btn-primary, .btn-secondary, .btn-danger {
   backdrop-filter: blur(20px) saturate(160%);
 }
 
+/* ─── Fluid Ring Loader ─── */
+
+@keyframes ring-rotate {
+  from { transform: rotate(-90deg); }
+  to { transform: rotate(270deg); }
+}
+
+@keyframes ring-flow {
+  0%   { stroke-dashoffset: 245; stroke-opacity: 0.3; }
+  40%  { stroke-dashoffset: 35;  stroke-opacity: 1;   }
+  100% { stroke-dashoffset: 245; stroke-opacity: 0.3; }
+}
+
+@keyframes ring-rotate-slow {
+  from { transform: rotate(90deg); }
+  to { transform: rotate(-270deg); }
+}
+
+@keyframes ring-flow-slow {
+  0%   { stroke-dashoffset: 188; stroke-opacity: 0.1; }
+  50%  { stroke-dashoffset: 30;  stroke-opacity: 0.25; }
+  100% { stroke-dashoffset: 188; stroke-opacity: 0.1; }
+}
+
 /* ─── Nothing Dot Grid ─── */
 
 .nothing-dot-grid {

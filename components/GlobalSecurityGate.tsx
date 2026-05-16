@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import { Turnstile } from "@marsidev/react-turnstile";
-import { CircleNotch, Warning, ArrowClockwise } from "@phosphor-icons/react";
+import { Warning, ArrowClockwise } from "@phosphor-icons/react";
 import DeauBitLogo from "./DeauBitLogo";
 
 export default function GlobalSecurityGate({ children }: { children: React.ReactNode }) {
@@ -46,13 +46,10 @@ export default function GlobalSecurityGate({ children }: { children: React.React
 
   return (
     <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-(--db-bg) animate-reveal">
-      <div className="flex flex-col items-center gap-8 text-center p-8 max-w-sm w-full">
-
-        <DeauBitLogo size={56} />
+      <div className="flex flex-col items-center gap-10 text-center p-8 max-w-sm w-full">
 
         {status === "checking" && (
           <>
-            {/* Invisible Turnstile — auto-executes, no visible iframe */}
             {siteKey && (
               <Turnstile
                 siteKey={siteKey}
@@ -61,12 +58,52 @@ export default function GlobalSecurityGate({ children }: { children: React.React
                 options={{ theme: "dark", size: "invisible" }}
               />
             )}
-            <div className="flex flex-col items-center gap-4">
-              <CircleNotch size={28} className="animate-spin text-(--db-primary)" />
-              <div className="space-y-1">
-                <p className="nothing-title text-lg text-(--db-text)">DEAUBIT</p>
-                <p className="nothing-label animate-pulse">Initializing secure connection...</p>
-              </div>
+
+            {/* Fluid ring loader */}
+            <div className="relative flex items-center justify-center" style={{ width: 140, height: 140 }}>
+              {/* Outer ring — slow counter-rotate */}
+              <svg
+                viewBox="0 0 100 100"
+                width={140} height={140}
+                className="absolute inset-0"
+                style={{ animation: "ring-rotate-slow 4s linear infinite", transformOrigin: "50% 50%" }}
+              >
+                <circle
+                  cx="50" cy="50" r="46"
+                  fill="none"
+                  stroke="#a3e635"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeDasharray="289"
+                  style={{ animation: "ring-flow-slow 4s ease-in-out infinite", transformOrigin: "50% 50%" }}
+                />
+              </svg>
+
+              {/* Inner ring — main fluid animation */}
+              <svg
+                viewBox="0 0 100 100"
+                width={110} height={110}
+                className="absolute"
+                style={{ animation: "ring-rotate 1.8s linear infinite", transformOrigin: "50% 50%" }}
+              >
+                <circle
+                  cx="50" cy="50" r="39"
+                  fill="none"
+                  stroke="#a3e635"
+                  strokeWidth="3.5"
+                  strokeLinecap="round"
+                  strokeDasharray="245"
+                  style={{ animation: "ring-flow 1.8s cubic-bezier(0.4,0,0.2,1) infinite", transformOrigin: "50% 50%" }}
+                />
+              </svg>
+
+              {/* Logo center */}
+              <DeauBitLogo size={44} />
+            </div>
+
+            <div className="space-y-1.5">
+              <p className="nothing-title text-base text-(--db-text)">DEAUBIT</p>
+              <p className="nothing-label animate-pulse opacity-40">Initializing secure connection...</p>
             </div>
           </>
         )}

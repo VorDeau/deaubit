@@ -59,19 +59,18 @@ function ShortlinkRow({
   const isExpired = link.expiresAt && new Date() > new Date(link.expiresAt);
 
   return (
-    <div className={`db-card p-4 sm:p-5 flex items-start sm:items-center gap-3 sm:gap-4 transition-all duration-500 hover:shadow-xl bg-(--db-surface) ${selected ? "border-(--db-primary)/40 bg-(--db-primary)/3" : ""} ${isDeleting ? "opacity-0 scale-95 pointer-events-none" : ""}`}>
+    <div className={`db-card p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 transition-all duration-500 hover:shadow-xl bg-(--db-surface) ${selected ? "border-(--db-primary)/40 bg-(--db-primary)/3" : ""} ${isDeleting ? "opacity-0 scale-95 pointer-events-none" : ""}`}>
 
-      <div className="shrink-0 mt-1 sm:mt-0">
+      {/* Top row on mobile: checkbox + slug + actions */}
+      <div className="flex items-center gap-3 sm:contents">
         <input
           type="checkbox"
           checked={selected}
           onChange={() => onToggleSelect(link.slug)}
-          className="w-4 h-4 accent-(--db-primary) cursor-pointer"
+          className="w-4 h-4 accent-(--db-primary) cursor-pointer shrink-0"
         />
-      </div>
 
-      <div className="flex-1 min-w-0 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-6">
-        <div className="flex flex-col min-w-0 sm:flex-1">
+        <div className="flex-1 min-w-0">
           <a
             href={shortUrl}
             target="_blank"
@@ -80,29 +79,51 @@ function ShortlinkRow({
             /{link.slug}
             <ArrowSquareOut size={12} className="opacity-20 shrink-0" />
           </a>
-          <span className="text-xs font-semibold text-(--db-text-muted) truncate opacity-50 mt-0.5" title={link.targetUrl}>
+          <span className="text-xs font-semibold text-(--db-text-muted) truncate opacity-50 block" title={link.targetUrl}>
             {domainLabel}
           </span>
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6">
-          <div className="flex flex-col">
-            <span className="nothing-label text-[8px] mb-0.5">Hits</span>
-            <span className="text-sm font-black text-(--db-text) tracking-tighter">{clickCount.toLocaleString()}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="nothing-label text-[8px] mb-0.5">Status</span>
-            <div className="flex items-center gap-1.5">
-              <div className={`w-2 h-2 rounded-full ${isExpired ? "bg-(--db-danger)" : "bg-(--db-primary) shadow-[0_0_6px_rgba(163,230,53,0.5)]"}`} />
-              <span className="nothing-label tracking-normal text-[8px] opacity-40">
-                {isExpired ? "EXPIRED" : link.expiresAt ? "TEMP" : "LIVE"}
-              </span>
-            </div>
+        {/* Actions — visible right of slug on mobile */}
+        <div className="flex items-center gap-0.5 shrink-0 sm:hidden">
+          <button onClick={() => onViewStats(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Analytics">
+            <ChartBar size={16} />
+          </button>
+          <button onClick={() => onEdit(link)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Edit">
+            <PencilSimple size={16} />
+          </button>
+          <button onClick={() => onViewQr(link.slug)} className="p-2.5 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="QR">
+            <QrCode size={16} />
+          </button>
+          <button
+            onClick={handleCopy}
+            className={`p-2.5 rounded-full transition-all ${isCopied ? "bg-(--db-primary) text-(--db-primary-fg)" : "hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary)"}`}
+            title="Copy"
+          >
+            {isCopied ? <Check size={16} /> : <Copy size={16} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Stats row on mobile */}
+      <div className="flex items-center gap-4 pl-7 sm:pl-0 sm:gap-6 sm:flex-1 sm:justify-end">
+        <div className="flex flex-col sm:items-center">
+          <span className="nothing-label text-[8px] mb-0.5">Hits</span>
+          <span className="text-sm font-black text-(--db-text) tracking-tighter">{clickCount.toLocaleString()}</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="nothing-label text-[8px] mb-0.5">Status</span>
+          <div className="flex items-center gap-1.5">
+            <div className={`w-2 h-2 rounded-full ${isExpired ? "bg-(--db-danger)" : "bg-(--db-primary) shadow-[0_0_6px_rgba(163,230,53,0.5)]"}`} />
+            <span className="nothing-label tracking-normal text-[8px] opacity-40">
+              {isExpired ? "EXPIRED" : link.expiresAt ? "TEMP" : "LIVE"}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-1 shrink-0">
+      {/* Actions — desktop only */}
+      <div className="hidden sm:flex items-center gap-1 shrink-0">
         <button onClick={() => onViewStats(link.slug)} className="p-2 rounded-full hover:bg-(--db-primary)/15 text-(--db-text-muted) hover:text-(--db-primary) transition-all" title="Analytics">
           <ChartBar size={15} />
         </button>
