@@ -9,6 +9,7 @@ preview_urls = false
 directory = "../out"
 binding = "ASSETS"
 not_found_handling = "none"
+run_worker_first = true
 
 [[d1_databases]]
 binding = "DB"
