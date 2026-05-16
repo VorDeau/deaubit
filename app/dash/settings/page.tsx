@@ -54,6 +54,7 @@ export default function SettingsPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Update failed");
       setProfileMessage("NAME_UPDATED");
+      window.dispatchEvent(new CustomEvent("db:profile-updated", { detail: { name } }));
     } catch (err) {
       setProfileError(err instanceof Error ? err.message : "Update failed");
     } finally { setLoadingProfile(false); }

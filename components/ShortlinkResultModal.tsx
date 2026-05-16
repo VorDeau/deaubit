@@ -58,7 +58,7 @@ export default function ShortlinkResultModal({ result, onClose }: ShortlinkResul
             </div>
           </div>
 
-          <div className="flex-1 w-full space-y-6 sm:space-y-8">
+          <div className="flex-1 w-full min-w-0 space-y-6 sm:space-y-8">
             <div className="space-y-2">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl nothing-title text-(--db-text)">LINK_READY</h3>
               <p className="nothing-label text-[10px] tracking-[0.2em] opacity-50">RELATIONAL_ACCESS_IDENTIFIER</p>

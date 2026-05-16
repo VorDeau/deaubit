@@ -117,6 +117,7 @@ export function CreateShortlinkCard({
                     type="datetime-local"
                     className="db-input pl-10!"
                     value={expiresAt}
+                    min={(() => { const d = new Date(Date.now() + 3600000); const off = d.getTimezoneOffset(); return new Date(d.getTime() - off * 60000).toISOString().slice(0, 16); })()}
                     onChange={(e) => onChangeExpiresAt(e.target.value)}
                     disabled={loading}
                   />

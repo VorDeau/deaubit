@@ -17,23 +17,30 @@ export default function DeauBitLogo({ size = 48, className = "" }: DeauBitLogoPr
         xmlns="http://www.w3.org/2000/svg"
         className="w-full h-full"
       >
-        {/* Lime chip — primary brand color as background */}
+        {/* Lime chip */}
         <rect width="100" height="100" rx="22" fill="#a3e635" />
 
         {/* Bold D */}
         <text
           x="50"
-          y="74"
+          y="75"
           textAnchor="middle"
           fill="#0a0a0a"
+          stroke="#0a0a0a"
+          strokeWidth="3"
+          strokeLinejoin="round"
+          paintOrder="stroke"
           style={{
-            fontSize: "64px",
-            fontFamily: "'Courier New', Courier, monospace",
+            fontSize: "68px",
+            fontFamily: "'Arial Black', 'Arial Bold', Arial, sans-serif",
             fontWeight: 900,
           }}
         >
           D
         </text>
+
+        {/* Nothing OS dot */}
+        <circle cx="76" cy="79" r="6" fill="#0a0a0a" opacity="0.3" />
       </svg>
     </div>
   );

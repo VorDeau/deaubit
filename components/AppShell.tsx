@@ -33,6 +33,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       .catch(() => {});
   }, [isDashboard]);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { name } = (e as CustomEvent<{ name: string }>).detail;
+      setUser(prev => prev ? { ...prev, name } : prev);
+    };
+    window.addEventListener("db:profile-updated", handler);
+    return () => window.removeEventListener("db:profile-updated", handler);
+  }, []);
+
   async function handleLogout() {
     await fetch("/api/logout", { method: "POST" });
     router.push("/");

@@ -8,7 +8,9 @@ import { CreateShortlinkCard } from "@/components/CreateShortlinkCard";
 import AnalyticsModal from "@/components/AnalyticsModal";
 import QrCodeModal from "@/components/QrCodeModal";
 import EditShortlinkModal from "@/components/EditShortlinkModal";
+import ShortlinkResultModal from "@/components/ShortlinkResultModal";
 import { Trash, CircleNotch } from "@phosphor-icons/react";
+import type { ShortlinkResult } from "@/types";
 
 export default function DashboardPage() {
   const [links, setLinks] = useState<ShortLink[]>([]);
@@ -29,6 +31,7 @@ export default function DashboardPage() {
   const [qrSlug, setQrSlug] = useState<string | null>(null);
   const [editingLink, setEditingLink] = useState<ShortLink | null>(null);
 
+  const [createdLink, setCreatedLink] = useState<ShortlinkResult | null>(null);
   const [pendingDeleteSlugs, setPendingDeleteSlugs] = useState<string[]>([]);
   const [deletingSlugs, setDeletingSlugs] = useState<string[]>([]);
   const [deleteLoading, setDeleteLoading] = useState(false);
@@ -61,6 +64,7 @@ export default function DashboardPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Failed");
       setTargetUrl(""); setSlug(""); setPassword(""); setExpiresAt("");
+      setCreatedLink({ slug: data.slug, shortUrl: data.shortUrl });
       fetchLinks(1);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Error");
@@ -138,6 +142,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Modals ── */}
+      {createdLink && <ShortlinkResultModal result={createdLink} onClose={() => setCreatedLink(null)} />}
       {analyticsSlug && <AnalyticsModal slug={analyticsSlug} onClose={() => setAnalyticsSlug(null)} />}
       {qrSlug && <QrCodeModal slug={qrSlug} shortUrl={`${baseUrl}/${qrSlug}`} onClose={() => setQrSlug(null)} />}
       {editingLink && <EditShortlinkModal link={editingLink} onClose={() => setEditingLink(null)} onUpdate={() => fetchLinks(currentPage)} />}
