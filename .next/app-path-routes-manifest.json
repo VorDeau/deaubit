@@ -1,0 +1,18 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/account-deleted/page": "/account-deleted",
+  "/admin/delete/page": "/admin/delete",
+  "/admin/page": "/admin",
+  "/dash/page": "/dash",
+  "/dash/settings/page": "/dash/settings",
+  "/forgot-password/page": "/forgot-password",
+  "/page": "/",
+  "/privacy/page": "/privacy",
+  "/register/page": "/register",
+  "/report/page": "/report",
+  "/reset-password/page": "/reset-password",
+  "/setup/page": "/setup",
+  "/terms/page": "/terms",
+  "/verify/page": "/verify"
+}

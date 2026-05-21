@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/account-deleted/layout,_N_T_/account-deleted/page,_N_T_/account-deleted"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/account-deleted/__PAGE__",
+    "/account-deleted",
+    "/_index",
+    "/_head"
+  ]
+}
