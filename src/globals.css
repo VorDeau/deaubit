@@ -1,0 +1,323 @@
+@import "tailwindcss";
+
+:root {
+  --font-sans: 'Inter', sans-serif;
+  --font-dot: 'DotGothic16', monospace;
+  color-scheme: dark;
+  --db-bg: #000000;
+  --db-surface: #0a0a0a;
+  --db-surface-hover: #141414;
+  --db-border: #262626;
+  --db-text: #f0f0f0;
+  --db-text-muted: #888888;
+  --db-primary: #a3e635;
+  --db-primary-fg: #0a0a0a;
+  --db-accent: #f0f0f0;
+  --db-accent-fg: #0a0a0a;
+  --db-danger: #ef4444;
+  --db-danger-fg: #ffffff;
+}
+
+body {
+  background-color: var(--db-bg);
+}
+
+::selection {
+  background-color: var(--db-primary);
+  color: white;
+}
+
+body {
+  background-color: var(--db-bg);
+  background-image: radial-gradient(circle, var(--db-border) 0.75px, transparent 0.75px);
+  background-size: 22px 22px;
+  color: var(--db-text);
+  font-family: var(--font-sans), sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.db-card {
+  background-color: var(--db-surface);
+  border: 1px solid var(--db-border);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .db-card { border-radius: 28px; }
+}
+
+.glass-panel {
+  background: color-mix(in srgb, var(--db-surface) 80%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--db-border);
+}
+
+.db-input {
+  background-color: #111111;
+  border: 1.5px solid var(--db-border);
+  border-radius: 9999px;
+  padding: 0.75rem 1.25rem;
+  color: var(--db-text);
+  font-weight: 600;
+  width: 100%;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  outline: none;
+}
+
+@media (min-width: 768px) {
+  .db-input { padding: 0.875rem 1.5rem; font-size: 15px; }
+}
+
+.db-input:focus {
+  border-color: var(--db-primary);
+  background-color: #1a1a1a;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--db-primary) 15%, transparent);
+}
+
+textarea.db-input {
+  border-radius: 16px;
+}
+
+button, .btn, .btn-primary, .btn-secondary, .btn-danger {
+  border-radius: 9999px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  padding: 0.75rem 1.5rem;
+  font-size: 0.75rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  button, .btn, .btn-primary, .btn-secondary, .btn-danger {
+    padding: 0.875rem 2rem; font-size: 0.875rem; letter-spacing: 0.15em;
+  }
+}
+
+.btn-primary {
+  background-color: var(--db-primary);
+  color: var(--db-primary-fg) !important;
+}
+
+.btn-primary:hover {
+  background-color: color-mix(in srgb, var(--db-primary) 85%, #000000);
+}
+
+.btn-secondary {
+  background-color: transparent;
+  border: 1.5px solid var(--db-border);
+  color: var(--db-text);
+}
+
+.btn-secondary:hover {
+  background-color: var(--db-surface-hover);
+}
+
+.btn-danger {
+  background-color: var(--db-danger);
+  color: var(--db-danger-fg) !important;
+}
+
+.font-dot { font-family: var(--font-dot), monospace; }
+
+.nothing-label {
+  font-family: var(--font-dot);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: var(--db-text-muted);
+}
+
+@media (min-width: 768px) {
+  .nothing-label { font-size: 10px; letter-spacing: 0.2em; }
+}
+
+.nothing-title {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.05em;
+  line-height: 0.9;
+}
+
+.container-nothing {
+  width: 100%;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+@media (min-width: 640px) {
+  .container-nothing { padding-left: 1.5rem; padding-right: 1.5rem; }
+}
+
+@media (min-width: 1024px) {
+  .container-nothing { padding-left: 2rem; padding-right: 2rem; }
+}
+
+@media (min-width: 1280px) {
+  .container-nothing { max-width: 1280px; }
+}
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: var(--db-border); border-radius: 10px; }
+
+.typewriter-text {
+  overflow: hidden;
+  border-right: 3px solid var(--db-primary);
+  white-space: nowrap;
+  animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+}
+
+@keyframes typing { from { width: 0 } to { width: 100% } }
+@keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--db-primary) } }
+
+@keyframes page-reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-reveal {
+  animation: page-reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+@keyframes error-shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+}
+
+.animate-error-shake {
+  animation: error-shake 0.38s cubic-bezier(0.36, 0.07, 0.19, 0.97);
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.97); }
+}
+
+.animate-soft-pulse {
+  animation: soft-pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes item-enter {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-item-enter {
+  animation: item-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-item-enter:nth-child(1) { animation-delay: 0ms; }
+.animate-item-enter:nth-child(2) { animation-delay: 45ms; }
+.animate-item-enter:nth-child(3) { animation-delay: 90ms; }
+.animate-item-enter:nth-child(4) { animation-delay: 135ms; }
+.animate-item-enter:nth-child(5) { animation-delay: 180ms; }
+.animate-item-enter:nth-child(6) { animation-delay: 225ms; }
+.animate-item-enter:nth-child(7) { animation-delay: 270ms; }
+.animate-item-enter:nth-child(8) { animation-delay: 315ms; }
+.animate-item-enter:nth-child(9) { animation-delay: 360ms; }
+.animate-item-enter:nth-child(10) { animation-delay: 405ms; }
+
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.animate-modal-in {
+  animation: modal-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-count-up {
+  animation: count-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+@keyframes bar-fill {
+  from { width: 0%; }
+}
+
+.animate-bar-fill {
+  animation: bar-fill 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+}
+
+@keyframes signal-ping {
+  0% { transform: scale(1); opacity: 0.8; }
+  70% { transform: scale(2.2); opacity: 0; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.signal-dot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.signal-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: signal-ping 1.8s ease-out infinite;
+}
+
+.db-overlay {
+  background-color: rgba(0, 0, 0, 0.92);
+  backdrop-filter: blur(20px) saturate(160%);
+}
+
+@keyframes caret-drift {
+  0%, 100% { transform: translateY(0px); opacity: 0.35; }
+  50%       { transform: translateY(7px); opacity: 0.65; }
+}
+
+@keyframes ring-rotate {
+  from { transform: rotate(-90deg); }
+  to { transform: rotate(270deg); }
+}
+
+@keyframes ring-flow {
+  0%   { stroke-dashoffset: 245; stroke-opacity: 0.3; }
+  40%  { stroke-dashoffset: 35;  stroke-opacity: 1;   }
+  100% { stroke-dashoffset: 245; stroke-opacity: 0.3; }
+}
+
+@keyframes ring-rotate-slow {
+  from { transform: rotate(90deg); }
+  to { transform: rotate(-270deg); }
+}
+
+@keyframes ring-flow-slow {
+  0%   { stroke-dashoffset: 188; stroke-opacity: 0.1; }
+  50%  { stroke-dashoffset: 30;  stroke-opacity: 0.25; }
+  100% { stroke-dashoffset: 188; stroke-opacity: 0.1; }
+}
+
+.nothing-dot-grid {
+  background-image: radial-gradient(circle, var(--db-border) 1px, transparent 1px);
+  background-size: 22px 22px;
+}

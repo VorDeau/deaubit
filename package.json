@@ -1,30 +1,45 @@
 {
   "name": "deaubit",
-  "version": "11.1.0",
+  "version": "13.0.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "dev": "concurrently \"vite\" \"wrangler dev --config wrangler.toml\"",
+    "build": "vite build",
+    "deploy": "vite build && wrangler deploy",
+    "lint": "eslint",
+    "db:migrate": "wrangler d1 migrations apply deaubit-db --config wrangler.toml",
+    "db:migrate:local": "wrangler d1 migrations apply deaubit-db --local --config wrangler.toml",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.4.1",
     "@phosphor-icons/react": "^2.1.10",
-    "next": "^16.2.6",
+    "bcryptjs": "^3.0.3",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.7.11",
+    "jose": "^5.9.6",
     "qrcode.react": "^4.2.0",
     "react": "19.2.1",
     "react-dom": "19.2.1",
-    "recharts": "^3.5.1"
+    "react-router-dom": "^7.6.0",
+    "recharts": "^3.5.1",
+    "ua-parser-js": "^2.0.6"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.17",
+    "@cloudflare/workers-types": "^4.20250430.0",
+    "@tailwindcss/vite": "^4.1.17",
+    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/ua-parser-js": "^0.7.39",
+    "@vitejs/plugin-react": "^4.5.2",
+    "concurrently": "^9.1.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.1",
-    "eslint-config-next": "16.0.3",
     "tailwindcss": "^4.1.17",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vite": "^6.3.5",
+    "wrangler": "^4.92.0"
   }
 }
