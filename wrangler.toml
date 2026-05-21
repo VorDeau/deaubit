@@ -1,0 +1,38 @@
+name = "deaubit"
+main = "src/api/index.ts"
+compatibility_date = "2025-04-01"
+compatibility_flags = ["nodejs_compat"]
+workers_dev = false
+preview_urls = false
+
+[assets]
+directory = "out"
+binding = "ASSETS"
+not_found_handling = "none"
+run_worker_first = true
+
+[[d1_databases]]
+binding = "DB"
+database_name = "deaubit-db"
+database_id = "YOUR_DB_ID"
+migrations_dir = "migrations"
+
+[[kv_namespaces]]
+binding = "SESSION"
+id = "YOUR_KV_ID"
+
+[vars]
+APP_HOST = "YOUR_APP_HOST"
+PROTOCOL = "https"
+SHORT_HOST = "YOUR_SHORT_HOST"
+REDIRECT_HOST = "YOUR_REDIRECT_HOST"
+AUTH_URL = "YOUR_AUTH_URL"
+SERVICE_SECRET = "YOUR_SERVICE_SECRET"
+TURNSTILE_SITE_KEY = "YOUR_TURNSTILE_SITE_KEY"
+
+[triggers]
+crons = ["0 3 * * *"]
+
+[observability]
+enabled = true
+head_sampling_rate = 1
